@@ -4,24 +4,28 @@ const styles: any = StyleSheet.create({
   container: {
     backgroundColor: 'transparent',
     flex: 1,
-    paddingBottom: 20,
-    paddingHorizontal: 15,
+    justifyContent: 'space-between',
+    paddingBottom: 15,
   },
-  logoContainer: {
+  dotsContainer: {
     alignItems: 'center',
-    flexGrow: 1,
+    flexDirection: 'row',
     justifyContent: 'center',
-    width: '100%',
+    paddingVertical: 15,
   },
-  logo: {
-    width: '65%',
-  },
-  buttonsContainer: {
-    paddingHorizontal: 15,
-    width: '100%',
+  dot: {
+    height: 20,
+    width: 20,
+    marginHorizontal: 10,
   },
   background: {
     flex: 1,
+  },
+  header: {
+    backgroundColor: '#090909'
+  },
+  title: {
+    color: '#Fff'
   }
 });
 
