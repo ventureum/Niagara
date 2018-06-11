@@ -136,6 +136,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-vector-icons')
     compile project(':react-native-sensitive-info')
     compile project(':react-native-randombytes')
     compile project(':react-native-linear-gradient')

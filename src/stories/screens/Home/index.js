@@ -13,6 +13,7 @@ import {
   List,
   ListItem
 } from "native-base";
+import TabFooter from '../../components/TabFooter'
 
 import styles from "./styles";
 export interface Props {
@@ -30,7 +31,7 @@ class Home extends React.Component<Props, State> {
               <Icon
                 active
                 name="menu"
-                onPress={() => this.props.navigation.navigate("DrawerOpen")}
+                onPress={() => this.props.navigation.openDrawer()}
               />
             </Button>
           </Left>
@@ -54,6 +55,7 @@ class Home extends React.Component<Props, State> {
             ))}
           </List>
         </Content>
+        <TabFooter active="assets" />
       </Container>
     );
   }

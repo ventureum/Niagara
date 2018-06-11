@@ -18,7 +18,7 @@ class PinCode extends React.Component<Props, State> {
   };
 
   onAuthSuccess = () => {
-    this.props.navigation.navigate('Home');
+    this.props.navigation.navigate('Drawer');
   };
 
   onBackPress = () => {
