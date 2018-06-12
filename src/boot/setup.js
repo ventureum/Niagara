@@ -1,3 +1,4 @@
+import '../../global'
 import * as React from 'react'
 import { StyleProvider } from 'native-base'
 import { Provider } from 'react-redux'

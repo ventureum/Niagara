@@ -14,6 +14,14 @@ const routes = [
   {
     route: 'Login',
     caption: 'Logout'
+  },
+  {
+    route: 'SendPage',
+    caption: 'Send'
+  },
+  {
+    route: 'ReceivePage',
+    caption: 'Receive'
   }
 ]
 
