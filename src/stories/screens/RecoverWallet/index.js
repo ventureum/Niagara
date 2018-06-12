@@ -1,21 +1,17 @@
-import * as React from "react";
-import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
-import { Container, Content, Header, Body, Title, Button, Text, View, Icon, Left, Right, Footer } from "native-base";
-import LinearGradient from 'react-native-linear-gradient';
-import EthereumJsWallet from 'ethereumjs-wallet';
+import * as React from 'react'
+import { Header, Body, Title, Button, Text, View, Icon, Left, Right } from 'native-base'
+import LinearGradient from 'react-native-linear-gradient'
+import EthereumJsWallet from 'ethereumjs-wallet'
 
-import styles from "./styles";
-import cameraIcon from './images/camera.png';
+import styles from './styles'
+import cameraIcon from './images/camera.png'
 import {
   Alert,
   Image,
   SafeAreaView,
-  StyleSheet,
   TextInput,
-  TouchableOpacity,
-} from 'react-native';
-
+  TouchableOpacity
+} from 'react-native'
 
 export interface Props {
   navigation: any;
@@ -29,59 +25,59 @@ class RecoverWallet extends React.Component<Props, State> {
 
   onBarCodeRead = privateKey => {
     this.setState({
-      privateKey,
-    });
+      privateKey
+    })
   };
 
   onCameraPress = () => {
     this.props.navigation.navigate('Camera', {
-      onBarCodeRead: this.onBarCodeRead,
-    });
+      onBarCodeRead: this.onBarCodeRead
+    })
   };
 
   importWallet = async () => {
     try {
-      this.recoverWallet(this.state.privateKey);
+      this.recoverWallet(this.state.privateKey)
     } catch (error) {
       Alert.alert(
         'Private key',
-        'Your private key is invalid. Please try again.',
-      );
-      return;
+        'Your private key is invalid. Please try again.'
+      )
+      return
     }
-    
+
     setTimeout(() => {
       Alert.alert(
         'Success',
-        "Wallet recovered! Address: " + this.state.wallet.getAddressString(),
-      );
-      this.props.navigation.navigate('Home');
+        'Wallet recovered! Address: ' + this.state.wallet.getAddressString()
+      )
+      this.props.navigation.navigate('Home')
     }, 0)
-    
+
     // this.props.navigation.navigate('Wallet');
   };
 
   recoverWallet (privateKey) {
     const wallet = EthereumJsWallet.fromPrivateKey(
-      Buffer.from(privateKey, 'hex'),
-    );
-    this.props.setWalletAddress(wallet.getAddressString());
-    this.props.setPrivateKey(wallet.getPrivateKey().toString('hex'));
+      Buffer.from(privateKey, 'hex')
+    )
+    this.props.setWalletAddress(wallet.getAddressString())
+    this.props.setPrivateKey(wallet.getPrivateKey().toString('hex'))
     this.setState({
       wallet
     })
   }
 
-  render() {
+  render () {
     return (
-			<LinearGradient colors={['#090909', '#181724']} style={styles.background}>
+      <LinearGradient colors={['#090909', '#181724']} style={styles.background}>
         <SafeAreaView style={styles.container}>
           <Header iosBarStyle='light-content' style={styles.header}>
             <Left>
               <Button transparent>
                 <Icon
                   active
-                  name="arrow-back"
+                  name='arrow-back'
                   onPress={() => this.props.navigation.goBack()}
                 />
               </Button>
@@ -98,12 +94,12 @@ class RecoverWallet extends React.Component<Props, State> {
                 <TextInput
                   autoCorrect={false}
                   onChangeText={privateKey => this.setState({ privateKey })}
-                  placeholder="0x..."
-                  placeholderTextColor="#9d9d9d"
-                  returnKeyType="done"
-                  selectionColor="#4D00FF"
+                  placeholder='0x...'
+                  placeholderTextColor='#9d9d9d'
+                  returnKeyType='done'
+                  selectionColor='#4D00FF'
                   style={styles.formInput}
-                  underlineColorAndroid="transparent"
+                  underlineColorAndroid='transparent'
                   value={this.state.privateKey}
                 />
                 <TouchableOpacity onPress={this.onCameraPress}>
@@ -121,9 +117,9 @@ class RecoverWallet extends React.Component<Props, State> {
             </Button>
           </View>
         </SafeAreaView>
-			</LinearGradient>
-		);
+      </LinearGradient>
+    )
   }
 }
 
-export default RecoverWallet;
+export default RecoverWallet

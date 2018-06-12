@@ -1,12 +1,12 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native'
 
 const styles: any = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   preview: {
     flex: 1,
-    marginTop: 15,
+    marginTop: 15
   },
   header: {
     backgroundColor: '#090909'
@@ -14,6 +14,6 @@ const styles: any = StyleSheet.create({
   title: {
     color: '#fff'
   }
-});
+})
 
-export default styles;
+export default styles

@@ -1,12 +1,11 @@
-import * as React from "react";
-import { Alert, SafeAreaView } from 'react-native';
-import PropTypes from 'prop-types';
-import { Container, Content, Header, Body, Title, Button, Text, View, Icon, Left, Right, Footer } from "native-base";
-import PinKeyboard from '../../components/PinKeyboard';
-import PinIndicator from '../../components/PinIndicator';
-import LinearGradient from 'react-native-linear-gradient';
+import * as React from 'react'
+import { Alert, SafeAreaView } from 'react-native'
+import { Header, Body, Title, Button, Icon, Left, Right } from 'native-base'
+import PinKeyboard from '../../components/PinKeyboard'
+import PinIndicator from '../../components/PinIndicator'
+import LinearGradient from 'react-native-linear-gradient'
 
-import styles from "./styles";
+import styles from './styles'
 export interface Props {
   navigation: any;
   pinCode: string;
@@ -14,53 +13,53 @@ export interface Props {
 
 class PinCode extends React.Component<Props, State> {
   state = {
-    pinCode: '',
+    pinCode: ''
   };
 
   onAuthSuccess = () => {
-    this.props.navigation.navigate('Drawer');
+    this.props.navigation.navigate('Drawer')
   };
 
   onBackPress = () => {
     this.setState({
-      pinCode: this.state.pinCode.slice(0, -1),
-    });
+      pinCode: this.state.pinCode.slice(0, -1)
+    })
   };
 
   onKeyPress = n => {
-    this.updatePinCode(n);
+    this.updatePinCode(n)
   };
 
   updatePinCode = n => {
     this.setState(
       {
-        pinCode: `${this.state.pinCode}${n}`,
+        pinCode: `${this.state.pinCode}${n}`
       },
       () => {
         if (this.state.pinCode.length === 4) {
           if (this.state.pinCode === this.props.pinCode) {
             setTimeout(() => {
-              this.onAuthSuccess();
-            });
+              this.onAuthSuccess()
+            })
           } else {
             this.setState(
               {
-                pinCode: '',
+                pinCode: ''
               },
               () => {
                 Alert.alert(
                   'PIN Code',
-                  'Your PIN code is incorrect. Please try again.',
-                );
-              },
-            );
+                  'Your PIN code is incorrect. Please try again.'
+                )
+              }
+            )
           }
         }
-      },
-    );
+      }
+    )
   };
 
-  render() {
+  render () {
     return (
       <LinearGradient colors={['#090909', '#181724']} style={styles.background}>
         <SafeAreaView style={styles.container}>
@@ -69,7 +68,7 @@ class PinCode extends React.Component<Props, State> {
               <Button transparent>
                 <Icon
                   active
-                  name="arrow-back"
+                  name='arrow-back'
                   onPress={() => this.props.navigation.goBack()}
                 />
               </Button>
@@ -88,8 +87,8 @@ class PinCode extends React.Component<Props, State> {
           />
         </SafeAreaView>
       </LinearGradient>
-    );
+    )
   }
 }
 
-export default PinCode;
+export default PinCode

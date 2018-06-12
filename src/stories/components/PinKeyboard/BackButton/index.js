@@ -1,63 +1,63 @@
-import React, { Component } from 'react';
-import { Image, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import PropTypes from 'prop-types';
-import FingerprintScanner from 'react-native-fingerprint-scanner';
-import DialogAndroid from 'react-native-dialogs';
-import Text from '../../Text';
-import arrowIcon from './images/arrow.png';
-import touchIdIcon from './images/touchid.png';
+import React, { Component } from 'react'
+import { Image, StyleSheet, TouchableOpacity, Platform } from 'react-native'
+import PropTypes from 'prop-types'
+import FingerprintScanner from 'react-native-fingerprint-scanner'
+import DialogAndroid from 'react-native-dialogs'
+import Text from '../../Text'
+import arrowIcon from './images/arrow.png'
+import touchIdIcon from './images/touchid.png'
 
 const styles = StyleSheet.create({
   keyboardKey: {
     flex: 1,
     flexGrow: 1,
-    paddingVertical: 20,
+    paddingVertical: 20
   },
   textPlaceholder: {
     color: 'transparent',
-    fontSize: 40,
+    fontSize: 40
   },
   arrowKey: {
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   arrowIcon: {
     height: 24,
-    width: 24,
+    width: 24
   },
   touchIdIcon: {
     height: 40,
-    width: 40,
-  },
-});
+    width: 40
+  }
+})
 
 export default class BackButton extends Component {
   static propTypes = {
     onBackPress: PropTypes.func.isRequired,
     onAuthSuccess: PropTypes.func,
-    showBackButton: PropTypes.bool.isRequired,
+    showBackButton: PropTypes.bool.isRequired
   };
 
   static defaultProps = {
-    onAuthSuccess: null,
+    onAuthSuccess: null
   };
 
   state = {
-    isTouchIdSupported: false,
+    isTouchIdSupported: false
   };
 
-  componentDidMount() {
+  componentDidMount () {
     if (this.props.onAuthSuccess) {
-      this.checkTouchIdSupport();
+      this.checkTouchIdSupport()
     }
   }
 
   onTouchIdClick = async () => {
-    let dialog;
+    let dialog
 
     try {
       if (Platform.OS === 'android') {
-        dialog = new DialogAndroid();
+        dialog = new DialogAndroid()
 
         dialog.set({
           title: 'Authentication Required',
@@ -65,50 +65,50 @@ export default class BackButton extends Component {
           negativeColor: '#4D00FF',
           negativeText: 'Cancel',
           onNegative: () => {
-            FingerprintScanner.release();
-          },
-        });
+            FingerprintScanner.release()
+          }
+        })
 
-        dialog.show();
+        dialog.show()
 
         await FingerprintScanner.authenticate({
-          onAttempt: () => {},
-        });
+          onAttempt: () => {}
+        })
 
-        this.props.onAuthSuccess();
+        this.props.onAuthSuccess()
 
-        dialog.dismiss();
+        dialog.dismiss()
       } else {
         await FingerprintScanner.authenticate({
-          description: 'Wallet access',
-        });
+          description: 'Wallet access'
+        })
 
-        this.props.onAuthSuccess();
+        this.props.onAuthSuccess()
       }
     } catch (error) {
       if (dialog) {
-        dialog.dismiss();
+        dialog.dismiss()
       }
     }
   };
 
   checkTouchIdSupport = async () => {
     try {
-      const isSensorAvailable = await FingerprintScanner.isSensorAvailable();
+      const isSensorAvailable = await FingerprintScanner.isSensorAvailable()
 
       if (isSensorAvailable) {
         this.setState({
-          isTouchIdSupported: true,
-        });
+          isTouchIdSupported: true
+        })
 
-        this.onTouchIdClick();
+        this.onTouchIdClick()
       }
     } catch (error) {
       // An error happened during biometric detection
     }
   };
 
-  render() {
+  render () {
     if (this.props.showBackButton) {
       return (
         <TouchableOpacity
@@ -117,7 +117,7 @@ export default class BackButton extends Component {
         >
           <Image source={arrowIcon} style={styles.arrowIcon} />
         </TouchableOpacity>
-      );
+      )
     } else if (this.state.isTouchIdSupported) {
       return (
         <TouchableOpacity
@@ -126,13 +126,13 @@ export default class BackButton extends Component {
         >
           <Image source={touchIdIcon} style={styles.touchIdIcon} />
         </TouchableOpacity>
-      );
+      )
     }
 
     return (
       <TouchableOpacity style={styles.keyboardKey}>
         <Text style={styles.textPlaceholder}> 0 </Text>
       </TouchableOpacity>
-    );
+    )
   }
 }

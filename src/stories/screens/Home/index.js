@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react'
 import {
   Container,
   Header,
@@ -12,17 +12,17 @@ import {
   Right,
   List,
   ListItem
-} from "native-base";
+} from 'native-base'
 import TabFooter from '../../components/TabFooter'
 
-import styles from "./styles";
+import styles from './styles'
 export interface Props {
   navigation: any;
   list: any;
 }
 export interface State {}
 class Home extends React.Component<Props, State> {
-  render() {
+  render () {
     return (
       <Container style={styles.container}>
         <Header>
@@ -30,7 +30,7 @@ class Home extends React.Component<Props, State> {
             <Button transparent>
               <Icon
                 active
-                name="menu"
+                name='menu'
                 onPress={() => this.props.navigation.openDrawer()}
               />
             </Button>
@@ -46,7 +46,7 @@ class Home extends React.Component<Props, State> {
               <ListItem
                 key={i}
                 onPress={() =>
-                  this.props.navigation.navigate("BlankPage", {
+                  this.props.navigation.navigate('BlankPage', {
                     name: { item }
                   })}
               >
@@ -55,10 +55,10 @@ class Home extends React.Component<Props, State> {
             ))}
           </List>
         </Content>
-        <TabFooter active="assets" />
+        <TabFooter active='assets' />
       </Container>
-    );
+    )
   }
 }
 
-export default Home;
+export default Home

@@ -1,13 +1,12 @@
-import * as React from "react";
-import { Alert, SafeAreaView } from 'react-native';
-import PropTypes from 'prop-types';
-import { Container, Content, Header, Body, Title, Button, Text, View, Icon, Left, Right, Footer } from "native-base";
-import PinKeyboard from '../../components/PinKeyboard';
-import PinIndicator from '../../components/PinIndicator';
-import LinearGradient from 'react-native-linear-gradient';
-import EthereumJsWallet from 'ethereumjs-wallet';
+import * as React from 'react'
+import { Alert, SafeAreaView } from 'react-native'
+import { Header, Body, Title, Button, Text, View, Icon, Left, Right } from 'native-base'
+import PinKeyboard from '../../components/PinKeyboard'
+import PinIndicator from '../../components/PinIndicator'
+import LinearGradient from 'react-native-linear-gradient'
+import EthereumJsWallet from 'ethereumjs-wallet'
 
-import styles from "./styles";
+import styles from './styles'
 export interface Props {
   navigation: any;
 }
@@ -23,113 +22,113 @@ class CreateWallet extends React.Component<Props, State> {
   onBackPress = () => {
     if (!this.state.isConfirmation) {
       this.setState({
-        pinCode: this.state.pinCode.slice(0, -1),
-      });
+        pinCode: this.state.pinCode.slice(0, -1)
+      })
     } else {
       this.setState({
-        confirmationPinCode: this.state.confirmationPinCode.slice(0, -1),
-      });
+        confirmationPinCode: this.state.confirmationPinCode.slice(0, -1)
+      })
     }
   };
 
   onKeyPress = n => {
     if (!this.state.isConfirmation) {
-      this.updatePinCode(n);
+      this.updatePinCode(n)
     } else {
-      this.updateConfirmationPinCode(n);
+      this.updateConfirmationPinCode(n)
     }
   };
 
   updatePinCode = n => {
     this.setState(
       {
-        pinCode: `${this.state.pinCode}${n}`,
+        pinCode: `${this.state.pinCode}${n}`
       },
       () => {
         if (this.state.pinCode.length === 4) {
           this.setState({
-            isConfirmation: true,
-          });
+            isConfirmation: true
+          })
         }
-      },
-    );
+      }
+    )
   };
 
   updateConfirmationPinCode = n => {
     this.setState(
       {
-        confirmationPinCode: `${this.state.confirmationPinCode}${n}`,
+        confirmationPinCode: `${this.state.confirmationPinCode}${n}`
       },
       async () => {
         if (
           this.state.confirmationPinCode.length === 4 &&
           this.state.pinCode === this.state.confirmationPinCode
         ) {
-          this.props.setPinCode(this.state.pinCode);
+          this.props.setPinCode(this.state.pinCode)
 
           if (this.props.navigation.getParam('recoverMode', false)) {
-            this.props.navigation.navigate('RecoverWallet');
-            return;
+            this.props.navigation.navigate('RecoverWallet')
+            return
           } else if (
             !this.props.navigation.getParam('editMode', false) &&
             !this.props.navigation.getParam('migrationMode', false)
           ) {
-            this.generateWallet();
+            this.generateWallet()
           }
 
           setTimeout(() => {
             Alert.alert(
               'Success',
-              "Wallet created! Address: " + this.state.wallet.getAddressString(),
-            );
-            this.props.navigation.navigate('Home');
-          });
+              'Wallet created! Address: ' + this.state.wallet.getAddressString()
+            )
+            this.props.navigation.navigate('Home')
+          })
         } else if (this.state.confirmationPinCode.length === 4) {
           this.setState(
             {
               pinCode: '',
               confirmationPinCode: '',
-              isConfirmation: false,
+              isConfirmation: false
             },
             () => {
               Alert.alert(
                 'PIN Code',
-                "Your PIN code doesn't match. Please try again.",
-              );
-            },
-          );
+                "Your PIN code doesn't match. Please try again."
+              )
+            }
+          )
         }
-      },
-    );
+      }
+    )
   };
 
   generateWallet () {
-    const wallet = EthereumJsWallet.generate();
-    this.props.setWalletAddress(wallet.getAddressString());
-    this.props.setPrivateKey(wallet.getPrivateKey().toString('hex'));
+    const wallet = EthereumJsWallet.generate()
+    this.props.setWalletAddress(wallet.getAddressString())
+    this.props.setPrivateKey(wallet.getPrivateKey().toString('hex'))
     this.setState({
       wallet
     })
   }
 
-  render() {
+  render () {
     const pinCode = this.state.isConfirmation
       ? this.state.confirmationPinCode
-      : this.state.pinCode;
+      : this.state.pinCode
 
     const originalTitle = this.props.navigation.getParam('editMode', false)
       ? 'Change PIN'
-      : 'Create PIN';
+      : 'Create PIN'
 
-  	return (
-			<LinearGradient colors={['#090909', '#181724']} style={styles.background}>
+    return (
+      <LinearGradient colors={['#090909', '#181724']} style={styles.background}>
         <SafeAreaView style={styles.container}>
           <Header iosBarStyle='light-content' style={styles.header}>
             <Left>
               <Button transparent>
                 <Icon
                   active
-                  name="arrow-back"
+                  name='arrow-back'
                   onPress={() => this.props.navigation.goBack()}
                 />
               </Button>
@@ -154,9 +153,9 @@ class CreateWallet extends React.Component<Props, State> {
             showBackButton={pinCode.length > 0}
           />
         </SafeAreaView>
-			</LinearGradient>
-		);
+      </LinearGradient>
+    )
   }
 }
 
-export default CreateWallet;
+export default CreateWallet

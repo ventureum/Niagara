@@ -1,9 +1,9 @@
-import React from "react";
-import Camera from "../index";
+import React from 'react'
+import Camera from '../index'
 // Note: test renderer must be required after react-native.
-import renderer from "react-test-renderer";
+import renderer from 'react-test-renderer'
 
-it("renders correctly", () => {
-	const tree = renderer.create(<Camera navigation={this.props.navigation} />).toJSON();
-	expect(tree).toMatchSnapshot();
-});
+it('renders correctly', () => {
+  const tree = renderer.create(<Camera navigation={this.props.navigation} />).toJSON()
+  expect(tree).toMatchSnapshot()
+})

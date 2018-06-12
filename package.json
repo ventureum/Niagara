@@ -76,6 +76,9 @@
     "web3": "0.19.1",
     "web3-provider-engine": "^14.0.5"
   },
+  "standard": {
+    "parser": "babel-eslint"
+  },
   "rnpm": {
     "assets": [
       "./assets/fonts/"

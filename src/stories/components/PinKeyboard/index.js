@@ -1,44 +1,44 @@
-import React, { Component } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import PropTypes from 'prop-types';
-import chunk from 'lodash/chunk';
-import range from 'lodash/range';
-import Text from '../Text';
-import BackButton from './BackButton';
+import React, { Component } from 'react'
+import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import PropTypes from 'prop-types'
+import chunk from 'lodash/chunk'
+import range from 'lodash/range'
+import Text from '../Text'
+import BackButton from './BackButton'
 
 const styles = StyleSheet.create({
   keyboardRow: {
-    flexDirection: 'row',
+    flexDirection: 'row'
   },
   keyboardKey: {
     flex: 1,
     flexGrow: 1,
-    paddingVertical: 20,
+    paddingVertical: 20
   },
   textPlaceholder: {
     color: 'transparent',
-    fontSize: 40,
+    fontSize: 40
   },
   keyboardText: {
     color: '#fff',
     fontSize: 40,
-    textAlign: 'center',
-  },
-});
+    textAlign: 'center'
+  }
+})
 
 export default class PinKeyboard extends Component {
   static propTypes = {
     onAuthSuccess: PropTypes.func,
     onBackPress: PropTypes.func.isRequired,
     onKeyPress: PropTypes.func.isRequired,
-    showBackButton: PropTypes.bool.isRequired,
+    showBackButton: PropTypes.bool.isRequired
   };
 
   static defaultProps = {
-    onAuthSuccess: null,
+    onAuthSuccess: null
   };
 
-  render() {
+  render () {
     return (
       <View>
         {chunk(range(1, 10), 3).map((numbersGroup, index) => (
@@ -48,7 +48,7 @@ export default class PinKeyboard extends Component {
                 style={styles.keyboardKey}
                 key={index2}
                 onPress={() => {
-                  this.props.onKeyPress(number);
+                  this.props.onKeyPress(number)
                 }}
               >
                 <Text style={styles.keyboardText}>{number}</Text>
@@ -63,7 +63,7 @@ export default class PinKeyboard extends Component {
           <TouchableOpacity
             style={styles.keyboardKey}
             onPress={() => {
-              this.props.onKeyPress(0);
+              this.props.onKeyPress(0)
             }}
           >
             <Text style={styles.keyboardText}>0</Text>
@@ -75,6 +75,6 @@ export default class PinKeyboard extends Component {
           />
         </View>
       </View>
-    );
+    )
   }
 }

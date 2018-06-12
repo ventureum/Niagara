@@ -1,25 +1,25 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native'
 
 const styles: any = StyleSheet.create({
   container: {
     backgroundColor: 'transparent',
     flex: 1,
     justifyContent: 'space-between',
-    paddingBottom: 15,
+    paddingBottom: 15
   },
   dotsContainer: {
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    paddingVertical: 15,
+    paddingVertical: 15
   },
   dot: {
     height: 20,
     width: 20,
-    marginHorizontal: 10,
+    marginHorizontal: 10
   },
   background: {
-    flex: 1,
+    flex: 1
   },
   header: {
     backgroundColor: '#090909'
@@ -27,6 +27,6 @@ const styles: any = StyleSheet.create({
   title: {
     color: '#Fff'
   }
-});
+})
 
-export default styles;
+export default styles

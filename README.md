@@ -39,6 +39,8 @@ $ npm install
 
 ### Run on Android
 
+Modify files based on [this issue](https://github.com/react-native-community/react-native-camera/issues/1490) before running.
+
   * Opt #1:
 	* Run `npm start` in your terminal
 	* Scan the QR code in your Expo app
