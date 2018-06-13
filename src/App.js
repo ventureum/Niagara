@@ -28,7 +28,6 @@ const App = StackNavigator(
     RecoverWallet: { screen: RecoverWallet },
     Camera: { screen: Camera },
     PinCode: { screen: PinCode },
-    BlankPage: { screen: BlankPage },
     Drawer: { screen: Drawer }
   },
   {

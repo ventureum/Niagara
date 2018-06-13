@@ -13,13 +13,17 @@ class BlankPage extends React.Component<Props, State> {
       <Container style={styles.container}>
         <Header>
           <Left>
-            <Button transparent onPress={() => this.props.navigation.goBack()}>
-              <Icon name='ios-arrow-back' />
+            <Button transparent>
+              <Icon
+                active
+                name='menu'
+                onPress={() => this.props.navigation.openDrawer()}
+              />
             </Button>
           </Left>
 
           <Body style={{ flex: 3 }}>
-            <Title>{param ? param.name.item : 'Blank Page'}</Title>
+            <Title>{param ? param.name.item : 'Assets'}</Title>
           </Body>
 
           <Right />

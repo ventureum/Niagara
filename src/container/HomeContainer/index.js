@@ -1,32 +1,56 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
-import Home from '../../stories/screens/Home'
-import datas from './data'
-import { fetchList } from './actions'
+import BlankPage from '../BlankPageContainer'
+import TCRContainer from '../TCRContainer'
+import { TabNavigator } from 'react-navigation'
+import { Button, Text, Icon, Footer, FooterTab } from 'native-base'
+
 export interface Props {
-  navigation: any,
-  fetchList: Function,
-  data: Object,
+  navigation: any;
 }
-export interface State {}
-class HomeContainer extends React.Component<Props, State> {
-  componentDidMount () {
-    this.props.fetchList(datas)
+export default (MainScreenNavigator = TabNavigator(
+  {
+    Assets: { screen: BlankPage },
+    TCR: { screen: TCRContainer }
+  },
+  {
+    tabBarPosition: 'bottom',
+    tabBarComponent: props => {
+      console.log(props)
+      return (
+        <Footer>
+          <FooterTab>
+            <Button
+              vertical
+              active={props.navigationState.index === 0}
+              onPress={() => props.navigation.navigate('Assets')}>
+              <Icon name='coin' type='MaterialCommunityIcons' />
+              <Text>Assets</Text>
+            </Button>
+            <Button
+              vertical
+              active={props.navigationState.index === 1}
+              onPress={() => props.navigation.navigate('TCR')}>
+              <Icon name='view-list' type='MaterialCommunityIcons' />
+              <Text>TCR</Text>
+            </Button>
+            <Button
+              vertical
+              active={props.navigationState.index === 2}
+              onPress={() => props.navigation.navigate('Discover')}>
+              <Icon name='compass' />
+              <Text>Discover</Text>
+            </Button>
+            <Button
+              vertical
+              active={props.navigationState.index === 3}
+              onPress={() => props.navigation.navigate('Profile')}>
+              <Icon name='person' type='MaterialIcons' />
+              <Text>Profile</Text>
+            </Button>
+          </FooterTab>
+        </Footer>
+      )
+    }
   }
-  render () {
-    return <Home navigation={this.props.navigation} list={this.props.data} />
-  }
-}
-
-function bindAction (dispatch) {
-  return {
-    fetchList: url => dispatch(fetchList(url))
-  }
-}
-
-const mapStateToProps = state => ({
-  data: state.homeReducer.list,
-  isLoading: state.homeReducer.isLoading
-})
-export default connect(mapStateToProps, bindAction)(HomeContainer)
+))
