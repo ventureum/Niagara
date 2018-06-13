@@ -1,4 +1,4 @@
-const ERC20ABI = [
+const ERC20_ABI = [
   {
     name: 'balanceOf',
     type: 'function',
@@ -7,15 +7,15 @@ const ERC20ABI = [
     inputs: [
       {
         name: '_owner',
-        type: 'address',
-      },
+        type: 'address'
+      }
     ],
     outputs: [
       {
         name: 'balance',
-        type: 'uint256',
-      },
-    ],
+        type: 'uint256'
+      }
+    ]
   },
   {
     name: 'transfer',
@@ -25,20 +25,20 @@ const ERC20ABI = [
     inputs: [
       {
         name: '_to',
-        type: 'address',
+        type: 'address'
       },
       {
         name: '_value',
-        type: 'uint256',
-      },
+        type: 'uint256'
+      }
     ],
     outputs: [
       {
         name: 'success',
-        type: 'bool',
-      },
-    ],
-  },
+        type: 'bool'
+      }
+    ]
+  }
 ]
 
-export { ERC20ABI };
+export { ERC20_ABI }

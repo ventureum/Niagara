@@ -4,7 +4,7 @@ import { Header, Body, Title, Button, Text, View, Icon, Left, Right } from 'nati
 import PinKeyboard from '../../components/PinKeyboard'
 import PinIndicator from '../../components/PinIndicator'
 import LinearGradient from 'react-native-linear-gradient'
-import EthereumJsWallet from 'ethereumjs-wallet'
+import WalletUtils from '../../../utils/wallet'
 
 import styles from './styles'
 export interface Props {
@@ -79,7 +79,7 @@ class CreateWallet extends React.Component<Props, State> {
           setTimeout(() => {
             Alert.alert(
               'Success',
-              'Wallet created! Address: ' + this.state.wallet.getAddressString()
+              'Wallet created! Address: ' + this.state.wallet.address
             )
             this.props.navigation.navigate('Home')
           })
@@ -103,9 +103,13 @@ class CreateWallet extends React.Component<Props, State> {
   };
 
   generateWallet () {
-    const wallet = EthereumJsWallet.generate()
-    this.props.setWalletAddress(wallet.getAddressString())
-    this.props.setPrivateKey(wallet.getPrivateKey().toString('hex'))
+    var crypto = require("crypto");
+    var entropy = crypto.randomBytes(20).toString('hex');
+    const Web3 = require ('web3')
+    const web3 = new Web3 (WalletUtils.getWeb3HTTPProvider())
+    const wallet = web3.eth.accounts.create(entropy)
+    this.props.setWalletAddress(wallet.address)
+    this.props.setPrivateKey(wallet.privateKey)
     this.setState({
       wallet
     })
