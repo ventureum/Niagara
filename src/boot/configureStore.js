@@ -3,7 +3,7 @@
 import devTools from 'remote-redux-devtools'
 import { createStore, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
-import { createMigrate, persistReducer, persistStore } from 'redux-persist'
+import { persistReducer, persistStore } from 'redux-persist'
 import createSensitiveStorage from 'redux-persist-sensitive-storage'
 import reducer from '../reducers'
 
@@ -19,7 +19,9 @@ const persistConfig = {
   storage
 }
 
-export default function configureStore (onCompletion: () => void): any {
+var store = null
+
+function configureStore (onCompletion: () => void): any {
   const enhancer = compose(
     applyMiddleware(thunk),
     devTools({
@@ -28,8 +30,10 @@ export default function configureStore (onCompletion: () => void): any {
     })
   )
 
-  const store = createStore(persistReducer(persistConfig, reducer), enhancer)
+  store = createStore(persistReducer(persistConfig, reducer), enhancer)
   persistStore(store, onCompletion)
 
   return store
 }
+
+export { store, configureStore }
