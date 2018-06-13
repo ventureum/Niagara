@@ -3,6 +3,14 @@ package com.reactnativeseed;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.oblador.vectoricons.VectorIconsPackage;
+import br.com.classapp.RNSensitiveInfo.RNSensitiveInfoPackage;
+import com.bitgo.randombytes.RandomBytesPackage;
+import com.BV.LinearGradient.LinearGradientPackage;
+import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
+import com.aakashns.reactnativedialogs.ReactNativeDialogsPackage;
+import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
+import org.reactnative.camera.RNCameraPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -22,7 +30,15 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
-          new MainReactPackage()
+          new MainReactPackage(),
+            new VectorIconsPackage(),
+            new RNSensitiveInfoPackage(),
+            new RandomBytesPackage(),
+            new LinearGradientPackage(),
+            new ReactNativeFingerprintScannerPackage(),
+            new ReactNativeDialogsPackage(),
+            new ReactNativeConfigPackage(),
+            new RNCameraPackage()
       );
     }
 
