@@ -31,6 +31,7 @@ function configureStore (onCompletion: () => void): any {
   )
 
   store = createStore(persistReducer(persistConfig, reducer), enhancer)
+
   persistStore(store, onCompletion)
 
   return store

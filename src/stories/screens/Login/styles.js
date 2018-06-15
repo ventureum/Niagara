@@ -24,5 +24,4 @@ const styles: any = StyleSheet.create({
     flex: 1
   }
 })
-
 export default styles

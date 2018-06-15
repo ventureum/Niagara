@@ -10,7 +10,9 @@ import PinCode from './container/PinCodeContainer'
 import Home from './container/HomeContainer'
 import BlankPage from './container/BlankPageContainer'
 import Sidebar from './container/SidebarContainer'
-
+import SendPage from './container/SendPageContainer'
+import ReceivePage from './container/ReceivePageContainer'
+import QRScaner from './container/QRScanerContainer'
 const Drawer = DrawerNavigator(
   {
     Home: { screen: Home }
@@ -28,7 +30,11 @@ const App = StackNavigator(
     RecoverWallet: { screen: RecoverWallet },
     Camera: { screen: Camera },
     PinCode: { screen: PinCode },
-    Drawer: { screen: Drawer }
+    BlankPage: { screen: BlankPage },
+    Drawer: { screen: Drawer },
+    SendPage: { screen: SendPage},
+    ReceivePage: {screen: ReceivePage},
+    QRScaner: {screen: QRScaner}
   },
   {
     initialRouteName: 'Login',
