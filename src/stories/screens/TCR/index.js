@@ -13,7 +13,6 @@ import {
   List,
   ListItem
 } from 'native-base'
-import TabFooter from '../../components/TabFooter'
 
 import styles from './styles'
 export interface Props {
@@ -21,7 +20,7 @@ export interface Props {
   list: any;
 }
 export interface State {}
-class Home extends React.Component<Props, State> {
+class TCR extends React.Component<Props, State> {
   render () {
     return (
       <Container style={styles.container}>
@@ -36,7 +35,7 @@ class Home extends React.Component<Props, State> {
             </Button>
           </Left>
           <Body>
-            <Title>Home</Title>
+            <Title>TCR</Title>
           </Body>
           <Right />
         </Header>
@@ -55,10 +54,9 @@ class Home extends React.Component<Props, State> {
             ))}
           </List>
         </Content>
-        <TabFooter active='assets' />
       </Container>
     )
   }
 }
 
-export default Home
+export default TCR
