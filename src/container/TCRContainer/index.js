@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import TCR from '../../stories/screens/TCR'
 import datas from './data'
 import { fetchList } from './actions'
+import tcr from '../../services/tcr'
 export interface Props {
   navigation: any,
   fetchList: Function,
@@ -11,8 +12,18 @@ export interface Props {
 }
 export interface State {}
 class TCRContainer extends React.Component<Props, State> {
-  componentDidMount () {
-    this.props.fetchList(datas)
+  async componentDidMount () {
+    if (!tcr.tcr) {
+      await tcr.init()
+    }
+    var pendingList = await tcr.getList('pending')
+    var votingList = await tcr.getList('voting')
+    var whitelistList = await tcr.getList('whitelist')
+    this.props.fetchList({
+      pendingList,
+      votingList,
+      whitelistList
+    })
   }
   render () {
     return <TCR navigation={this.props.navigation} list={this.props.data} />
