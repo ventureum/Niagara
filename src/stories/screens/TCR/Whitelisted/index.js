@@ -21,10 +21,6 @@ class Whitelisted extends React.Component<Props, State> {
             this.props.list.whitelistList.map((item, i) => (
               <ListItem
                 key={i}
-                onPress={() =>
-                  this.props.navigation.navigate('BlankPage', {
-                    name: { item }
-                  })}
               >
                 <Text>{item}</Text>
               </ListItem>

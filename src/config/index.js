@@ -1,33 +1,26 @@
-import contract from 'truffle-contract'
 import WalletUtils from '../utils/wallet'
 import TCRRegistry from '../contracts/Registry'
+import Token from '../contracts/VetXToken'
 
 var contracts = {
-  TCRRegistry
+  TCRRegistry,
+  Token
 }
 
-var createErrorHandler = function (name) {
-  return function (err) {
-    console.error(err)
-    throw new Error('contract ' + name + ' cannot be found, make sure you are using the correct network.')
-  }
+export const getToken = async (account, provider) => {
+  const tokenArtifact = contracts['Token']
+  const web3 = WalletUtils.getWeb3Instance()
+  const networkId = await web3.eth.net.getId()
+  const Token = new web3.eth.Contract(tokenArtifact.abi, tokenArtifact.networks[networkId].address, {from: account, gas: 500000})
+
+  return Token
 }
 
 export const getTCR = async (account, provider) => {
   const registryArtifact = contracts['TCRRegistry']
-  const Registry = contract(registryArtifact)
-  Registry.defaults({from: account})
-  Registry.setProvider(provider || WalletUtils.getWeb3HTTPProvider())
+  const web3 = WalletUtils.getWeb3Instance()
+  const networkId = await web3.eth.net.getId()
+  const Registry = new web3.eth.Contract(registryArtifact.abi, registryArtifact.networks[networkId].address, {from: account, gas: 500000})
 
-  // truffle-contract has bug with local httpprovider
-  // fix according to https://github.com/trufflesuite/truffle-contract/issues/57
-  if (typeof Registry.currentProvider.sendAsync !== 'function') {
-    Registry.currentProvider.sendAsync = function () {
-      return Registry.currentProvider.send.apply(
-        Registry.currentProvider, arguments
-      )
-    }
-  }
-
-  return Registry.deployed().catch(createErrorHandler('TCR'))
+  return Registry
 }

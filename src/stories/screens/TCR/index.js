@@ -19,6 +19,9 @@ import styles from './styles'
 export interface Props {
   navigation: any;
   list: any;
+  delisted: Function;
+  whitelisted: Function;
+  voted: Function;
 }
 export interface State {}
 class TCR extends React.Component<Props, State> {
@@ -45,7 +48,7 @@ class TCR extends React.Component<Props, State> {
             <Whitelisted navigation={this.props.navigation} list={this.props.list} />
           </Tab>
           <Tab heading='Vote'>
-            <Vote navigation={this.props.navigation} list={this.props.list} />
+            <Vote navigation={this.props.navigation} list={this.props.list} delisted={this.props.delisted} whitelisted={this.props.whitelisted} voted={this.props.voted} />
           </Tab>
           <Tab heading='Pending'>
             <Pending navigation={this.props.navigation} list={this.props.list} />

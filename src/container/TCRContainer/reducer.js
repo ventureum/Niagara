@@ -1,19 +1,49 @@
 const initialState = {
   list: [],
-  isLoading: true
+  isLoading: true,
+  hash: null,
+  needUpdate: false
 }
 
 export default function (state: any = initialState, action: Function) {
   if (action.type === 'FETCH_LIST_SUCCESS') {
     return {
       ...state,
-      list: action.list
+      list: action.list,
+      needUpdate: false
     }
   }
   if (action.type === 'LIST_IS_LOADING') {
     return {
       ...state,
       isLoading: action.isLoading
+    }
+  }
+  if (action.type === 'PROJECT_DELISTED') {
+    return {
+      ...state,
+      hash: action.hash,
+      needUpdate: true
+    }
+  }
+  if (action.type === 'PROJECT_WHITELISTED') {
+    return {
+      ...state,
+      hash: action.hash,
+      needUpdate: true
+    }
+  }
+  if (action.type === 'PROJECT_VOTED') {
+    return {
+      ...state,
+      hash: action.hash,
+      needUpdate: true
+    }
+  }
+  if (action.type === 'TCR_EVENT') {
+    return {
+      ...state,
+      needUpdate: true
     }
   }
   return state
