@@ -13,6 +13,9 @@ import Sidebar from './container/SidebarContainer'
 import SendPage from './container/SendPageContainer'
 import ReceivePage from './container/ReceivePageContainer'
 import QRScaner from './container/QRScanerContainer'
+import Assets from './container/AssetsContainer'
+import SendAndReceive from './container/SendAndReceiveContainer'
+
 const Drawer = DrawerNavigator(
   {
     Home: { screen: Home }
@@ -34,7 +37,9 @@ const App = StackNavigator(
     Drawer: { screen: Drawer },
     SendPage: { screen: SendPage},
     ReceivePage: {screen: ReceivePage},
-    QRScaner: {screen: QRScaner}
+    QRScaner: {screen: QRScaner},
+    Assets: {screen: Assets},
+    SendAndReceive: {screen: SendAndReceive}
   },
   {
     initialRouteName: 'Login',

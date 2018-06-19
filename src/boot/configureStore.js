@@ -6,6 +6,8 @@ import thunk from 'redux-thunk'
 import { persistReducer, persistStore } from 'redux-persist'
 import createSensitiveStorage from 'redux-persist-sensitive-storage'
 import reducer from '../reducers'
+import promiseMiddleware from 'redux-promise-middleware'
+import logger from 'redux-logger'
 
 const storage = createSensitiveStorage({
   encrypt: true,
@@ -23,7 +25,7 @@ var store = null
 
 function configureStore (onCompletion: () => void): any {
   const enhancer = compose(
-    applyMiddleware(thunk),
+    applyMiddleware(promiseMiddleware(), thunk, logger),
     devTools({
       name: 'nativestarterkit',
       realtime: true

@@ -4,13 +4,14 @@ import BlankPage from '../BlankPageContainer'
 import TCRContainer from '../TCRContainer'
 import { TabNavigator } from 'react-navigation'
 import { Button, Text, Icon, Footer, FooterTab } from 'native-base'
+import Assets from '../AssetsContainer'
 
 export interface Props {
   navigation: any;
 }
 export default (MainScreenNavigator = TabNavigator(
   {
-    Assets: { screen: BlankPage },
+    Assets: { screen: Assets },
     TCR: { screen: TCRContainer }
   },
   {
