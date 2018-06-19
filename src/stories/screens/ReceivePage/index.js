@@ -8,12 +8,8 @@ let web3
 export default class ReceivePage extends Component {
   constructor (props) {
     super(props)
-    this.state = ({account: '0xE23ABfC1f558Aa08Cfe664af63C3A214D1F95290'})
     web3 = wallet.getWeb3Instance();
-    console.log("web3.eth.accounts:", web3.eth.defaultAccount)
     this.state = ({account: web3.eth.defaultAccount})
-    console.log("in Receive page:", web3);
-    
   }
 
   render () {

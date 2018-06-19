@@ -69,7 +69,7 @@ class Assets extends React.Component {
       </List>
     )
 
-    let walletAddressAbbre = '0x' + walletAddress.slice(0, 8) + '...' + walletAddress.slice(-6)
+    let walletAddressAbbre =  walletAddress.slice(0, 8) + '...' + walletAddress.slice(-6)
     let identiconData = new Identicon(walletAddress, 64).toString()
     let identiconBase64 = 'data:image/png;base64,' + identiconData
     return (

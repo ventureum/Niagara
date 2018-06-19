@@ -19,7 +19,6 @@ export default class QRScaner extends Component {
   }
 
 	onBarCodeRead = (e) => {
-	  console.log('read:', e.data)
 	  this.props.navigation.state.params.returnData(e.data)
 	  this.props.navigation.goBack()
 	}
