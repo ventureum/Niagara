@@ -1,50 +1,50 @@
 import { BigNumber } from 'bignumber.js'
 
 const initialState = {
-	loading: false,
+  loading: false,
+  error: false,
   tokens: [{
     symbol: 'ETH',
     address: '0x0000000000000000000000000000000000000000',
+    decimals: 18,
     balance: new BigNumber(0),
     value: 0
-  },{
+  }, {
     symbol: 'VTX',
-    address: '0xb8a004cbb640a4194dad812de9af4ea61954b5cd',
+    address: '0xe19a5acadad67ff06c28ebe8d97dd36f20f9f373',
+    decimals: 18,
     balance: new BigNumber(0),
     value: 0
   }],
   totalVal: 0
-};
+}
 
-export default function(state: any = initialState, action: Function) {
-	if (action.type === "FETCH_TOKEN_LIST_PENDING") {
-		return {
-			...state,
-			loading: true,
-		};
-	}
-	if (action.type === "FETCH_TOKEN_LIST_FULFILLED") {
-    let data = action.payload.data
-    ethData = {
-      balance: data.ETH.balance,
-      tokenInfo: {
-        decimals: '0',
-        symbol: 'ETH'
-      }
+export default function (state: any = initialState, action: Function) {
+  if (action.type === 'REFRESH_TOKENS_PENDING') {
+    return {
+      ...state,
+      loading: true
     }
-		return {
-			...state,
-			loading: false,
+  }
+  if (action.type === 'REFRESH_TOKENS_FULFILLED') {
+    return {
+      ...state,
+      loading: false,
       error: false,
-      tokens: [ethData, ...data.tokens]
-		};
-	}
-  if (action.type === "FETCH_TOKEN_LIST_REJECTED") {
-		return {
-			...state,
-			loading: false,
+      tokens: action.payload
+    }
+  }
+  if (action.type === 'REFRESH_TOKENS_REJECTED') {
+    return {
+      ...state,
+      loading: false,
       error: true
-		};
-	}
-	return state;
+    }
+  }
+  if (action.type === 'INIT_TOKENS') {
+    return {
+      ...initialState
+    }
+  }
+  return state
 }

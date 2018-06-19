@@ -1,7 +1,6 @@
-import * as React from "react"
-import { View, Image } from 'react-native'
+import * as React from 'react'
+import { RefreshControl } from 'react-native'
 import {
-  Icon,
   Left,
   Container,
   Header,
@@ -12,24 +11,22 @@ import {
   Right,
   List,
   ListItem,
-  Thumbnail,
-  Button
-} from "native-base"
-import { Col, Row, Grid } from 'react-native-easy-grid';
-import styles from "./styles"
+  Thumbnail
+} from 'native-base'
+import { Row, Grid } from 'react-native-easy-grid'
+import styles from './styles'
 import { BigNumber } from 'bignumber.js'
 import Identicon from 'identicon.js'
 
 var numeral = require('numeral')
 
 class Assets extends React.Component {
-
   constructor (props) {
     super(props)
     this.tokenListOnPress = this.tokenListOnPress.bind(this)
   }
 
-  format(val) {
+  format (val) {
     if (BigNumber.isBigNumber(val)) {
       val = val.toNumber()
     }
@@ -42,16 +39,20 @@ class Assets extends React.Component {
 
   tokenListOnPress (tokenIdx) {
     this.props.navigation.navigate('SendAndReceive', {
-      tokenIdx: tokenIdx,
+      tokenIdx: tokenIdx
     })
   }
 
+  onRefresh () {
+    this.props.refreshTokens()
+  }
+
   render () {
-    let { tokens, totalVal, loading, walletAddress } = this.props
+    let { tokens, totalVal, walletAddress } = this.props
 
     const listItems = tokens.map((token, i) => {
       return (
-        <ListItem key={ i } onPress={() => this.tokenListOnPress(i)}>
+        <ListItem key={i} onPress={() => this.tokenListOnPress(i)}>
           <Left>
             <Text> {token.symbol } </Text>
           </Left>
@@ -59,33 +60,30 @@ class Assets extends React.Component {
             <Text> { this.format(token.balance) } </Text>
             <Text note> &#8776; { this.format(token.value) } </Text>
           </Right>
-        </ListItem> )
+        </ListItem>)
     })
 
-    const listContent = !loading ? (
+    const listContent = (
       <List>
         {listItems}
       </List>
-    ) : (
-      <Text> Loading ... </Text>
     )
 
-    let walletAddressAbbre = '0x' + walletAddress.slice(0,8) + '...' + walletAddress.slice(-6)
-    let identiconData = new Identicon(walletAddress, 64).toString();
+    let walletAddressAbbre = '0x' + walletAddress.slice(0, 8) + '...' + walletAddress.slice(-6)
+    let identiconData = new Identicon(walletAddress, 64).toString()
     let identiconBase64 = 'data:image/png;base64,' + identiconData
     return (
       <Container style={styles.container}>
         <Header span>
           <Grid>
-            <Row size={1}>
-            </Row>
+            <Row size={1} />
             <Row size={2}>
-              <Body style = {{flexDirection: "row", justifyContent: "center"}}>
-                <Thumbnail small source={{ uri: identiconBase64 }} /> 
+              <Body style={{flexDirection: 'row', justifyContent: 'center'}}>
+                <Thumbnail small source={{ uri: identiconBase64 }} />
               </Body>
             </Row>
             <Row size={1}>
-              <Body style = {{flexDirection: "row", justifyContent: "center"}}>
+              <Body style={{flexDirection: 'row', justifyContent: 'center'}}>
                 <Text style={styles.textContent}> {walletAddressAbbre} </Text>
               </Body>
             </Row>
@@ -96,12 +94,16 @@ class Assets extends React.Component {
             </Row>
           </Grid>
         </Header>
-        <Content>
+        <Content refreshControl={
+          <RefreshControl refreshing={this.props.loading}
+            onRefresh={this.onRefresh.bind(this)}
+          />} >
           {listContent}
         </Content>
       </Container>
+
     )
   }
 }
 
-export default Assets;
+export default Assets

@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
-import {Container, Header, Footer, FooterTab, Body, Button, Left, Right, Title, Icon, Text, Content} from 'native-base'
-import { Col, Row, Grid } from 'react-native-easy-grid'
+import {Container, Header, Footer, FooterTab, Body, Button, Left, Title, Icon, Text, Content} from 'native-base'
+import { Grid, Row } from 'react-native-easy-grid'
 import styles from './styles.js'
-var numeral = require('numeral')
 import { BigNumber } from 'bignumber.js'
 
-export default class SendAndReceive extends Component {
+var numeral = require('numeral')
 
-  format(val) {
+export default class SendAndReceive extends Component {
+  format (val) {
     if (BigNumber.isBigNumber(val)) {
       val = val.toNumber()
     }
@@ -20,32 +20,31 @@ export default class SendAndReceive extends Component {
 
   toSendPage = () => {
     this.props.navigation.navigate('SendPage', {
-      tokenIdx: this.props.tokenIdx,
+      tokenIdx: this.props.tokenIdx
     })
   }
 
   toReceivePage = () => {
     this.props.navigation.navigate('ReceivePage', {
-      tokenIdx: this.props.tokenIdx,
+      tokenIdx: this.props.tokenIdx
     })
   }
 
   render () {
-    let { token, loading } = this.props
+    let { token } = this.props
 
     return (
       <Container style={styles.container}>
         <Header span>
           <Grid>
-            <Row size={1}>
-            </Row>
+            <Row size={1} />
             <Row size={2}>
-              <Body style = {{flexDirection: "row", justifyContent: "center"}}>
+              <Body style={{flexDirection: 'row', justifyContent: 'center'}}>
                 <Title style={styles.textContent}> { token.symbol } </Title>
               </Body>
             </Row>
             <Row size={1}>
-              <Body style = {{flexDirection: "row", justifyContent: "center"}}>
+              <Body style={{flexDirection: 'row', justifyContent: 'center'}}>
                 <Text style={styles.textContent}> { this.format(token.balance) } </Text>
               </Body>
             </Row>
@@ -60,12 +59,12 @@ export default class SendAndReceive extends Component {
         </Content>
         <Footer>
           <FooterTab>
-            <Button vertical onPress={ this.toSendPage } >
-              <Icon name="log-out" />
+            <Button vertical onPress={this.toSendPage} >
+              <Icon name='log-out' />
               <Text> Send </Text>
             </Button>
-            <Button vertical onPress={ this.toReceivePage }>
-              <Icon name="log-in" />
+            <Button vertical onPress={this.toReceivePage}>
+              <Icon name='log-in' />
               <Text> Receive </Text>
             </Button>
           </FooterTab>

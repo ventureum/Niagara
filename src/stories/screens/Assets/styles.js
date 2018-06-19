@@ -1,12 +1,12 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native'
 
 const styles: any = StyleSheet.create({
-	container: {
-		backgroundColor: "#FBFAFA",
-	},
+  container: {
+    backgroundColor: '#FBFAFA'
+  },
   textContent: {
     fontSize: 14,
-    color: 'white',
-  },
-});
-export default styles;
+    color: 'white'
+  }
+})
+export default styles
