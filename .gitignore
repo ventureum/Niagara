@@ -56,4 +56,4 @@ buck-out/
 *.jsbundle
 
 # contracts
-src/contracts/
+src/utils/contracts/

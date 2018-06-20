@@ -3,7 +3,8 @@ import Web3 from 'web3'
 import { store } from '../boot/configureStore.js'
 
 import { ERC20_ABI } from './contracts/ERC20.js'
-import { TCR_ABI, TCR_ADDRESS } from './contracts/TCR.js'
+import TCRRegistry from './contracts/Registry'
+import Token from './contracts/VetXToken'
 
 export default class WalletUtils {
   /**
@@ -103,7 +104,6 @@ export default class WalletUtils {
   static getERC20Balance (contractAddress, decimals) {
     const { walletReducer } = store.getState()
 
-    const _web3 = this.getWeb3Instance()
     return new Promise((resolve, reject) => {
       const instance = this.getERC20Instance(contractAddress)
       instance.methods.balanceOf(walletReducer.walletAddress).call((error, decimalsBalance) => {
@@ -131,14 +131,23 @@ export default class WalletUtils {
     @param {String} Name of the contract
     @dev Intended to be used only with Ventureum product
   */
-  static getContractInstance (name) {
+  static async getContractInstance (name) {
     const _web3 = this.getWeb3Instance()
+    const networkId = await _web3.eth.net.getId()
+    const account = this.getWallet().walletAddress
 
+    var artifact
     switch (name) {
-      case 'TCR':
-        return new _web3.eth.contract(TCR_ABI, TCR_ADDRESS)
+      case 'Registry':
+        artifact = TCRRegistry
+        break
+      case 'Token':
+        artifact = Token
+        break
       default:
         return new Error('Invalid contract name received.')
     }
+
+    return new _web3.eth.Contract(artifact.abi, artifact.networks[networkId].address, {from: account, gas: 500000})
   }
 }

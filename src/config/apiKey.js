@@ -1,3 +1,0 @@
-const INFURA_API_KEY = "UIovb3o3e1Q0SRHdLaTZ"
-
-export INFURA_API_KEY;

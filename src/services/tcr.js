@@ -1,6 +1,5 @@
 import WalletUtils from '../utils/wallet'
 import { BigNumber } from 'bignumber.js'
-import { getTCR, getToken } from '../config'
 import { store } from '../boot/configureStore'
 
 class TCRService {
@@ -13,8 +12,8 @@ class TCRService {
 
   async init () {
     this.account = WalletUtils.getWallet().walletAddress
-    this.tcr = await getTCR(this.account)
-    this.token = await getToken(this.account)
+    this.tcr = await WalletUtils.getContractInstance('Registry')
+    this.token = await WalletUtils.getContractInstance('Token')
     this.address = this.tcr._address
     this.web3 = WalletUtils.getWeb3Instance()
   }
