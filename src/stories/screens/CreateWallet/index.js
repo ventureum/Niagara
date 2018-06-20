@@ -103,10 +103,10 @@ class CreateWallet extends React.Component<Props, State> {
   };
 
   generateWallet () {
-    var crypto = require("crypto");
-    var entropy = crypto.randomBytes(20).toString('hex');
-    const Web3 = require ('web3')
-    const web3 = new Web3 (WalletUtils.getWeb3HTTPProvider())
+    var crypto = require('crypto')
+    var entropy = crypto.randomBytes(20).toString('hex')
+    const Web3 = require('web3')
+    const web3 = new Web3(WalletUtils.getWeb3HTTPProvider())
     const wallet = web3.eth.accounts.create(entropy)
     this.props.setWalletAddress(wallet.address)
     this.props.setPrivateKey(wallet.privateKey)

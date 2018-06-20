@@ -16,3 +16,27 @@ export function fetchList (url: any) {
     dispatch(listIsLoading(false))
   }
 }
+export function delisted (hash: any) {
+  return dispatch => {
+    dispatch({
+      type: 'PROJECT_DELISTED',
+      hash
+    })
+  }
+}
+export function whitelisted (hash: any) {
+  return dispatch => {
+    dispatch({
+      type: 'PROJECT_WHITELISTED',
+      hash
+    })
+  }
+}
+export function voted (hash: any) {
+  return dispatch => {
+    dispatch({
+      type: 'PROJECT_VOTED',
+      hash
+    })
+  }
+}
