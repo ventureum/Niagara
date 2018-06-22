@@ -17,7 +17,6 @@ export default (MainScreenNavigator = TabNavigator(
   {
     tabBarPosition: 'bottom',
     tabBarComponent: props => {
-      console.log(props)
       return (
         <Footer>
           <FooterTab>

@@ -1,4 +1,5 @@
 import { BigNumber } from 'bignumber.js'
+import update from 'immutability-helper';
 
 const initialState = {
   loading: false,
@@ -46,5 +47,15 @@ export default function (state: any = initialState, action: Function) {
       ...initialState
     }
   }
+  if (action.type === 'ADD_TOKEN_TRANSACTION') {
+    return update(
+      update(
+        state, 
+        {tokens: {[action.tokenIdx]: {logs: logs => update(logs || [], {$push: [action.receipt]})}}}
+      ),
+      {logs: logs => update(logs || [], {$push: [action.receipt]})}
+    )
+  }
   return state
 }
+

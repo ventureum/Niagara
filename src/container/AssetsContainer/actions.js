@@ -1,7 +1,6 @@
 import WalletUtils from '../../utils/wallet.js'
 
 async function refreshToken (token, i) {
-  console.log('token: ', token, i)
   token.balance = await WalletUtils.getBalance(token)
   return token
 }
@@ -18,7 +17,6 @@ function _refreshTokens (tokens) {
 function refreshTokens () {
   return (dispatch, getState) => {
     let tokens = getState().assetsReducer.tokens
-    console.log(getState())
     dispatch(_refreshTokens(tokens))
   }
 }
@@ -28,4 +26,15 @@ function initTokens () {
     type: 'INIT_TOKENS'
   }
 }
-export { refreshTokens, initTokens }
+
+function addTokenTransaction (tokenIdx: number, receipt: any) {
+  return dispatch => {
+    dispatch({
+      type: 'ADD_TOKEN_TRANSACTION',
+      tokenIdx,
+      receipt
+    })
+  }
+}
+
+export { refreshTokens, initTokens, addTokenTransaction }

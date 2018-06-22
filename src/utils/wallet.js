@@ -68,12 +68,12 @@ export default class WalletUtils {
    *
    * @param {Object} token
    */
-  static getBalance ({ contractAddress, symbol, decimals }) {
+  static getBalance({ address, symbol, decimals }) {
     if (symbol === 'ETH') {
       return this.getEthBalance()
     }
 
-    return this.getERC20Balance(contractAddress, decimals)
+    return this.getERC20Balance(address, decimals);
   }
 
   /**

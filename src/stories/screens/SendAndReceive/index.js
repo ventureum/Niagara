@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {Container, Header, Footer, FooterTab, Body, Button, Left, Title, Icon, Text, Content} from 'native-base'
+import {Container, Header, Footer, FooterTab, Body, Button, Left, Right, Title, Icon, Text, Content, ListItem, List} from 'native-base'
 import { Grid, Row } from 'react-native-easy-grid'
 import styles from './styles.js'
 import { BigNumber } from 'bignumber.js'
@@ -32,6 +32,25 @@ export default class SendAndReceive extends Component {
 
   render () {
     let { token } = this.props
+    let listItems
+    let listContent
+    if (token.logs){
+      listItems = token.logs.map((log, i) => {
+        return (
+          <ListItem key={i}>
+            <Left>
+              <Text> {log.transactionHash} </Text>
+            </Left>
+          </ListItem>)
+      })
+    }
+    if (listItems){
+      listContent = (
+        <List>          
+          {listItems}
+        </List>
+      )
+    }
 
     return (
       <Container style={styles.container}>
@@ -51,11 +70,8 @@ export default class SendAndReceive extends Component {
           </Grid>
         </Header>
         <Content>
-          <Body>
-            <Left>
-              <Text> Transaction log </Text>
-            </Left>
-          </Body>
+        <Text style={styles.listContent}> Transaction logs:</Text>
+        {listContent}
         </Content>
         <Footer>
           <FooterTab>

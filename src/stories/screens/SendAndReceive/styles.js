@@ -7,6 +7,10 @@ const styles: any = StyleSheet.create({
   textContent: {
     fontSize: 14,
     color: 'white'
+  },
+    listContent: {
+    fontSize: 14,
+    color: 'black'
   }
 })
 export default styles
