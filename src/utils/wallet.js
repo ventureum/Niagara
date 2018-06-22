@@ -40,11 +40,12 @@ export default class WalletUtils {
         )
       default:
         return new Web3.providers.HttpProvider(
-          'http://10.0.2.2:8545'
+        `https://rinkeby.infura.io/${Config.INFURA_API_KEY}`
+
         )
     }
   }
-
+  
   /**
    * Returns a web3 instance with the user's wallet
    */

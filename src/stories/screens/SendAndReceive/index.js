@@ -3,19 +3,18 @@ import {Container, Header, Footer, FooterTab, Body, Button, Left, Right, Title, 
 import { Grid, Row } from 'react-native-easy-grid'
 import styles from './styles.js'
 import { BigNumber } from 'bignumber.js'
+import { RefreshControl } from 'react-native'
 
-var numeral = require('numeral')
+let numeral = require('numeral')
+let moment = require('moment')
 
 export default class SendAndReceive extends Component {
+
   format (val) {
     if (BigNumber.isBigNumber(val)) {
-      val = val.toNumber()
+      val = new BigNumber(val).toPrecision(3)
     }
-    if (val > 1000) {
-      return numeral(val.toString()).format('0.0 a')
-    } else {
-      return numeral(val.toString()).format('0.000')
-    }
+    return val
   }
 
   toSendPage = () => {
@@ -30,17 +29,35 @@ export default class SendAndReceive extends Component {
     })
   }
 
+  onRefresh() {
+    this.props.getLogs()
+  }
+
   render () {
     let { token } = this.props
     let listItems
     let listContent
-    if (token.logs){
-      listItems = token.logs.map((log, i) => {
+    if (token.eventLogs){
+      listItems = token.eventLogs.map((eventLog, i) => {
+        const hashString = String(eventLog.hash)
+        let amount = eventLog.value === "0" ? "0" : 
+          this.format(Number(eventLog.value) / (10**18))
+        const date = moment(eventLog.timeStamp*1000).fromNow();
+        if (eventLog.from.toUpperCase() === this.props.walletAddress.toUpperCase()){
+          amount = "- " +amount
+        }
+        else {
+          amount = "+ " +amount
+        }
         return (
           <ListItem key={i}>
             <Left>
-              <Text> {log.transactionHash} </Text>
+              <Text> {amount} </Text>
             </Left>
+            <Body>
+              <Text> {date} </Text>
+              <Text note> {"tx "+ hashString.slice(0,7)+'...'+hashString.slice(-6)} </Text>
+            </Body>
           </ListItem>)
       })
     }
@@ -51,7 +68,6 @@ export default class SendAndReceive extends Component {
         </List>
       )
     }
-
     return (
       <Container style={styles.container}>
         <Header span>
@@ -69,9 +85,12 @@ export default class SendAndReceive extends Component {
             </Row>
           </Grid>
         </Header>
-        <Content>
-        <Text style={styles.listContent}> Transaction logs:</Text>
-        {listContent}
+        <Content refreshControl={
+          <RefreshControl refreshing={this.props.loading}
+            onRefresh={this.onRefresh.bind(this)}
+          />} >
+          <Text style={styles.listContent}> Transaction logs:</Text>
+          {listContent}
         </Content>
         <Footer>
           <FooterTab>

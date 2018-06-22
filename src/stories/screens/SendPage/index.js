@@ -33,7 +33,6 @@ export default class SendPage extends Component {
         address: this.props.address,
         symbol: this.props.symbol,
         decimals: this.props.decimals,
-        previousTx: null
       } 
     }
   }
@@ -60,7 +59,7 @@ export default class SendPage extends Component {
           gas: 500000
         }).on('transactionHash', (hash) => {
           this.setState({transactionState: 'pending'})
-        }).on('error', (error) => {
+        }).on('error', (error, rec) => {
           Toast.show({
             text: 'Error in sending transaction!',
             position: 'center',
@@ -68,15 +67,16 @@ export default class SendPage extends Component {
             type: 'danger',
             duration: 10000
           })
+          this.setState({transactionState: 'normal'})
         }).on('receipt', (receipt) => {
           this.setState({transactionState: 'normal'}, () => {
             Toast.show({
               text: 'Transaction is fulfilled!',
               buttonText: 'Okay',
               type: 'success',
+              position: 'center',
               duration: 10000
-            })            
-            this.props.addTokenTransaction(this.props.tokenIdx, receipt)
+            })
             this.props.navigation.goBack()
           })
         })
@@ -84,7 +84,6 @@ export default class SendPage extends Component {
       else {
         // Other ERC20 Token:
         const tokenInstance = wallet.getERC20Instance(this.state.address);
-
         tokenInstance.methods.transfer(receiver, amount).send({
           from: sender,
           gas: 500000
@@ -98,15 +97,16 @@ export default class SendPage extends Component {
             type: 'danger',
             duration: 10000
           })
+          this.setState({transactionState: 'normal'})
         }).on('receipt', (receipt) => {
           this.setState({transactionState: 'normal'}, () => {
             Toast.show({
               text: 'Transaction is fulfilled!',
+              position: 'center',
               buttonText: 'Okay',
               type: 'success',
               duration: 10000
             })
-            this.props.addTokenTransaction(this.props.tokenIdx, receipt)
             this.props.navigation.goBack()
           })
         })
@@ -146,7 +146,8 @@ export default class SendPage extends Component {
             <Right>
               <Button transparent
                 onPress={
-                  () => this.props.navigation.navigate('QRScaner', {returnData: this.returnData.bind(this)})}
+                  () => this.props.navigation.navigate('QRScaner', {returnData: this.returnData.bind(this)})
+                }
               >
                 <Icon name='menu' />
               </Button>

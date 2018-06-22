@@ -3,7 +3,6 @@ import { Container } from 'native-base'
 import SendPage from '../../stories/screens/SendPage'
 import WalletUtils from '../../utils/wallet.js'
 import { connect } from 'react-redux'
-import { addTokenTransaction } from '../AssetsContainer/actions'
 
 class SendPageContainer extends Component {
   constructor(props){
@@ -23,7 +22,6 @@ class SendPageContainer extends Component {
         symbol={tokens[this.state.tokenIdx].symbol}
         decimals={tokens[this.state.tokenIdx].decimals}
         balance={tokens[this.state.tokenIdx].balance}
-        addTokenTransaction={this.props.addTokenTransaction}
         />
       </Container>
     )
@@ -34,8 +32,4 @@ const mapStateToProps = (state) => ({
   tokens: state.assetsReducer.tokens
 })
 
-const mapDispatchToProps = (dispatch) => ({
-  addTokenTransaction: (address, receipt) => dispatch(addTokenTransaction(address, receipt))
-})
-
-export default connect(mapStateToProps, mapDispatchToProps)(SendPageContainer)
+export default connect(mapStateToProps)(SendPageContainer)

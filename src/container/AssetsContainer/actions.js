@@ -27,14 +27,39 @@ function initTokens () {
   }
 }
 
-function addTokenTransaction (tokenIdx: number, receipt: any) {
+function addTokenTransaction (receipt: any) {
   return dispatch => {
     dispatch({
       type: 'ADD_TOKEN_TRANSACTION',
-      tokenIdx,
       receipt
     })
   }
 }
 
-export { refreshTokens, initTokens, addTokenTransaction }
+function refreshLogsFulfilled(tokenIdx: number,eventLogs: any){
+  return dispatch => {
+    dispatch({
+      type: 'REFRESH_LOGS_FULFILLED',
+      tokenIdx,
+      eventLogs
+    })
+  }
+}
+
+function refreshLogsPending(){
+  return dispatch => {
+    dispatch({
+      type: 'REFRESH_LOGS_PENDING'
+    })
+  }
+}
+
+function refreshLogsRejected(){
+  return dispatch => {
+    dispatch({
+      type: 'REFRESH_LOGS_REJECTED'
+    })
+  }
+}
+
+export { refreshTokens, initTokens, addTokenTransaction, refreshLogsFulfilled, refreshLogsPending, refreshLogsRejected }

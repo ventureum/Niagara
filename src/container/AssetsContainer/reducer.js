@@ -3,6 +3,7 @@ import update from 'immutability-helper';
 
 const initialState = {
   loading: false,
+  blockFetched: 0,
   error: false,
   tokens: [{
     symbol: 'ETH',
@@ -12,7 +13,7 @@ const initialState = {
     value: 0
   }, {
     symbol: 'VTX',
-    address: '0xe19a5acadad67ff06c28ebe8d97dd36f20f9f373',
+    address: '0x7daa1a5f0b0ac9ada30f907e2b49c167bdd0460a',
     decimals: 18,
     balance: new BigNumber(0),
     value: 0
@@ -49,12 +50,30 @@ export default function (state: any = initialState, action: Function) {
   }
   if (action.type === 'ADD_TOKEN_TRANSACTION') {
     return update(
-      update(
-        state, 
-        {tokens: {[action.tokenIdx]: {logs: logs => update(logs || [], {$push: [action.receipt]})}}}
-      ),
+      state,
       {logs: logs => update(logs || [], {$push: [action.receipt]})}
     )
+  }
+  if (action.type === 'REFRESH_LOGS_FULFILLED') {
+    return update(
+      update(
+        state, 
+        {tokens: {[action.tokenIdx]: {eventLogs: eventLogs => update(eventLogs || [], {$set: action.eventLogs})}}}
+      ),
+      {loading: {$set:false}}
+    )
+  }
+  if (action.type === 'REFRESH_LOGS_PENDING') {
+    return {
+      ...state,
+      loading: true
+    }
+  }  
+  if (action.type === 'REFRESH_LOGS_REJECTED') {
+    return {
+      ...state,
+      loading: false
+    }
   }
   return state
 }
