@@ -35,11 +35,11 @@ const App = StackNavigator(
     PinCode: { screen: PinCode },
     BlankPage: { screen: BlankPage },
     Drawer: { screen: Drawer },
-    SendPage: { screen: SendPage},
-    ReceivePage: {screen: ReceivePage},
-    QRScaner: {screen: QRScaner},
-    Assets: {screen: Assets},
-    SendAndReceive: {screen: SendAndReceive}
+    SendPage: { screen: SendPage },
+    ReceivePage: { screen: ReceivePage },
+    QRScaner: { screen: QRScaner },
+    Assets: { screen: Assets },
+    SendAndReceive: { screen: SendAndReceive }
   },
   {
     initialRouteName: 'Login',

@@ -8,12 +8,12 @@ const styles: any = StyleSheet.create({
     fontSize: 14,
     color: 'white'
   },
-    listContent: {
+  listContent: {
     fontSize: 14,
     color: 'black'
   },
   smallText: {
-    fontSize: 10,
+    fontSize: 10
   }
 })
 export default styles

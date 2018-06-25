@@ -1,4 +1,5 @@
 import WalletUtils from '../../utils/wallet.js'
+import axios from 'axios'
 
 async function refreshToken (token, i) {
   token.balance = await WalletUtils.getBalance(token)
@@ -36,30 +37,15 @@ function addTokenTransaction (receipt: any) {
   }
 }
 
-function refreshLogsFulfilled(tokenIdx: number,eventLogs: any){
-  return dispatch => {
-    dispatch({
-      type: 'REFRESH_LOGS_FULFILLED',
-      tokenIdx,
-      eventLogs
-    })
+function refreshLogs (tokenIdx: number, url: string) {
+  console.log('going to dispatch with id', tokenIdx)
+  return {
+    type: 'REFRESH_LOGS',
+    async payload () {
+      const result = await axios.get(url)
+      return {tokenIdx, result}
+    }
   }
 }
 
-function refreshLogsPending(){
-  return dispatch => {
-    dispatch({
-      type: 'REFRESH_LOGS_PENDING'
-    })
-  }
-}
-
-function refreshLogsRejected(){
-  return dispatch => {
-    dispatch({
-      type: 'REFRESH_LOGS_REJECTED'
-    })
-  }
-}
-
-export { refreshTokens, initTokens, addTokenTransaction, refreshLogsFulfilled, refreshLogsPending, refreshLogsRejected }
+export { refreshTokens, initTokens, addTokenTransaction, refreshLogs }

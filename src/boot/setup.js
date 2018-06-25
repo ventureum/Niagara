@@ -12,7 +12,6 @@ export interface State {
   store: Object;
   isLoading: boolean;
 }
-
 export default class Setup extends React.Component<Props, State> {
   constructor () {
     super()

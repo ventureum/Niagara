@@ -1,5 +1,5 @@
-import './shim';
-import { AppRegistry } from 'react-native';
-import App from './App';
+import './shim'
+import { AppRegistry } from 'react-native'
+import App from './App'
 
-AppRegistry.registerComponent('ReactNativeSeed', () => App);
+AppRegistry.registerComponent('ReactNativeSeed', () => App)

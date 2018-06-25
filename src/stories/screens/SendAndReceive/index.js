@@ -1,15 +1,13 @@
 import React, { Component } from 'react'
-import {Container, Header, Footer, FooterTab, Body, Button, Left, Right, Title, Icon, Text, Content, ListItem, List} from 'native-base'
+import {Container, Header, Footer, FooterTab, Body, Button, Left, Title, Icon, Text, Content, ListItem, List} from 'native-base'
 import { Grid, Row } from 'react-native-easy-grid'
 import styles from './styles.js'
 import { BigNumber } from 'bignumber.js'
 import { RefreshControl } from 'react-native'
 
-let numeral = require('numeral')
 let moment = require('moment')
 
 export default class SendAndReceive extends Component {
-
   format (val) {
     if (BigNumber.isBigNumber(val)) {
       val = new BigNumber(val).toPrecision(3)
@@ -29,7 +27,7 @@ export default class SendAndReceive extends Component {
     })
   }
 
-  onRefresh() {
+  onRefresh () {
     this.props.getLogs()
   }
 
@@ -37,17 +35,16 @@ export default class SendAndReceive extends Component {
     let { token } = this.props
     let listItems
     let listContent
-    if (token.eventLogs){
+    if (token.eventLogs) {
       listItems = token.eventLogs.map((eventLog, i) => {
         const hashString = String(eventLog.hash)
-        let amount = eventLog.value === "0" ? "0" : 
-          this.format(Number(eventLog.value) / (10**18))
-        const date = moment(eventLog.timeStamp*1000).fromNow();
-        if (eventLog.from.toUpperCase() === this.props.walletAddress.toUpperCase()){
-          amount = "- " +amount
-        }
-        else {
-          amount = "+ " +amount
+        let amount = eventLog.value === '0' ? '0'
+          : this.format(Number(eventLog.value) / (10 ** 18))
+        const date = moment(eventLog.timeStamp * 1000).fromNow()
+        if (eventLog.from.toUpperCase() === this.props.walletAddress.toUpperCase()) {
+          amount = '- ' + amount
+        } else {
+          amount = '+ ' + amount
         }
         return (
           <ListItem key={i}>
@@ -56,14 +53,14 @@ export default class SendAndReceive extends Component {
             </Left>
             <Body>
               <Text> {date} </Text>
-              <Text note> {"tx "+ hashString.slice(0,7)+'...'+hashString.slice(-6)} </Text>
+              <Text note> {'tx ' + hashString.slice(0, 7) + '...' + hashString.slice(-6)} </Text>
             </Body>
           </ListItem>)
       })
     }
-    if (listItems){
+    if (listItems) {
       listContent = (
-        <List>          
+        <List>
           {listItems}
         </List>
       )

@@ -1,6 +1,7 @@
 import { BigNumber } from 'bignumber.js'
-import update from 'immutability-helper';
+import update from 'immutability-helper'
 
+const NUMBER_OF_TX_TO_FETCH = 20
 const initialState = {
   loading: false,
   blockFetched: 0,
@@ -55,12 +56,24 @@ export default function (state: any = initialState, action: Function) {
     )
   }
   if (action.type === 'REFRESH_LOGS_FULFILLED') {
+    let validLogs = []
+    const {result} = action.payload
+    if (result.data.message === 'OK') {
+      for (let i = 0; i < result.data.result.length; i++) {
+        if (validLogs.length === NUMBER_OF_TX_TO_FETCH) {
+          break
+        }
+        if (result.data.result[i].value !== '0') {
+          validLogs.push(result.data.result[i])
+        }
+      }
+    }
     return update(
       update(
-        state, 
-        {tokens: {[action.tokenIdx]: {eventLogs: eventLogs => update(eventLogs || [], {$set: action.eventLogs})}}}
+        state,
+        {tokens: {[action.payload.tokenIdx]: {eventLogs: eventLogs => update(eventLogs || [], {$set: validLogs})}}}
       ),
-      {loading: {$set:false}}
+      {loading: {$set: false}}
     )
   }
   if (action.type === 'REFRESH_LOGS_PENDING') {
@@ -68,7 +81,7 @@ export default function (state: any = initialState, action: Function) {
       ...state,
       loading: true
     }
-  }  
+  }
   if (action.type === 'REFRESH_LOGS_REJECTED') {
     return {
       ...state,
@@ -77,4 +90,3 @@ export default function (state: any = initialState, action: Function) {
   }
   return state
 }
-

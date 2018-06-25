@@ -40,12 +40,11 @@ export default class WalletUtils {
         )
       default:
         return new Web3.providers.HttpProvider(
-        `https://rinkeby.infura.io/${Config.INFURA_API_KEY}`
-
+          'http://10.0.2.2:8545'
         )
     }
   }
-  
+
   /**
    * Returns a web3 instance with the user's wallet
    */
@@ -69,12 +68,12 @@ export default class WalletUtils {
    *
    * @param {Object} token
    */
-  static getBalance({ address, symbol, decimals }) {
+  static getBalance ({ address, symbol, decimals }) {
     if (symbol === 'ETH') {
       return this.getEthBalance()
     }
 
-    return this.getERC20Balance(address, decimals);
+    return this.getERC20Balance(address, decimals)
   }
 
   /**
