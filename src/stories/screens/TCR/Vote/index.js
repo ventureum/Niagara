@@ -152,7 +152,7 @@ class Vote extends React.Component<Props, State> {
                   selected={this.state.voteOption}>
                   <Text>Support</Text>
                   <Right>
-                    <Radio selectedColor={'#5cb85c'} selected={this.state.voteOption} />
+                    <Radio onPress={() => { this.setState({voteOption: true}) }} selectedColor={'#5cb85c'} selected={this.state.voteOption} />
                   </Right>
                 </ListItem>
                 <ListItem style={[styles.optionWithBorder, styles.withPadding]}
@@ -160,7 +160,7 @@ class Vote extends React.Component<Props, State> {
                   selected={!this.state.voteOption}>
                   <Text>Against</Text>
                   <Right>
-                    <Radio selectedColor={'#5cb85c'} selected={!this.state.voteOption} />
+                    <Radio onPress={() => { this.setState({voteOption: false}) }} selectedColor={'#5cb85c'} selected={!this.state.voteOption} />
                   </Right>
                 </ListItem>
                 <Item style={[styles.option, styles.withOutBorder]}>
