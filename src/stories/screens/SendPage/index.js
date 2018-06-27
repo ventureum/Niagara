@@ -1,22 +1,23 @@
 import React, { Component } from 'react'
-import {Toast, 
-  Container, 
-  Header, 
-  Form, 
-  Icon, 
-  Spinner, 
+import {
+  Toast,
+  Container,
+  Header,
+  Form,
+  Icon,
+  Spinner,
   Title,
-  Item, 
-  Label, 
-  Input, 
-  Content, 
+  Item,
+  Label,
+  Input,
+  Content,
   Text,
-  Button, 
-  Left, 
-  Right, 
-  Body, 
-  Footer, 
-  Textarea } from 'native-base'
+  Button,
+  Left,
+  Right,
+  Body,
+  Footer
+} from 'native-base'
 import wallet from '../../../utils/wallet'
 
 let web3
@@ -24,7 +25,7 @@ export default class SendPage extends Component {
   constructor (props) {
     super(props)
     web3 = wallet.getWeb3Instance()
-    if (this.props.address){
+    if (this.props.address) {
       this.state = {
         transactionState: 'normal',
         receiverAddr: null,
@@ -32,9 +33,8 @@ export default class SendPage extends Component {
         balance: this.props.balance,
         address: this.props.address,
         symbol: this.props.symbol,
-        decimals: this.props.decimals,
-        previousTx: null
-      } 
+        decimals: this.props.decimals
+      }
     }
   }
 
@@ -54,13 +54,13 @@ export default class SendPage extends Component {
 
       if (this.state.symbol === 'ETH') {
         web3.eth.sendTransaction({
-          from: sender, 
-          to: receiver, 
-          value: amount, 
+          from: sender,
+          to: receiver,
+          value: amount,
           gas: 500000
         }).on('transactionHash', (hash) => {
           this.setState({transactionState: 'pending'})
-        }).on('error', (error) => {
+        }).on('error', (error, rec) => {
           Toast.show({
             text: 'Error in sending transaction!',
             position: 'center',
@@ -68,23 +68,22 @@ export default class SendPage extends Component {
             type: 'danger',
             duration: 10000
           })
+          this.setState({transactionState: 'normal'})
         }).on('receipt', (receipt) => {
           this.setState({transactionState: 'normal'}, () => {
             Toast.show({
               text: 'Transaction is fulfilled!',
               buttonText: 'Okay',
               type: 'success',
+              position: 'center',
               duration: 10000
-            })            
-            this.props.addTokenTransaction(this.props.tokenIdx, receipt)
+            })
             this.props.navigation.goBack()
           })
         })
-      }
-      else {
+      } else {
         // Other ERC20 Token:
-        const tokenInstance = wallet.getERC20Instance(this.state.address);
-
+        const tokenInstance = wallet.getERC20Instance(this.state.address)
         tokenInstance.methods.transfer(receiver, amount).send({
           from: sender,
           gas: 500000
@@ -98,15 +97,16 @@ export default class SendPage extends Component {
             type: 'danger',
             duration: 10000
           })
+          this.setState({transactionState: 'normal'})
         }).on('receipt', (receipt) => {
           this.setState({transactionState: 'normal'}, () => {
             Toast.show({
               text: 'Transaction is fulfilled!',
+              position: 'center',
               buttonText: 'Okay',
               type: 'success',
               duration: 10000
             })
-            this.props.addTokenTransaction(this.props.tokenIdx, receipt)
             this.props.navigation.goBack()
           })
         })
@@ -146,7 +146,8 @@ export default class SendPage extends Component {
             <Right>
               <Button transparent
                 onPress={
-                  () => this.props.navigation.navigate('QRScaner', {returnData: this.returnData.bind(this)})}
+                  () => this.props.navigation.navigate('QRScaner', {returnData: this.returnData.bind(this)})
+                }
               >
                 <Icon name='menu' />
               </Button>

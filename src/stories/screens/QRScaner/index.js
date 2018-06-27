@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import {Container, Header, Body, Title, Left, Button, Icon} from 'native-base'
-import {SafeAreaView, StyleSheet} from 'react-native'
+import { Header, Body, Title, Left, Button, Icon } from 'native-base'
+import { SafeAreaView, StyleSheet } from 'react-native'
 import { RNCamera } from 'react-native-camera'
 
 const styles = StyleSheet.create({
@@ -14,17 +14,13 @@ const styles = StyleSheet.create({
 })
 
 export default class QRScaner extends Component {
-  constructor (props) {
-    super(props)
+  onBarCodeRead = (e) => {
+    this.props.navigation.state.params.returnData(e.data)
+    this.props.navigation.goBack()
   }
 
-	onBarCodeRead = (e) => {
-	  this.props.navigation.state.params.returnData(e.data)
-	  this.props.navigation.goBack()
-	}
-
-	render () {
-	  return (
+  render () {
+    return (
       <SafeAreaView style={styles.container}>
         <Header>
           <Left>
@@ -37,7 +33,7 @@ export default class QRScaner extends Component {
           </Body>
         </Header>
         <RNCamera onBarCodeRead={this.onBarCodeRead} style={styles.preview} />
-	    </SafeAreaView>
-	  )
-	}
+      </SafeAreaView>
+    )
+  }
 }

@@ -8,7 +8,7 @@ let web3
 export default class ReceivePage extends Component {
   constructor (props) {
     super(props)
-    web3 = wallet.getWeb3Instance();
+    web3 = wallet.getWeb3Instance()
     this.state = ({account: web3.eth.defaultAccount})
   }
 

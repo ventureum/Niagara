@@ -1,4 +1,5 @@
 import WalletUtils from '../../utils/wallet.js'
+import axios from 'axios'
 
 async function refreshToken (token, i) {
   token.balance = await WalletUtils.getBalance(token)
@@ -27,14 +28,24 @@ function initTokens () {
   }
 }
 
-function addTokenTransaction (tokenIdx: number, receipt: any) {
+function addTokenTransaction (receipt: any) {
   return dispatch => {
     dispatch({
       type: 'ADD_TOKEN_TRANSACTION',
-      tokenIdx,
       receipt
     })
   }
 }
 
-export { refreshTokens, initTokens, addTokenTransaction }
+function refreshLogs (tokenIdx: number, url: string) {
+  console.log('going to dispatch with id', tokenIdx)
+  return {
+    type: 'REFRESH_LOGS',
+    async payload () {
+      const result = await axios.get(url)
+      return {tokenIdx, result}
+    }
+  }
+}
+
+export { refreshTokens, initTokens, addTokenTransaction, refreshLogs }
