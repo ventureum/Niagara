@@ -16,10 +16,13 @@ import {
   Left,
   Icon,
   Title,
-  Toast
+  Toast,
+  Spinner
 } from 'native-base'
 import { Modal, RefreshControl } from 'react-native'
 import tcr from '../../../../services/tcr'
+import { BigNumber } from 'bignumber.js'
+import update from 'immutability-helper'
 import styles from './styles'
 export interface Props {
   navigation: any;
@@ -32,72 +35,133 @@ export interface Props {
 export interface State {}
 class Vote extends React.Component<Props, State> {
   state = {
+    projectList: this.props.list && typeof (this.props.list.votingList) === typeof ([]) && this.props.list.votingList,
     modalVisible: false,
     voteOption: true,
     amount: null,
     selectedItem: null
   }
 
-  setModalVisible (visible, item) {
+  componentWillReceiveProps (nextProps) {
     this.setState({
-      modalVisible: visible,
-      selectedItem: item
+      projectList: nextProps.list && typeof (nextProps.list.votingList) === typeof ([]) && nextProps.list.votingList
+    })
+  }
+
+  setModalVisible (visible, item) {
+    if (item) {
+      this.setState({
+        modalVisible: visible,
+        selectedItem: item
+      })
+    } else {
+      this.setState({
+        modalVisible: visible
+      })
+    }
+  }
+
+  setItemProcess (item, value = true) {
+    let index = this.state.projectList.indexOf(item)
+    if (index < 0) {
+      return
+    }
+    this.setState({
+      projectList: update(this.state.projectList, {
+        [index]: {
+          processing: {
+            $set: value
+          }
+        }
+      })
     })
   }
 
   async delist (item) {
-    try {
-      await tcr.delist(item)
-      Toast.show({
-        text: 'The project has been delisted',
-        buttonText: 'Okay',
-        type: 'success'
-      })
-      this.props.delisted()
-    } catch (e) {
-      Toast.show({
-        text: e.message,
-        buttonText: 'Okay',
-        type: 'danger'
-      })
-    }
+    this.setItemProcess(item)
+    Toast.show({
+      text: 'The operation is processing',
+      buttonText: 'Okay',
+      type: 'success'
+    })
+    var _this = this
+    setTimeout(async function () {
+      try {
+        await tcr.delist(item)
+        Toast.show({
+          text: 'The project has been delisted',
+          buttonText: 'Okay',
+          type: 'success'
+        })
+        _this.props.delisted()
+      } catch (e) {
+        Toast.show({
+          text: e.message,
+          buttonText: 'Okay',
+          type: 'danger'
+        })
+        _this.setItemProcess(item, false)
+      }
+    }, 0)
   }
 
   async whitelist (item) {
-    try {
-      await tcr.whitelist(item)
-      Toast.show({
-        text: 'The project has been whitelisted',
-        buttonText: 'Okay',
-        type: 'success'
-      })
-      this.props.whitelisted()
-    } catch (e) {
-      Toast.show({
-        text: e.message,
-        buttonText: 'Okay',
-        type: 'danger'
-      })
-    }
+    this.setItemProcess(item)
+    Toast.show({
+      text: 'The operation is processing',
+      buttonText: 'Okay',
+      type: 'success'
+    })
+    var _this = this
+    setTimeout(async function () {
+      try {
+        await tcr.whitelist(item)
+        Toast.show({
+          text: 'The project has been whitelisted',
+          buttonText: 'Okay',
+          type: 'success'
+        })
+        _this.props.whitelisted()
+      } catch (e) {
+        Toast.show({
+          text: e.message,
+          buttonText: 'Okay',
+          type: 'danger'
+        })
+        _this.setItemProcess(item, false)
+      }
+    }, 0)
   }
 
   async vote () {
-    try {
-      await tcr.vote(this.state.selectedItem.hash, this.state.voteOption, this.state.amount)
-      this.setModalVisible(false)
-      Toast.show({
-        text: 'The project has been voted',
-        buttonText: 'Okay',
-        type: 'success'
-      })
-      this.props.voted()
-    } catch (e) {
-      Toast.show({
-        text: e.message,
-        buttonText: 'Okay',
-        type: 'danger'
-      })
-    }
+    var selectedItem = this.state.selectedItem
+    this.setItemProcess(selectedItem)
+    Toast.show({
+      text: 'The operation is processing',
+      buttonText: 'Okay',
+      type: 'success'
+    })
+    var _this = this
+    this.setModalVisible(false)
+    setTimeout(async function () {
+      try {
+        await tcr.vote(selectedItem.hash, _this.state.voteOption, big(_this.state.amount).multipliedBy(tenToTheEighteenth))
+        Toast.show({
+          text: 'The project has been voted',
+          buttonText: 'Okay',
+          type: 'success'
+        })
+        _this.setItemProcess(selectedItem, false)
+        _this.props.voted()
+      } catch (e) {
+        Toast.show({
+          text: e.message,
+          buttonText: 'Okay',
+          type: 'danger'
+        })
+        _this.setItemProcess(selectedItem, false)
+      }
+    }, 0)
   }
 
   onValueChange (value) {
@@ -183,13 +247,12 @@ class Vote extends React.Component<Props, State> {
           </Container>
         </Modal>
         <List>
-          {this.props.list &&
-            typeof (this.props.list.votingList) === typeof ([]) &&
-            this.props.list.votingList.map((item, i) => (
+          {this.state.projectList &&
+            this.state.projectList.map((item, i) => (
               <ListItem
                 key={i}
               >
-                <Body>
+                <Body style={styles.body}>
                   <Text>{item.hash}</Text>
                   {item.inProgress &&
                     <Text note>Support: {typeof (item.voteFor) === typeof ('') ? item.voteFor : item.voteFor.toNumber()} | Against: {typeof (item.voteAgainst) === typeof ('') ? item.voteAgainst : item.voteAgainst.toNumber()}</Text>
@@ -198,20 +261,26 @@ class Vote extends React.Component<Props, State> {
                 <Right>
                   {item.inProgress &&
                     <Button
+                      disabled={item.processing}
                       onPress={() => { this.setModalVisible(true, item) }}>
-                      <Text>Vote</Text>
+                      <Text style={styles.wide}>Vote</Text>
+                      {item.processing && <Spinner style={styles.spin} size='small' color='white' />}
                     </Button>
                   }
                   {!item.inProgress && item.canBeWhitelisted &&
                     <Button
+                      disabled={item.processing}
                       onPress={() => { this.whitelist(item) }}>
                       <Text style={styles.wide}>Whitelist</Text>
+                      {item.processing && <Spinner style={styles.spin} size='small' color='white' />}
                     </Button>
                   }
                   {!item.inProgress && !item.canBeWhitelisted &&
                     <Button
+                      disabled={item.processing}
                       onPress={() => { this.delist(item) }}>
-                      <Text>Delist</Text>
+                      <Text style={styles.wide}>Delist</Text>
+                      {item.processing && <Spinner style={styles.spin} size='small' color='white' />}
                     </Button>
                   }
                 </Right>
