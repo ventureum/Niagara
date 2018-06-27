@@ -22,6 +22,8 @@ export interface Props {
   delisted: Function;
   whitelisted: Function;
   voted: Function;
+  refreshProject: Function;
+  loading: String;
 }
 export interface State {}
 class TCR extends React.Component<Props, State> {
@@ -45,13 +47,13 @@ class TCR extends React.Component<Props, State> {
         </Header>
         <Tabs initialPage={0}>
           <Tab heading='Whitelisted'>
-            <Whitelisted navigation={this.props.navigation} list={this.props.list} />
+            <Whitelisted loading={this.props.loading} refreshProject={this.props.refreshProject} navigation={this.props.navigation} list={this.props.list} />
           </Tab>
           <Tab heading='Vote'>
-            <Vote navigation={this.props.navigation} list={this.props.list} delisted={this.props.delisted} whitelisted={this.props.whitelisted} voted={this.props.voted} />
+            <Vote loading={this.props.loading} refreshProject={this.props.refreshProject} navigation={this.props.navigation} list={this.props.list} delisted={this.props.delisted} whitelisted={this.props.whitelisted} voted={this.props.voted} />
           </Tab>
           <Tab heading='Pending'>
-            <Pending navigation={this.props.navigation} list={this.props.list} />
+            <Pending loading={this.props.loading} refreshProject={this.props.refreshProject} navigation={this.props.navigation} list={this.props.list} />
           </Tab>
         </Tabs>
       </Container>

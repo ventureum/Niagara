@@ -18,7 +18,7 @@ import {
   Title,
   Toast
 } from 'native-base'
-import { Modal } from 'react-native'
+import { Modal, RefreshControl } from 'react-native'
 import tcr from '../../../../services/tcr'
 import styles from './styles'
 export interface Props {
@@ -27,6 +27,7 @@ export interface Props {
   delisted: Function;
   whitelisted: Function;
   voted: Function;
+  loading: String;
 }
 export interface State {}
 class Vote extends React.Component<Props, State> {
@@ -113,7 +114,10 @@ class Vote extends React.Component<Props, State> {
 
   render () {
     return (
-      <Content>
+      <Content refreshControl={
+        <RefreshControl refreshing={this.props.loading}
+          onRefresh={this.props.refreshProject}
+        />}>
         <Modal
           animationType='slide'
           transparent={false}

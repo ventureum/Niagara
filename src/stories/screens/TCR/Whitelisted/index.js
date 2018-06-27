@@ -6,15 +6,20 @@ import {
   ListItem
 } from 'native-base'
 import styles from './styles'
+import { RefreshControl } from 'react-native'
 export interface Props {
   navigation: any;
   list: any;
+  loading: String;
 }
 export interface State {}
 class Whitelisted extends React.Component<Props, State> {
   render () {
     return (
-      <Content>
+      <Content refreshControl={
+        <RefreshControl refreshing={this.props.loading}
+          onRefresh={this.props.refreshProject}
+        />}>
         <List style={styles.list}>
           {this.props.list &&
             typeof (this.props.list.whitelistList) === typeof ([]) &&

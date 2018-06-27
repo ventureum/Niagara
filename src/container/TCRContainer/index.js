@@ -11,7 +11,8 @@ export interface Props {
   data: Object,
   delisted: Function,
   whitelisted: Function,
-  voted: Function
+  voted: Function,
+  isLoading: String
 }
 export interface State {}
 class TCRContainer extends React.Component<Props, State> {
@@ -40,7 +41,7 @@ class TCRContainer extends React.Component<Props, State> {
   }
 
   render () {
-    return <TCR navigation={this.props.navigation} list={this.props.data} delisted={this.props.delisted} whitelisted={this.props.whitelisted} voted={this.props.voted} />
+    return <TCR loading={this.props.isLoading} refreshProject={this.getProjects.bind(this)} navigation={this.props.navigation} list={this.props.data} delisted={this.props.delisted} whitelisted={this.props.whitelisted} voted={this.props.voted} />
   }
 }
 
