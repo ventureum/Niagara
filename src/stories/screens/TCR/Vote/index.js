@@ -33,6 +33,10 @@ export interface Props {
   loading: String;
 }
 export interface State {}
+
+const big = (number) => new BigNumber(number.toString(10))
+const tenToTheEighteenth = big(10).pow(big(18))
+
 class Vote extends React.Component<Props, State> {
   state = {
     projectList: this.props.list && typeof (this.props.list.votingList) === typeof ([]) && this.props.list.votingList,
@@ -255,7 +259,7 @@ class Vote extends React.Component<Props, State> {
                 <Body style={styles.body}>
                   <Text>{item.hash}</Text>
                   {item.inProgress &&
-                    <Text note>Support: {typeof (item.voteFor) === typeof ('') ? item.voteFor : item.voteFor.toNumber()} | Against: {typeof (item.voteAgainst) === typeof ('') ? item.voteAgainst : item.voteAgainst.toNumber()}</Text>
+                    <Text note>Support: {typeof (item.voteFor) === typeof ('') ? big(item.voteFor).div(tenToTheEighteenth).toNumber() : item.voteFor.div(tenToTheEighteenth).toNumber()} | Against: {typeof (item.voteAgainst) === typeof ('') ? big(item.voteAgainst).div(tenToTheEighteenth).toNumber() : item.voteAgainst.div(tenToTheEighteenth).toNumber()}</Text>
                   }
                 </Body>
                 <Right>
