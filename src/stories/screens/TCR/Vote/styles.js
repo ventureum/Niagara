@@ -23,6 +23,13 @@ const styles: any = StyleSheet.create({
     paddingRight: 6,
     width: 82,
     textAlign: 'center'
+  },
+  spin: {
+    marginRight: 10,
+    marginLeft: -5
+  },
+  body: {
+    marginRight: '10%'
   }
 })
 export default styles

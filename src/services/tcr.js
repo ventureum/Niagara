@@ -91,8 +91,8 @@ class TCRService {
   }
 
   async vote (hash, option, amount) {
-    let data = this.tcr.methods.vote(this.account, hash, option, Number(amount)).encodeABI()
-    await this.token.methods.approveAndCall(this.address, Number(amount), data).send()
+    let data = this.tcr.methods.vote(this.account, hash, option, amount).encodeABI()
+    await this.token.methods.approveAndCall(this.address, amount, data).send()
   }
 }
 
