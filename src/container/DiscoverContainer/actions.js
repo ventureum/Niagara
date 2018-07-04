@@ -1,46 +1,23 @@
-import WalletUtils from '../../utils/wallet.js'
-let stream = require('getstream')
-const client = stream.connect('6tp7vtdetzcd', null, '38815', { location: 'us-east' })
-
-const NUMBER_OF_POSTS_PER_FETCH = 15
-
-function _getTimelineFeed (feedToken) {
-  const web3 = WalletUtils.getWeb3Instance()
-  const userAddress = web3.eth.defaultAccount
-  return client.feed('timeline', userAddress, feedToken)
-}
-
-function _refreshPosts (feed) {
-  return {
-    type: 'REFRESH_POSTS',
-    payload: feed.get({ limit: NUMBER_OF_POSTS_PER_FETCH })
-  }
-}
+import { batchReadFeedsByBoardId, addContentToIPFS, addPostToForum } from '../../services/forum'
 
 function refreshPosts () {
-  return (dispatch, getState) => {
-    const feedToken = getState().discoverReducer.timelineToken
-    const timelineFeed = _getTimelineFeed(feedToken)
-    dispatch(_refreshPosts(timelineFeed))
+  return {
+    type: 'REFRESH_POSTS',
+    payload: batchReadFeedsByBoardId('board:all')
   }
 }
 
-function _getMorePosts (offset, feed) {
+function _getMorePosts (lastUUID) {
   return {
     type: 'GET_MORE_POSTS',
-    payload: feed.get({ limit: NUMBER_OF_POSTS_PER_FETCH, offset: offset }),
-    meta: {
-      offset
-    }
+    payload: batchReadFeedsByBoardId('board:all', lastUUID)
   }
 }
 
 function getMorePosts () {
   return (dispatch, getState) => {
-    const offset = getState().discoverReducer.offset + NUMBER_OF_POSTS_PER_FETCH
-    const feedToken = getState().discoverReducer.timelineToken
-    const timelineFeed = _getTimelineFeed(feedToken)
-    dispatch(_getMorePosts(offset, timelineFeed))
+    const lastUUID = getState().discoverReducer.lastUUID
+    dispatch(_getMorePosts(lastUUID))
   }
 }
 
@@ -54,4 +31,25 @@ function setTokens (publicToken, userToken, timelineToken) {
   }
 }
 
-export { refreshPosts, setTokens, getMorePosts }
+function getReplies (postHash) {
+  return {
+    type: 'GET_REPLIES',
+    payload: batchReadFeedsByBoardId('comment:' + postHash)
+  }
+}
+
+function _addContentToIPFS (content) {
+  return {
+    type: 'ADD_CONTENT_TO_IPFS',
+    payload: addContentToIPFS(content)
+  }
+}
+
+function _addPostToForum (boardId, parentHash, postHash, ipfsPath) {
+  return {
+    type: 'ADD_POST_TO_FORUM',
+    payload: addPostToForum(boardId, parentHash, postHash, ipfsPath)
+  }
+}
+
+export { refreshPosts, setTokens, getMorePosts, getReplies, _addContentToIPFS, _addPostToForum }

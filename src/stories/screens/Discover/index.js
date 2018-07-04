@@ -1,66 +1,43 @@
 import React, { Component } from 'react'
-import { Text, FlatList, View, Image } from 'react-native'
-import { Container, Body, Header, Left, Right, Button, Icon, Title, Thumbnail, Card, CardItem } from 'native-base'
-import styles from './styles'
+import { FlatList, RefreshControl, View } from 'react-native'
+import { Container, Body, Header, Left, Right, Button, Icon, Title, Text, Content } from 'native-base'
+import FeedCard from '../../components/FeedCard'
+import WalletUtils from '../../../utils/wallet'
 
 console.ignoredYellowBox = ['Setting a timer']
 
 export default class Discover extends Component {
   onRefresh = () => {
     this.props.refreshPosts()
-    this.flatListRef.scrollToIndex({ animated: true, index: 0 })
+    if (this.props.posts.length !== 0) {
+      this.flatListRef.scrollToIndex({ animated: true, index: 0 })
+    }
   }
 
+  toUpvote = () => {
+    return null
+  }
+
+  toReply(post) {
+    this.props.navigation.navigate('Reply', {
+      post
+    })
+  }
   onRenderItem = ({ item }) => {
-    const actor = item.actor.slice(0, 8) + '...' + item.actor.slice(-6)
-    let cardContent
-    if (item.content.image === undefined) {
-      cardContent = (
-        <Body>
-          <Text>
-            {item.content.text}
-          </Text>
-        </Body>
-      )
-    } else {
-      cardContent = (<Image source={{ uri: item.content.image }} style={{ height: 300, width: null, flex: 1 }} />)
+    item = {
+      ...item,
+      author: WalletUtils.getAddrAbbre(item.author),
+      avatar: WalletUtils.getAvatar(item.author)
     }
     return (
-      <Card>
-        <CardItem>
-          <Left>
-            <Thumbnail small source={{ uri: this.props.identiconBase64 }} />
-            <Body>
-              <Text style={styles.titleText}>{item.content.title}</Text>
-              <Text style={styles.noteText}>{actor}</Text>
-            </Body>
-          </Left>
-        </CardItem>
-        <CardItem>
-          {cardContent}
-        </CardItem>
-        <CardItem >
-          <Left>
-            <Button transparent>
-              <Icon active name='thumbs-up' />
-              <Text>12 Likes</Text>
-            </Button>
-          </Left>
-          <Body>
-            <Button transparent>
-              <Icon active name='chatbubbles' />
-              <Text>4 Comments</Text>
-            </Button>
-          </Body>
-          <Right>
-            <Text>11h ago</Text>
-          </Right>
-        </CardItem>
-      </Card>
+      <FeedCard post={item}
+        navigation={this.props.navigation}
+        upvote={this.toUpvote}
+        feedCardDetails={this.toReply} />
     )
   }
 
-  render () {
+  render() {
     return (
       <Container>
         <Header >
@@ -78,14 +55,27 @@ export default class Discover extends Component {
             </Button>
           </Right>
         </Header>
-        <FlatList
-          data={this.props.posts}
-          renderItem={this.onRenderItem}
-          ref={(ref) => { this.flatListRef = ref }}
-          keyExtractor={item => item.id}
-          onEndReachedThreshold={0.7}
-          onEndReached={this.props.getMorePosts}
-        />
+        {this.props.posts.length === 0 ?
+          <Content contentContainerStyle={{ flex: 1, justifyContent: 'center', flexDirection: 'row', alignItems: 'center' }}
+            refreshControl={
+              <RefreshControl refreshing={this.props.loading}
+                onRefresh={this.onRefresh}
+              />}>
+            <Text > No feed information were found. </Text>
+          </Content> :
+          <FlatList
+            data={this.props.posts}
+            renderItem={this.onRenderItem}
+            ref={(ref) => { this.flatListRef = ref }}
+            keyExtractor={item => item.id}
+            onEndReachedThreshold={0.5}
+            onEndReached={this.props.getMorePosts}
+            refreshControl={
+              <RefreshControl refreshing={this.props.loading}
+                onRefresh={this.onRefresh}
+              />}
+          />
+        }
       </Container>
     )
   }

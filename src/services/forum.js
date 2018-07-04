@@ -1,23 +1,29 @@
+import Config from 'react-native-config'
 import WalletUtils from '../utils/wallet'
 import axios from 'axios'
 import bs58 from 'bs58'
+import { Toast } from 'native-base'
 
 const stream = require('getstream')
-const apiSecret = ''
-const apiKey = ''
-const client = stream.connect(apiKey)
+const client = stream.connect(Config.STREAM_API_KEY)
+const GAS_PRICE = '20000000000'
+const MINIMUM_BALANCE = 10000000000000000
 
 /*
   fetch the content of a single post from IPFS
   @param post A post object with its ipfsPath
   @return A post object with with its content
 */
-async function _getSingleContent (post) {
-  let ipfsContent = await axios.get('https://ipfs.infura.io/ipfs/' + post.ipfsPath)
+async function _getSingleContent(post) {
+  let ipfsContent = await axios.get(Config.INFURA_IPFS + post.ipfsPath)
   return { ...post, content: ipfsContent.data }
 }
 
-function getMultihashFromBytes32 (digest) {
+/*
+  translate a given bytes32 hash into a multihash
+  IPFS utils function
+*/
+function getMultihashFromBytes32(digest) {
   const hashFunction = 18
   const size = 32
 
@@ -32,6 +38,20 @@ function getMultihashFromBytes32 (digest) {
 
   return bs58.encode(multihashBytes)
 }
+
+/*
+  translate a given multihash into bytes32 hash
+  IPFS utils function
+*/
+function getBytes32FromMultiash(multihash) {
+  const decoded = bs58.decode(multihash)
+
+  return {
+    digest: `0x${decoded.slice(2).toString('hex')}`,
+    hashFunction: decoded[0],
+    size: decoded[1]
+  }
+}
 // @param size less than 10
 
 /*
@@ -43,16 +63,16 @@ function getMultihashFromBytes32 (digest) {
     API. size must satisfy: 0 < size <= 10
   @return return a array of post details
 */
-async function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
+async function batchReadFeedsByBoardId(feed, id_lt = null, size = 10) {
   // get feed token from lamda API
   const feedSlug = feed.split(':')
   const response = await axios.post(
-    'https://dh3rwe6m9a.execute-api.ca-central-1.amazonaws.com/prod/feed_token',
+    Config.FEED_TOKEN_API,
     {
       'feedSlug': feedSlug[0],
       'userId': feedSlug[1],
-      'getStreamApiKey': apiKey,
-      'getStreamApiSecret': apiSecret
+      'getStreamApiKey': Config.STREAM_API_KEY,
+      'getStreamApiSecret': Config.STREAM_API_SECRET
     }
   )
 
@@ -113,4 +133,57 @@ async function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
   return postContents
 }
 
-export { batchReadFeedsByBoardId }
+/*
+  @param content is a jsObject in a form of
+    content ={
+      title: "",
+      text: "",
+      image: ""
+    }
+  @param return the bytes32 path hash on IPFS of the content
+  Add a given content to IPFS
+*/
+async function addContentToIPFS(content) {
+  // prepare data for IPFS post
+  const buf = Buffer.from(JSON.stringify(content))
+  const data = buf.toJSON()
+  const toIPFS = {
+    'command': 'add',
+    'data': data
+  }
+
+  // post content to IPFS
+  const IPFSHash = await axios.post(
+    Config.IPFS_POST_API,
+    toIPFS
+  )
+
+  // translate multiHash into bytes32 hash
+  const ipfsPath = getBytes32FromMultiash(IPFSHash.data.body[0].path).digest
+
+  return ipfsPath
+}
+
+/*
+  @param boardId A bytes32 hash of the boardID
+  @param parentHash A bytes32 hash of the post's parent
+  @param postHash A bytes32 hash of the post
+  @param ipfsPath a bytes32 path hash on IPFS of the post content
+  Add the post to Forum contract
+*/
+async function addPostToForum(boardId, parentHash, postHash, ipfsPath) {
+  const forum = await WalletUtils.getContractInstance('Forum')
+  await forum.methods.post(boardId, parentHash, postHash, ipfsPath).send({ gasPrice: GAS_PRICE })
+}
+
+/*
+  Check if the user has enough ether for a tx
+  @return true if the user has enough ether
+*/
+async function checkBalanceForTx() {
+  let userBalance = await WalletUtils.getEthBalance();
+  userBalance = userBalance * Math.pow(10, 18)
+  return userBalance > MINIMUM_BALANCE
+}
+
+export { batchReadFeedsByBoardId, addContentToIPFS, addPostToForum, checkBalanceForTx }

@@ -10,10 +10,6 @@ import Forum from './contracts/Forum'
 import Identicon from 'identicon.js'
 
 export default class WalletUtils {
-  /**
-   * Reads an EthereumJSWallet instance from Redux store
-   */
-
   static ERC20 = './abi/ERC20.js'
 
   static web3;
@@ -22,6 +18,9 @@ export default class WalletUtils {
   static symbolToToken = {}
   static tokens = []
 
+  /*
+   * Reads an Web3 wallet instance from Redux store
+   */
   static getWallet () {
     const { walletReducer } = store.getState()
     return walletReducer
@@ -185,7 +184,7 @@ export default class WalletUtils {
     // Modify the following token info for testing
     this.tokens.push({
       'symbol': 'VTX',
-      'address': '0x001F0aA5dA15585e5b2305DbaB2bac425ea71007',
+      'address': '0xdd998c0a031d4a46ec520ecfcbf4ee5ca9ae2cd0',
       'decimals': 18,
       'name': 'VetX Token'
     })
