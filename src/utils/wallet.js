@@ -6,6 +6,8 @@ import { ERC20_ABI } from './contracts/ERC20.js'
 import TCRRegistry from './contracts/Registry'
 import Token from './contracts/VetXToken'
 import tokenData from './tokens.json'
+import Forum from './contracts/Forum'
+import Identicon from 'identicon.js'
 
 export default class WalletUtils {
   /**
@@ -49,7 +51,7 @@ export default class WalletUtils {
         )
     }
   }
-
+  
   /**
    * Returns a web3 instance with the user's wallet
    */
@@ -149,11 +151,29 @@ export default class WalletUtils {
       case 'Token':
         artifact = Token
         break
+      case 'Forum':
+        artifact = Forum
+        break
       default:
         return new Error('Invalid contract name received.')
     }
 
-    return new _web3.eth.Contract(artifact.abi, artifact.networks[networkId].address, {from: account, gas: 500000})
+    return new _web3.eth.Contract(artifact.abi, artifact.networks[networkId].address, { from: account, gas: 500000 })
+  }
+
+  /*
+    generate user avatar by its address
+  */
+  static getAvatar (address) {
+    let identiconData = new Identicon(address, 64).toString()
+    return ('data:image/png;base64,' + identiconData)
+  }
+
+  /*
+    generate the abbreviation of user address
+  */
+  static getAddrAbbre (address) {
+    return address.slice(0, 8) + '...' + address.slice(-6)
   }
 
   /*
