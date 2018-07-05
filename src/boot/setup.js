@@ -7,6 +7,8 @@ import { configureStore } from './configureStore'
 import App from '../App'
 import getTheme from '../theme/components'
 import variables from '../theme/variables/platform'
+import WalletUtils from '../utils/wallet.js'
+
 export interface Props {}
 export interface State {
   store: Object;
@@ -19,6 +21,8 @@ export default class Setup extends React.Component<Props, State> {
       isLoading: false,
       store: configureStore(() => this.setState({ isLoading: false }))
     }
+
+    WalletUtils.loadTokens()
   }
 
   render () {

@@ -5,6 +5,7 @@ import { store } from '../boot/configureStore.js'
 import { ERC20_ABI } from './contracts/ERC20.js'
 import TCRRegistry from './contracts/Registry'
 import Token from './contracts/VetXToken'
+import tokenData from './tokens.json'
 
 export default class WalletUtils {
   /**
@@ -14,6 +15,10 @@ export default class WalletUtils {
   static ERC20 = './abi/ERC20.js'
 
   static web3;
+
+  static addressToToken = {}
+  static symbolToToken = {}
+  static tokens = []
 
   static getWallet () {
     const { walletReducer } = store.getState()
@@ -149,5 +154,41 @@ export default class WalletUtils {
     }
 
     return new _web3.eth.Contract(artifact.abi, artifact.networks[networkId].address, {from: account, gas: 500000})
+  }
+
+  /*
+     Load a list of erc20 tokens
+   */
+  static loadTokens () {
+    this.tokens = tokenData.tokens
+    for (var i = 0; i < this.tokens.length; i++) {
+      let token = this.tokens[i]
+      this.addressToToken[token.address] = i
+      if (this.symbolToToken[token.symbol]) {
+        this.symbolToToken[token.symbol].push(i)
+      } else {
+        this.symbolToToken[token.symbol] = [i]
+      }
+    }
+  }
+
+  /*
+     Return a list of token data given symbol or address
+     @param {string} symbol - symbol of a token
+     @param {string} address - address of a token
+     @returns {(Object | Array)} (array of) token data
+     including address, symbol, name, decimals, etc
+   */
+  static getToken (symbol, address) {
+    if (address) {
+      return this.tokens[this.addressToToken[address]]
+    } else {
+      let rv = []
+      for (var i = 0; i < this.symbolToToken[symbol].length; i++) {
+        let idx = this.symbolToToken[symbol][i]
+        rv.push(this.tokens[idx])
+      }
+      return rv
+    }
   }
 }
