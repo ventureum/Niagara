@@ -181,6 +181,15 @@ export default class WalletUtils {
    */
   static loadTokens () {
     this.tokens = tokenData.tokens
+
+    // Modify the following token info for testing
+    this.tokens.push({
+      'symbol': 'VTX',
+      'address': '0x001F0aA5dA15585e5b2305DbaB2bac425ea71007',
+      'decimals': 18,
+      'name': 'VetX Token'
+    })
+
     for (var i = 0; i < this.tokens.length; i++) {
       let token = this.tokens[i]
       this.addressToToken[token.address] = i
