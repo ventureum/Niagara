@@ -51,7 +51,7 @@ export default class WalletUtils {
         )
     }
   }
-  
+
   /**
    * Returns a web3 instance with the user's wallet
    */
@@ -209,9 +209,9 @@ export default class WalletUtils {
      including address, symbol, name, decimals, etc
    */
   static getToken (symbol, address) {
-    if (address) {
+    if (address && this.addressToToken[address]) {
       return this.tokens[this.addressToToken[address]]
-    } else {
+    } else if (this.symbolToToken[symbol]) {
       let rv = []
       for (var i = 0; i < this.symbolToToken[symbol].length; i++) {
         let idx = this.symbolToToken[symbol][i]
@@ -219,5 +219,6 @@ export default class WalletUtils {
       }
       return rv
     }
+    return null
   }
 }
