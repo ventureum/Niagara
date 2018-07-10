@@ -1,23 +1,24 @@
 import { batchReadFeedsByBoardId, addContentToIPFS, addPostToForum } from '../../services/forum'
 
-function refreshPosts () {
+function refreshPosts (feedSlug, feedId) {
+  console.log(feedSlug, feedId)
   return {
     type: 'REFRESH_POSTS',
-    payload: batchReadFeedsByBoardId('board:all')
+    payload: batchReadFeedsByBoardId(feedSlug + ':' + feedId)
   }
 }
 
-function _getMorePosts (lastUUID) {
+function _getMorePosts (feedSlug, feedId, lastUUID) {
   return {
     type: 'GET_MORE_POSTS',
-    payload: batchReadFeedsByBoardId('board:all', lastUUID)
+    payload: batchReadFeedsByBoardId(feedSlug + ':' + feedId, lastUUID)
   }
 }
 
-function getMorePosts () {
+function getMorePosts (feedSlug, feedId) {
   return (dispatch, getState) => {
     const lastUUID = getState().discoverReducer.lastUUID
-    dispatch(_getMorePosts(lastUUID))
+    dispatch(_getMorePosts(feedSlug, feedId, lastUUID))
   }
 }
 
@@ -52,4 +53,14 @@ function _addPostToForum (boardId, parentHash, postHash, ipfsPath) {
   }
 }
 
-export { refreshPosts, setTokens, getMorePosts, getReplies, _addContentToIPFS, _addPostToForum }
+function switchBoard (boardHash, boardName) {
+  return {
+    type: 'SWITCH_BOARD',
+    meta: {
+      boardHash: boardHash,
+      boardName: boardName
+    }
+  }
+}
+
+export { refreshPosts, setTokens, getMorePosts, getReplies, _addContentToIPFS, _addPostToForum, switchBoard }

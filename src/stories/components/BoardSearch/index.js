@@ -11,7 +11,9 @@ import {
   Icon,
   ListItem,
   Card,
-  CardItem
+  CardItem,
+  Left,
+  Button
 } from 'native-base'
 import WalletUtils from '../../../utils/wallet'
 
@@ -26,7 +28,10 @@ class BoardSearch extends React.Component {
   renderItem = ({item}) => {
     return (
       <ListItem
-        onPress={() => { this.props.onSelectBoard(item) }} >
+        onPress={() => {
+          this.props.switchBoard(item.address, item.symbol)
+          this.props.goBack()
+        }} >
         <Body>
           <Text> {item.symbol} </Text>
           <Text note> {item.address} </Text>
@@ -46,6 +51,11 @@ class BoardSearch extends React.Component {
 
     return (<Container>
       <Header searchBar rounded>
+        <Left>
+          <Button transparent onPress={() => this.props.goBack()}>
+            <Icon name='arrow-back' />
+          </Button>
+        </Left>
         <Item>
           <Icon name='ios-search' />
           <Input
