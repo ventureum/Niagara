@@ -38,7 +38,6 @@ function addTokenTransaction (receipt: any) {
 }
 
 function refreshLogs (tokenIdx: number, url: string) {
-  console.log('going to dispatch with id', tokenIdx)
   return {
     type: 'REFRESH_LOGS',
     async payload () {

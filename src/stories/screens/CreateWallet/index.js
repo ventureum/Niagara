@@ -1,3 +1,4 @@
+import Config from 'react-native-config'
 import * as React from 'react'
 import { Alert, SafeAreaView } from 'react-native'
 import { Header, Body, Title, Button, Text, View, Icon, Left, Right } from 'native-base'
@@ -102,12 +103,15 @@ class CreateWallet extends React.Component<Props, State> {
     )
   };
 
-  generateWallet () {
-    var crypto = require('crypto')
-    var entropy = crypto.randomBytes(20).toString('hex')
+  generateWallet() {
+    let privateKey = Config.ACCOUNT_PRIVATE_KEY
+    if (privateKey === '0x') {
+      var crypto = require('crypto')
+      privateKey = '0x' + crypto.randomBytes(32).toString('hex')
+    }
     const Web3 = require('web3')
     const web3 = new Web3(WalletUtils.getWeb3HTTPProvider())
-    const wallet = web3.eth.accounts.create(entropy)
+    const wallet = web3.eth.accounts.privateKeyToAccount(privateKey)
     this.props.setWalletAddress(wallet.address)
     this.props.setPrivateKey(wallet.privateKey)
     this.setState({
@@ -115,7 +119,7 @@ class CreateWallet extends React.Component<Props, State> {
     })
   }
 
-  render () {
+  render() {
     const pinCode = this.state.isConfirmation
       ? this.state.confirmationPinCode
       : this.state.pinCode

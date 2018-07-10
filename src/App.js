@@ -15,6 +15,8 @@ import ReceivePage from './container/ReceivePageContainer'
 import QRScaner from './container/QRScanerContainer'
 import Assets from './container/AssetsContainer'
 import SendAndReceive from './container/SendAndReceiveContainer'
+import Discover from './container/DiscoverContainer'
+import Reply from './container/ReplyContainer'
 
 const Drawer = DrawerNavigator(
   {
@@ -39,7 +41,9 @@ const App = StackNavigator(
     ReceivePage: { screen: ReceivePage },
     QRScaner: { screen: QRScaner },
     Assets: { screen: Assets },
-    SendAndReceive: { screen: SendAndReceive }
+    SendAndReceive: { screen: SendAndReceive },
+    Discover: { screen: Discover },
+    Reply: { screen: Reply }
   },
   {
     initialRouteName: 'Login',
