@@ -1,6 +1,8 @@
 import update from 'immutability-helper'
 
 const initialState = {
+  boardHash: 'all',
+  boardName: 'Feed',
   posts: [],
   lastUUID: '',
   replies: [],
@@ -87,6 +89,14 @@ export default function (state: any = initialState, action: Function) {
     return {
       ...state,
       loading: false
+    }
+  }
+  if (action.type === 'SWITCH_BOARD') {
+    return {
+      ...state,
+      boardHash: action.payload.boardHash,
+      boardName: action.payload.boardName,
+      posts: []
     }
   }
   return state

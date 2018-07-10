@@ -18,7 +18,8 @@ const storage = createSensitiveStorage({
 const persistConfig = {
   key: 'vthwallet',
   version: 1,
-  storage
+  storage,
+  blacklist: ['discoverReducer']
 }
 
 var store = null
