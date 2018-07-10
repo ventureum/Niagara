@@ -1,8 +1,7 @@
-package main
+package feed_events
 
 import (
   "os"
-  "fmt"
   "log"
   "context"
 
@@ -14,14 +13,16 @@ import (
   "strings"
 )
 
-type Client struct {
+
+type EthClient struct {
   c *ethclient.Client
 }
 
 
 const LOCAL_SOCKET_URL string = "ws://127.0.0.1:8546"
 
-func ConnectClient() (*Client) {
+
+func ConnectEthClient() (*EthClient) {
   rawURL := os.Getenv("SOCKET_URL")
 
   if rawURL == "" {
@@ -32,17 +33,17 @@ func ConnectClient() (*Client) {
   if err != nil {
     log.Fatal(err)
   }
-
-  return &Client{c:  client}
+  log.Println("Connected to Ethereum EthClient")
+  return &EthClient{c:  client}
 }
 
-func (client *Client) Close() {
+func (client *EthClient) Close() {
   client.c.Close()
+  log.Println("Disconnected to Ethereum EthClient")
 }
 
 func createFilterQuery(forumAddressHex string) ethereum.FilterQuery {
   forumAddress := common.HexToAddress(forumAddressHex)
-  fmt.Println(forumAddress)
   query := ethereum.FilterQuery{
     Addresses: []common.Address{forumAddress},
     Topics: [][]common.Hash{{
@@ -54,7 +55,7 @@ func createFilterQuery(forumAddressHex string) ethereum.FilterQuery {
   return query
 }
 
-func (client *Client) SubscribeFilterLogs(forumAddressHex string) {
+func (client *EthClient) SubscribeFilterLogs(forumAddressHex string) {
   logs := make(chan types.Log)
   filterQuery := createFilterQuery(forumAddressHex)
   sub, err := client.c.SubscribeFilterLogs(context.Background(), filterQuery, logs)

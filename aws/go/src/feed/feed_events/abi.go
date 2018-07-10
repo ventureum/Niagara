@@ -1,4 +1,4 @@
-package main
+package feed_events
 
 const PostEventABI string = `[{
   "anonymous": false,
@@ -27,6 +27,11 @@ const PostEventABI string = `[{
       "indexed": false,
       "name": "ipfsPath",
       "type": "bytes32"
+    },
+    {
+      "indexed": false,
+      "name": "timestamp",
+      "type": "uint256"
     }
   ],
   "name": "Post",
@@ -50,6 +55,11 @@ const UpdatePostEventABI  = `[{
       "indexed": false,
       "name": "ipfsPath",
       "type": "bytes32"
+    },
+    {
+      "indexed": false,
+      "name": "timestamp",
+      "type": "uint256"
     }
   ],
   "name": "UpdatePost",
@@ -78,9 +88,13 @@ const UpvoteEventABI = `[{
       "indexed": false,
       "name": "value",
       "type": "uint256"
+    },
+    {
+      "indexed": false,
+      "name": "timestamp",
+      "type": "uint256"
     }
   ],
   "name": "Upvote",
   "type": "event"
 }]`
-

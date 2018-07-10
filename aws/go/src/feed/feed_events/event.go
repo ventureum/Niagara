@@ -1,4 +1,4 @@
-package main
+package feed_events
 
 import (
   "github.com/ethereum/go-ethereum/common"
@@ -19,6 +19,7 @@ type PostEventResult struct {
   ParentHash common.Hash
   PostHash common.Hash  // indexed
   IpfsPath common.Hash
+  Timestamp *big.Int
 }
 
 type PostEvent struct {
@@ -27,30 +28,35 @@ type PostEvent struct {
   ParentHash string
   PostHash string  // indexed
   IpfsPath string
+  Timestamp *big.Int
 }
 
 type UpdatePostEventResult struct {
   Poster common.Address  // indexed
   PostHash common.Hash   // indexed
   IpfsPath common.Hash
+  Timestamp *big.Int
 }
 
 type UpdatePostEvent struct {
   Poster string  // indexed
   PostHash string   // indexed
   IpfsPath string
+  Timestamp *big.Int
 }
 
 type UpvoteEventResult struct {
   Poster common.Address // indexed
   BoardId common.Hash   // indexed
   Value *big.Int
+  Timestamp *big.Int
 }
 
 type UpvoteEvent struct {
   Poster string // indexed
   BoardId string   // indexed
-  Value uint64
+  Value *big.Int
+  Timestamp *big.Int
 }
 
 func (postEventResult *PostEventResult) ToPostEvent() *PostEvent {
@@ -60,6 +66,7 @@ func (postEventResult *PostEventResult) ToPostEvent() *PostEvent {
     ParentHash: postEventResult.ParentHash.String(),
     PostHash: postEventResult.PostHash.String(),
     IpfsPath: postEventResult.IpfsPath.String(),
+    Timestamp: postEventResult.Timestamp,
   }
 }
 
@@ -68,6 +75,7 @@ func (updatePostEventResult *UpdatePostEventResult) ToUpdatePostEvent() *UpdateP
     Poster: updatePostEventResult.Poster.String(),
     PostHash: updatePostEventResult.PostHash.String(),
     IpfsPath: updatePostEventResult.IpfsPath.String(),
+    Timestamp: updatePostEventResult.Timestamp,
   }
 }
 
@@ -75,6 +83,7 @@ func (upvoteEventResult *UpvoteEventResult) ToUpvoteEvent() *UpvoteEvent{
   return &UpvoteEvent {
     Poster: upvoteEventResult.Poster.String(),
     BoardId: upvoteEventResult.BoardId.String(),
-    Value: upvoteEventResult.Value.Uint64(),
+    Value: upvoteEventResult.Value,
+    Timestamp: upvoteEventResult.Timestamp,
   }
 }
