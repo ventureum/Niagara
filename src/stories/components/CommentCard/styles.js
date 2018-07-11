@@ -1,66 +1,43 @@
 import { StyleSheet } from 'react-native'
 
 const styles = StyleSheet.create({
-  topMargin: {
-    backgroundColor: 'white',
-    zIndex: -1
-  },
-  content: {
-    padding: 10,
-    backgroundColor: 'white'
-  },
-  heading: {
-    fontSize: 32,
-    fontWeight: '400',
-    marginBottom: 30
-  },
   card: {
+    flex: 1,
     paddingTop: 20,
     paddingBottom: 5,
     paddingLeft: 10,
     paddingRight: 10,
     borderBottomColor: '#bbb',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    flexDirection: 'column'
+    flexDirection: 'row'
   },
-  cardText: {
-    marginTop: 10,
-    fontSize: 18,
-    color: '#555'
-  },
-  cardFooter: {
+  avatarContainer: {
+    flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 0
+    justifyContent: 'center',
+    alignItems: 'flex-start'
   },
-  badgeCount: {
-    fontSize: 12,
-    paddingLeft: 5
+  ContentContainer: {
+    flex: 7,
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    paddingLeft: 15
   },
-  footerIcons: {
-    flexDirection: 'row',
-    alignItems: 'center'
+  authorContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'stretch'
   },
-  modalFooter: {
-    backgroundColor: 'white',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 0.2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    height: 54,
-    width: '100%',
-    flexDirection: 'row',
+  commentContainer: {
+    flex: 1,
+    flexDirection: 'column',
     justifyContent: 'flex-start',
-    alignItems: 'center',
-    padding: 5
+    flexWrap: 'wrap',
+    paddingTop: 7,
+    paddingRight: 10
   },
-  modal: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    position: 'absolute',
-    zIndex: 4,
-    elevation: 4
+  authorText: {
+    fontSize: 17
   }
 })
 

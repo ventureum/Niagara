@@ -2,11 +2,13 @@ import React, { Component } from 'react'
 import { Text, Button, Spinner, Toast } from 'native-base'
 import { FlatList, TextInput, View, KeyboardAvoidingView } from 'react-native'
 import CommentCard from '../../components/CommentCard'
+import FeedCard from '../../components/FeedCard'
 import styles from './styles'
 import { checkBalanceForTx } from '../../../services/forum'
+import WalletUtils from '../../../utils/wallet'
 
 export default class Reply extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = ({
       text: null
@@ -14,6 +16,14 @@ export default class Reply extends Component {
   }
 
   onRenderItem = ({ item }) => {
+    if (item === this.props.post) {
+      return <FeedCard post={item} />
+    }
+    item = {
+      ...item,
+      author: WalletUtils.getAddrAbbre(item.author),
+      avatar: WalletUtils.getAvatar(item.author)
+    }
     return (
       <CommentCard post={item} />
     )
@@ -46,8 +56,7 @@ export default class Reply extends Component {
           duration: 10000
         })
         this.setState({ text: null })
-      }
-      else {
+      } else {
         Toast.show({
           type: 'danger',
           text: 'Insufficient fund!',
@@ -59,7 +68,7 @@ export default class Reply extends Component {
     }
   }
 
-  render() {
+  render () {
     const { post, replies } = this.props
     let content = [post]
     content = content.concat(replies)

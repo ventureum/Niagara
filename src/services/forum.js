@@ -2,7 +2,6 @@ import Config from 'react-native-config'
 import WalletUtils from '../utils/wallet'
 import axios from 'axios'
 import bs58 from 'bs58'
-import { Toast } from 'native-base'
 
 const stream = require('getstream')
 const client = stream.connect(Config.STREAM_API_KEY)
@@ -14,7 +13,7 @@ const MINIMUM_BALANCE = 10000000000000000
   @param post A post object with its ipfsPath
   @return A post object with with its content
 */
-async function _getSingleContent(post) {
+async function _getSingleContent (post) {
   let ipfsContent = await axios.get(Config.INFURA_IPFS + post.ipfsPath)
   return { ...post, content: ipfsContent.data }
 }
@@ -23,7 +22,7 @@ async function _getSingleContent(post) {
   translate a given bytes32 hash into a multihash
   IPFS utils function
 */
-function getMultihashFromBytes32(digest) {
+function getMultihashFromBytes32 (digest) {
   const hashFunction = 18
   const size = 32
 
@@ -43,7 +42,7 @@ function getMultihashFromBytes32(digest) {
   translate a given multihash into bytes32 hash
   IPFS utils function
 */
-function getBytes32FromMultiash(multihash) {
+function getBytes32FromMultiash (multihash) {
   const decoded = bs58.decode(multihash)
 
   return {
@@ -63,7 +62,7 @@ function getBytes32FromMultiash(multihash) {
     API. size must satisfy: 0 < size <= 10
   @return return a array of post details
 */
-async function batchReadFeedsByBoardId(feed, id_lt = null, size = 10) {
+async function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
   // get feed token from lamda API
   const feedSlug = feed.split(':')
   const response = await axios.post(
@@ -143,7 +142,7 @@ async function batchReadFeedsByBoardId(feed, id_lt = null, size = 10) {
   @param return the bytes32 path hash on IPFS of the content
   Add a given content to IPFS
 */
-async function addContentToIPFS(content) {
+async function addContentToIPFS (content) {
   // prepare data for IPFS post
   const buf = Buffer.from(JSON.stringify(content))
   const data = buf.toJSON()
@@ -171,7 +170,7 @@ async function addContentToIPFS(content) {
   @param ipfsPath a bytes32 path hash on IPFS of the post content
   Add the post to Forum contract
 */
-async function addPostToForum(boardId, parentHash, postHash, ipfsPath) {
+async function addPostToForum (boardId, parentHash, postHash, ipfsPath) {
   const forum = await WalletUtils.getContractInstance('Forum')
   await forum.methods.post(boardId, parentHash, postHash, ipfsPath).send({ gasPrice: GAS_PRICE })
 }
@@ -180,8 +179,8 @@ async function addPostToForum(boardId, parentHash, postHash, ipfsPath) {
   Check if the user has enough ether for a tx
   @return true if the user has enough ether
 */
-async function checkBalanceForTx() {
-  let userBalance = await WalletUtils.getEthBalance();
+async function checkBalanceForTx () {
+  let userBalance = await WalletUtils.getEthBalance()
   userBalance = userBalance * Math.pow(10, 18)
   return userBalance > MINIMUM_BALANCE
 }

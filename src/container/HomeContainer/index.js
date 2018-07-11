@@ -1,10 +1,10 @@
 // @flow
 import * as React from 'react'
-import BlankPage from '../BlankPageContainer'
 import TCRContainer from '../TCRContainer'
 import { TabNavigator } from 'react-navigation'
 import { Button, Text, Icon, Footer, FooterTab } from 'native-base'
 import Assets from '../AssetsContainer'
+import Discover from '../DiscoverContainer'
 
 export interface Props {
   navigation: any;
@@ -12,7 +12,8 @@ export interface Props {
 export default (MainScreenNavigator = TabNavigator(
   {
     Assets: { screen: Assets },
-    TCR: { screen: TCRContainer }
+    TCR: { screen: TCRContainer },
+    Discover: {screen: Discover}
   },
   {
     tabBarPosition: 'bottom',
