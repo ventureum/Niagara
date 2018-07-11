@@ -13,6 +13,7 @@ import {
   Button
 } from 'native-base'
 import styles from './styles'
+let moment = require('moment')
 
 export default class FeedCard extends React.Component {
   render () {
@@ -49,6 +50,11 @@ export default class FeedCard extends React.Component {
                 }}
               >
                 {'@' + post.author}
+              </Text>
+            </View>
+            <View style={{flex: 1, flexDirection: 'column', justifyContent: 'flex-end'}}>
+              <Text style={{paddingLeft: 10, paddingBottom: 10, fontSize: 13, color: '#aaa'}}>
+                {moment.utc(post.time).fromNow()}
               </Text>
             </View>
           </View>

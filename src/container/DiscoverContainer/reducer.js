@@ -94,8 +94,8 @@ export default function (state: any = initialState, action: Function) {
   if (action.type === 'SWITCH_BOARD') {
     return {
       ...state,
-      boardHash: action.payload.boardHash,
-      boardName: action.payload.boardName,
+      boardHash: action.meta.boardHash,
+      boardName: action.meta.boardName,
       posts: []
     }
   }

@@ -115,7 +115,8 @@ async function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
         author: '0x' + postDataFromForumContrat[i + 3].substr(26, 40),
         rewards: (web3.utils.toBN(postDataFromForumContrat[i + 4]).div(base).toNumber()) / (10 ** 2),
         repliesLength: web3.utils.toDecimal(postDataFromForumContrat[i + 5]),
-        id: feedData.results[i / 6].id
+        id: feedData.results[i / 6].id,
+        time: feedData.results[i / 6].time
       })
     } else {
       break

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Discover from '../../stories/screens/Discover'
-import { refreshPosts, getMorePosts, switchBoard } from './actions'
+import { refreshPosts, getMorePosts, switchBoard, _addContentToIPFS, _addPostToForum } from './actions'
 
 class DiscoverContainer extends Component {
   constructor (props) {
@@ -19,6 +19,9 @@ class DiscoverContainer extends Component {
         switchBoard={this.props.switchBoard}
         boardHash={this.props.boardHash}
         boardName={this.props.boardName}
+        addContentToIPFS={this.props.addContentToIPFS}
+        addPostToForum={this.props.addPostToForum}
+        ipfsPath={this.props.ipfsPath}
       />
     )
   }
@@ -28,13 +31,16 @@ const mapStateToProps = state => ({
   posts: state.discoverReducer.posts,
   loading: state.discoverReducer.loading,
   boardHash: state.discoverReducer.boardHash,
-  boardName: state.discoverReducer.boardName
+  boardName: state.discoverReducer.boardName,
+  ipfsPath: state.discoverReducer.ipfsPath
 })
 
 const mapDispatchToProps = (dispatch) => ({
   refreshPosts: (boardHash) => dispatch(refreshPosts('board', boardHash)),
   getMorePosts: (boardHash) => dispatch(getMorePosts('board', boardHash)),
-  switchBoard: (boardHash, boardName) => dispatch(switchBoard(boardHash, boardName))
+  switchBoard: (boardHash, boardName) => dispatch(switchBoard(boardHash, boardName)),
+  addContentToIPFS: (content) => dispatch(_addContentToIPFS(content)),
+  addPostToForum: (boardId, parentHash, postHash, ipfsPath) => dispatch(_addPostToForum(boardId, parentHash, postHash, ipfsPath))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(DiscoverContainer)
