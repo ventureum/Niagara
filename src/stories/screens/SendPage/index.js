@@ -44,145 +44,145 @@ export default class SendPage extends Component {
       symbol: this.state.symbol,
       decimals: this.state.decimals
     }).then((balance) => {
-      this.setState({balance})
+      this.setState({ balance })
     })
   }
-    sendTx = () => {
-      const sender = web3.eth.defaultAccount
-      const receiver = this.state.receiverAddr
-      const amount = web3.utils.toWei(this.state.amount, 'ether')
+  sendTx = () => {
+    const sender = web3.eth.defaultAccount
+    const receiver = this.state.receiverAddr
+    const amount = web3.utils.toWei(this.state.amount, 'ether')
 
-      if (this.state.symbol === 'ETH') {
-        web3.eth.sendTransaction({
-          from: sender,
-          to: receiver,
-          value: amount,
-          gas: 500000
-        }).on('transactionHash', (hash) => {
-          this.setState({transactionState: 'pending'})
-        }).on('error', (error, rec) => {
+    if (this.state.symbol === 'ETH') {
+      web3.eth.sendTransaction({
+        from: sender,
+        to: receiver,
+        value: amount,
+        gas: 500000
+      }).on('transactionHash', (hash) => {
+        this.setState({ transactionState: 'pending' })
+      }).on('error', (error, rec) => {
+        Toast.show({
+          text: 'Error in sending transaction!',
+          position: 'center',
+          buttonText: 'Okay',
+          type: 'danger',
+          duration: 10000
+        })
+        this.setState({ transactionState: 'normal' })
+      }).on('receipt', (receipt) => {
+        this.setState({ transactionState: 'normal' }, () => {
           Toast.show({
-            text: 'Error in sending transaction!',
-            position: 'center',
+            text: 'Transaction is fulfilled!',
             buttonText: 'Okay',
-            type: 'danger',
+            type: 'success',
+            position: 'center',
             duration: 10000
           })
-          this.setState({transactionState: 'normal'})
-        }).on('receipt', (receipt) => {
-          this.setState({transactionState: 'normal'}, () => {
-            Toast.show({
-              text: 'Transaction is fulfilled!',
-              buttonText: 'Okay',
-              type: 'success',
-              position: 'center',
-              duration: 10000
-            })
-            this.props.navigation.goBack()
-          })
+          this.props.navigation.goBack()
         })
-      } else {
-        // Other ERC20 Token:
-        const tokenInstance = wallet.getERC20Instance(this.state.address)
-        tokenInstance.methods.transfer(receiver, amount).send({
-          from: sender,
-          gas: 500000
-        }).on('transactionHash', (hash) => {
-          this.setState({transactionState: 'pending'})
-        }).on('error', (error) => {
+      })
+    } else {
+      // Other ERC20 Token:
+      const tokenInstance = wallet.getERC20Instance(this.state.address)
+      tokenInstance.methods.transfer(receiver, amount).send({
+        from: sender,
+        gas: 500000
+      }).on('transactionHash', (hash) => {
+        this.setState({ transactionState: 'pending' })
+      }).on('error', (error) => {
+        Toast.show({
+          text: 'Error in sending transaction!',
+          position: 'center',
+          buttonText: 'Okay',
+          type: 'danger',
+          duration: 10000
+        })
+        this.setState({ transactionState: 'normal' })
+      }).on('receipt', (receipt) => {
+        this.setState({ transactionState: 'normal' }, () => {
           Toast.show({
-            text: 'Error in sending transaction!',
+            text: 'Transaction is fulfilled!',
             position: 'center',
             buttonText: 'Okay',
-            type: 'danger',
+            type: 'success',
             duration: 10000
           })
-          this.setState({transactionState: 'normal'})
-        }).on('receipt', (receipt) => {
-          this.setState({transactionState: 'normal'}, () => {
-            Toast.show({
-              text: 'Transaction is fulfilled!',
-              position: 'center',
-              buttonText: 'Okay',
-              type: 'success',
-              duration: 10000
-            })
-            this.props.navigation.goBack()
-          })
+          this.props.navigation.goBack()
         })
-      }
+      })
     }
+  }
 
-    returnData (data) {
-      this.setState({receiverAddr: data})
-    }
+  returnData (data) {
+    this.setState({ receiverAddr: data })
+  }
 
-    render () {
-      let button
-      if (this.state.transactionState === 'pending') {
-        button = (
-          <Button block onPress={this.sendTx}>
-            <Spinner />
-          </Button>
-        )
-      } else {
-        button = (
-          <Button block onPress={this.sendTx}>
-            <Text>Send</Text>
-          </Button>
-        )
-      }
-      return (
-        <Container>
-          <Header>
-            <Left>
-              <Button transparent onPress={() => this.props.navigation.goBack()}>
-                <Icon name='arrow-back' />
-              </Button>
-            </Left>
-            <Body>
-              <Title>Send</Title>
-            </Body>
-            <Right>
-              <Button transparent
-                onPress={
-                  () => this.props.navigation.navigate('QRScaner', {returnData: this.returnData.bind(this)})
-                }
-              >
-                <Icon name='menu' />
-              </Button>
-            </Right>
-          </Header>
-          <Content>
-            <Form>
-              <Item >
-                <Input placeholder="Receiver's Address"
-                  onChangeText={(text) => this.setState({receiverAddr: text})}
-                  value={this.state.receiverAddr}
-                />
-                <Icon active name='home' />
-              </Item>
-              <Item>
-                <Label>Symbol:</Label>
-                <Input disabled value={String(this.state.symbol)} />
-              </Item>
-              <Item>
-                <Label>Balance:</Label>
-                <Input disabled value={String(this.state.balance)} />
-              </Item>
-              <Item >
-                <Input placeholder='Amount'
-                  onChangeText={(text) => this.setState({amount: text})}
-                  value={String(this.state.amount)} />
-              </Item>
-            </Form>
-          </Content>
-          <Footer>
-            <Right>
-              {button}
-            </Right>
-          </Footer>
-        </Container>
+  render () {
+    let button
+    if (this.state.transactionState === 'pending') {
+      button = (
+        <Button block onPress={this.sendTx}>
+          <Spinner />
+        </Button>
+      )
+    } else {
+      button = (
+        <Button block onPress={this.sendTx}>
+          <Text>Send</Text>
+        </Button>
       )
     }
+    return (
+      <Container>
+        <Header>
+          <Left>
+            <Button transparent onPress={() => this.props.navigation.goBack()}>
+              <Icon name='arrow-back' />
+            </Button>
+          </Left>
+          <Body>
+            <Title>Send</Title>
+          </Body>
+          <Right>
+            <Button transparent
+              onPress={
+                () => this.props.navigation.navigate('QRScaner', { returnData: this.returnData.bind(this) })
+              }
+            >
+              <Icon name='menu' />
+            </Button>
+          </Right>
+        </Header>
+        <Content>
+          <Form>
+            <Item >
+              <Input placeholder="Receiver's Address"
+                onChangeText={(text) => this.setState({ receiverAddr: text })}
+                value={this.state.receiverAddr}
+              />
+              <Icon active name='home' />
+            </Item>
+            <Item>
+              <Label>Symbol:</Label>
+              <Input disabled value={String(this.state.symbol)} />
+            </Item>
+            <Item>
+              <Label>Balance:</Label>
+              <Input disabled value={String(this.state.balance)} />
+            </Item>
+            <Item >
+              <Input placeholder='Amount'
+                onChangeText={(text) => this.setState({ amount: text })}
+                value={String(this.state.amount)} />
+            </Item>
+          </Form>
+        </Content>
+        <Footer>
+          <Right>
+            {button}
+          </Right>
+        </Footer>
+      </Container>
+    )
+  }
 }

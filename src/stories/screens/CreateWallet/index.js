@@ -103,7 +103,7 @@ class CreateWallet extends React.Component<Props, State> {
     )
   };
 
-  generateWallet() {
+  generateWallet () {
     let privateKey = Config.ACCOUNT_PRIVATE_KEY
     if (privateKey === '0x') {
       var crypto = require('crypto')
@@ -119,7 +119,7 @@ class CreateWallet extends React.Component<Props, State> {
     })
   }
 
-  render() {
+  render () {
     const pinCode = this.state.isConfirmation
       ? this.state.confirmationPinCode
       : this.state.pinCode
