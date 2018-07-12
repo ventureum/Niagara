@@ -46,6 +46,14 @@ func (feedId FeedId) Value() string {
 }
 
 func (feedId FeedId) FeedToken(secret string) string {
-   id := strings.Replace(feedId.Value(), ":", "", -1)
-   return utils.CryptoToken(id, secret)
+  id := strings.Replace(feedId.Value(), ":", "", -1)
+  return utils.CryptoToken(id, secret)
+}
+
+func ConvertToStringArray(feedIds []FeedId) []string {
+  arr := make([]string, len(feedIds))
+  for i, v := range feedIds {
+    arr[i] = v.Value()
+  }
+  return arr
 }

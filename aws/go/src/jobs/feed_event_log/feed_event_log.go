@@ -17,8 +17,14 @@ func main() {
   log.Printf("Get Forum Address: %s\n", forumAddress)
 
   log.Println("Connecting to Ethereum EthClient")
-  client := feed_events.ConnectEthClient()
+  ethClient := feed_events.ConnectEthClient()
+
+  log.Println("Connecting to GetStream Client")
+  getStreamClient := feed_events.ConnectGetStreamClient()
+
+  log.Println("Connecting to Dynamodb Client")
+  dynamodbClient := feed_events.CreateDynamodbFeedClient()
 
   log.Printf("Subscribing to logs at Forum Address: %s\n", forumAddress)
-  client.SubscribeFilterLogs(forumAddress)
+  ethClient.SubscribeFilterLogs(forumAddress, getStreamClient, dynamodbClient)
 }

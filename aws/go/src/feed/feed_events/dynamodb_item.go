@@ -55,7 +55,7 @@ func GetObjectFromItemForFeedActivity(itemForFeedActivity *ItemForFeedActivity) 
     switch reflect.TypeOf(*itemForFeedActivity) {
       case reflect.TypeOf(ItemForFeedPostActivity{}):
         obj = (*itemForFeedActivity).(ItemForFeedPostActivity).Activity.Object
-      case reflect.TypeOf(feed_attributes.CommentActivity{}):
+      case reflect.TypeOf(ItemForCommentActivity{}):
         obj = (*itemForFeedActivity).(ItemForCommentActivity).Activity.Object
     }
     return obj
