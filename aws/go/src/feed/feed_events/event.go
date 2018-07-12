@@ -5,28 +5,26 @@ import (
   "math/big"
 )
 
-type Event struct {
-  event interface{}
-}
+type Event interface{}
 
-func NewEvent(e interface{}) (*Event) {
-  return &Event{e}
-}
+
+var NullHashString string = common.HexToHash("0x0").String()
+
 
 type PostEventResult struct {
   Poster common.Address  // indexed
   BoardId common.Hash    // indexed
   ParentHash common.Hash
-  PostHash common.Hash  // indexed
+  PostHash common.Hash   // indexed
   IpfsPath common.Hash
   Timestamp *big.Int
 }
 
 type PostEvent struct {
-  Poster string // indexed
+  Poster string     // indexed
   BoardId string    // indexed
   ParentHash string
-  PostHash string  // indexed
+  PostHash string   // indexed
   IpfsPath string
   Timestamp *big.Int
 }
@@ -39,7 +37,7 @@ type UpdatePostEventResult struct {
 }
 
 type UpdatePostEvent struct {
-  Poster string  // indexed
+  Poster string     // indexed
   PostHash string   // indexed
   IpfsPath string
   Timestamp *big.Int
@@ -48,13 +46,15 @@ type UpdatePostEvent struct {
 type UpvoteEventResult struct {
   Poster common.Address // indexed
   BoardId common.Hash   // indexed
+  PostHash common.Hash  // indexed
   Value *big.Int
   Timestamp *big.Int
 }
 
 type UpvoteEvent struct {
-  Poster string // indexed
+  Poster string    // indexed
   BoardId string   // indexed
+  PostHash string  // indexed
   Value *big.Int
   Timestamp *big.Int
 }
@@ -83,6 +83,7 @@ func (upvoteEventResult *UpvoteEventResult) ToUpvoteEvent() *UpvoteEvent{
   return &UpvoteEvent {
     Poster: upvoteEventResult.Poster.String(),
     BoardId: upvoteEventResult.BoardId.String(),
+    PostHash: upvoteEventResult.PostHash.String(),
     Value: upvoteEventResult.Value,
     Timestamp: upvoteEventResult.Timestamp,
   }

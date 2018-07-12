@@ -16,7 +16,9 @@ type DynamodbFeedClient struct {
 
 
 func CreateDynamodbFeedClient() *DynamodbFeedClient{
-  return &DynamodbFeedClient{c: utils.CreateAwsDynamoDBClient()}
+  client := utils.CreateAwsDynamoDBClient()
+  log.Println("Connected to Dynamodb Client")
+  return &DynamodbFeedClient{c: client}
 }
 
 func (dynamodbClient *DynamodbFeedClient) CreateFeedEventsTable() {

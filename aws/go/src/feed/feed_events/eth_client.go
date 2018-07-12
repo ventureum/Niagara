@@ -11,6 +11,8 @@ import (
   "github.com/ethereum/go-ethereum/core/types"
   "github.com/ethereum/go-ethereum/accounts/abi"
   "strings"
+  "reflect"
+  "feed/feed_attributes"
 )
 
 
@@ -55,7 +57,8 @@ func createFilterQuery(forumAddressHex string) ethereum.FilterQuery {
   return query
 }
 
-func (client *EthClient) SubscribeFilterLogs(forumAddressHex string) {
+func (client *EthClient) SubscribeFilterLogs(
+    forumAddressHex string, getStreamClient *GetStreamClient, dynamodbClient *DynamodbFeedClient) {
   logs := make(chan types.Log)
   filterQuery := createFilterQuery(forumAddressHex)
   sub, err := client.c.SubscribeFilterLogs(context.Background(), filterQuery, logs)
@@ -72,8 +75,8 @@ func (client *EthClient) SubscribeFilterLogs(forumAddressHex string) {
       if err != nil {
         log.Println(err)
       }
-      // TODO(david.shao): convert to FeedRecord and store it into dynamodb
-      log.Println(*event)
+      log.Printf("Processing Event: %+v\n", *event)
+      processEvent(event, getStreamClient, dynamodbClient)
     }
   }
 }
@@ -82,7 +85,7 @@ func matchEvent(topics []common.Hash, data []byte) (*Event, error) {
   if len(topics) == 0 {
     return nil, nil
   }
-
+  var event Event
   switch topics[0] {
     case PostEventTopic:
       var postEventResult PostEventResult
@@ -94,7 +97,8 @@ func matchEvent(topics []common.Hash, data []byte) (*Event, error) {
       postEventResult.Poster = common.BytesToAddress(topics[1].Bytes())
       postEventResult.BoardId = topics[2]
       postEventResult.PostHash = topics[3]
-      return NewEvent(*postEventResult.ToPostEvent()), nil
+      event = *postEventResult.ToPostEvent()
+      return &event, nil
 
     case UpdatePostEventTopic:
       var updatePostEventResult UpdatePostEventResult
@@ -105,7 +109,8 @@ func matchEvent(topics []common.Hash, data []byte) (*Event, error) {
       }
       updatePostEventResult.Poster = common.BytesToAddress(topics[1].Bytes())
       updatePostEventResult.PostHash = topics[2]
-      return NewEvent(*updatePostEventResult.ToUpdatePostEvent()), nil
+      event = *updatePostEventResult.ToUpdatePostEvent()
+      return &event, nil
 
     case UpvoteEventTopic:
       var upvoteEventResult UpvoteEventResult
@@ -116,9 +121,77 @@ func matchEvent(topics []common.Hash, data []byte) (*Event, error) {
       }
       upvoteEventResult.Poster = common.BytesToAddress(topics[1].Bytes())
       upvoteEventResult.BoardId = topics[2]
-      return NewEvent(*upvoteEventResult.ToUpvoteEvent()), nil
+      upvoteEventResult.PostHash = topics[3]
+      event = *upvoteEventResult.ToUpvoteEvent()
+      return &event, nil
   }
 
   return nil, nil
 }
 
+func processEvent(event *Event, getStreamClient *GetStreamClient, dynamodbClient *DynamodbFeedClient) {
+  switch reflect.TypeOf(*event) {
+    case reflect.TypeOf(PostEvent{}):
+       postEvent := (*event).(PostEvent)
+       activity := convertPostEventToActivity(&postEvent)
+       getStreamClient.AddFeedActivityToGetStream(activity)
+       dynamodbClient.AddItemIntoFeedEvents(CreateItemForFeedActivity(activity))
+    case reflect.TypeOf(UpvoteEvent{}):
+       upvoteEvent := (*event).(UpvoteEvent)
+       updatedObj := feed_attributes.Object{
+         ObjType: feed_attributes.PostObjectType,
+         ObjId: upvoteEvent.PostHash,
+       }
+       rewards := feed_attributes.CreateRewardFromBigInt(upvoteEvent.Value)
+       dynamodbClient.UpdateItemForFeedEventsWithRewards(updatedObj, rewards)
+  }
+}
+
+func convertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity {
+  var verb feed_attributes.Verb
+  var extraParam interface{}
+  var to []feed_attributes.FeedId
+  if postEvent.ParentHash == NullHashString {
+    verb = feed_attributes.SubmitVerb
+    extraParam = feed_attributes.Reward("0")
+    to = []feed_attributes.FeedId {
+      {
+        FeedSlug: feed_attributes.UserFeedSlug,
+        UserId: feed_attributes.UserId(postEvent.PostHash),
+      },
+      {
+        FeedSlug: feed_attributes.BoardFeedSlug,
+        UserId: feed_attributes.AllUserType,
+      },
+      {
+        FeedSlug: feed_attributes.BoardFeedSlug,
+        UserId: feed_attributes.UserId(postEvent.BoardId),
+      },
+    }
+  } else {
+    verb = feed_attributes.ReplyVerb
+    extraParam = feed_attributes.Object{
+      ObjType: feed_attributes.PostObjectType,
+      ObjId: postEvent.ParentHash,
+    }
+    to = []feed_attributes.FeedId {
+      {
+        FeedSlug: feed_attributes.UserFeedSlug,
+        UserId: feed_attributes.UserId(postEvent.PostHash),
+      },
+      {
+        FeedSlug: feed_attributes.CommentFeedSlug,
+        UserId: feed_attributes.UserId(postEvent.ParentHash),
+      },
+    }
+  }
+  obj := feed_attributes.Object{
+    ObjType:feed_attributes.CommentObjectType,
+    ObjId: postEvent.PostHash,
+  }
+
+  actor := feed_attributes.Actor(postEvent.Poster)
+  timeStamp := feed_attributes.BlockTimestamp(postEvent.Timestamp.String())
+
+  return feed_attributes.CreateNewActivity(actor, verb, obj, timeStamp, to, extraParam)
+}
