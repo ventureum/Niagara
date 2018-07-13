@@ -175,7 +175,7 @@ func (dynamodbClient *DynamodbFeedClient) UpdateItemForFeedEventsWithRewards (
   updatedValue, err := dynamodbClient.c.UpdateItem(input)
 
   if err != nil {
-    log.Printf("Failed to add rewards %d to ItemForFeedActivity with object: %s\n", rewards, object.Value())
+    log.Printf("Failed to add rewards %+v to ItemForFeedActivity with object: %s\n", rewards, object.Value())
     log.Fatal(err.Error())
     return nil
   }
