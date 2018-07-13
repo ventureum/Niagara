@@ -151,7 +151,12 @@ func convertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity 
   var verb feed_attributes.Verb
   var extraParam interface{}
   var to []feed_attributes.FeedId
+  var obj feed_attributes.Object
   if postEvent.ParentHash == NullHashString {
+    obj = feed_attributes.Object{
+      ObjType:feed_attributes.PostObjectType,
+      ObjId: postEvent.PostHash,
+    }
     verb = feed_attributes.SubmitVerb
     extraParam = feed_attributes.Reward("0")
     to = []feed_attributes.FeedId {
@@ -169,6 +174,10 @@ func convertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity 
       },
     }
   } else {
+    obj = feed_attributes.Object{
+      ObjType:feed_attributes.CommentObjectType,
+      ObjId: postEvent.PostHash,
+    }
     verb = feed_attributes.ReplyVerb
     extraParam = feed_attributes.Object{
       ObjType: feed_attributes.PostObjectType,
@@ -185,13 +194,8 @@ func convertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity 
       },
     }
   }
-  obj := feed_attributes.Object{
-    ObjType:feed_attributes.CommentObjectType,
-    ObjId: postEvent.PostHash,
-  }
 
   actor := feed_attributes.Actor(postEvent.Poster)
   timeStamp := feed_attributes.BlockTimestamp(postEvent.Timestamp.String())
-
   return feed_attributes.CreateNewActivity(actor, verb, obj, timeStamp, to, extraParam)
 }
