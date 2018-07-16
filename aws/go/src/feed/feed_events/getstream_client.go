@@ -54,7 +54,7 @@ func (getStreamClient *GetStreamClient) AddFeedActivityToGetStream(activity *fee
 
       flatFeed := getStreamClient.CreateFlatFeed(string(feed_attributes.UserFeedSlug), actor)
       flatFeed.AddActivities(streamActivity)
-      log.Printf("Added feed activity to GetStream with object: %s by user %s", obj, actor)
+      log.Printf("Added feed activity to GetStream with object: %s by user %s with stream activty: %v+\n", obj, actor, streamActivity)
 
     case reflect.TypeOf(feed_attributes.CommentActivity{}):
       commentActivity := (*activity).(feed_attributes.CommentActivity)
@@ -67,7 +67,7 @@ func (getStreamClient *GetStreamClient) AddFeedActivityToGetStream(activity *fee
         Verb: verb,
         Object: obj,
         Time: stream.Time{
-          Time: time.Unix(timestamp.ToInt64(), 0),
+          Time: time.Unix(timestamp.ToInt64(), 0).UTC(),
         },
         ForeignID: obj,
         To: feed_attributes.ConvertToStringArray(commentActivity.To),
@@ -76,9 +76,9 @@ func (getStreamClient *GetStreamClient) AddFeedActivityToGetStream(activity *fee
         },
       }
 
-      flatFeed := getStreamClient.CreateFlatFeed(string(feed_attributes.CommentObjectType), actor)
+      flatFeed := getStreamClient.CreateFlatFeed(string(feed_attributes.UserFeedSlug), actor)
       flatFeed.AddActivities(streamActivity)
-      log.Printf("Added feed activity to GetStream with object: %s by user %s", obj, actor)
+      log.Printf("Added feed activity to GetStream with object: %s by user %s with stream activty: %v+\n", obj, actor, streamActivity)
   }
 }
 
