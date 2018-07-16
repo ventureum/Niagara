@@ -61,6 +61,7 @@
     "react-native-dialogs": "0.0.21",
     "react-native-fingerprint-scanner": "^2.3.2",
     "react-native-linear-gradient": "^2.4.0",
+    "react-native-markdown-renderer": "^3.2.8",
     "react-native-qrcode-svg": "^5.0.6",
     "react-native-randombytes": "^3.2.0",
     "react-native-sensitive-info": "^5.1.0",

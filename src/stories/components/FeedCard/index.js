@@ -3,8 +3,7 @@ import * as React from 'react'
 import {
   View,
   Text,
-  TouchableHighlight,
-  Image
+  TouchableHighlight
 } from 'react-native'
 
 import {
@@ -13,9 +12,17 @@ import {
   Button
 } from 'native-base'
 import styles from './styles'
+import Markdown from 'react-native-markdown-renderer'
 let moment = require('moment')
 
 export default class FeedCard extends React.Component {
+  markdownGenerator = (text, image) => {
+    if (image === undefined) {
+      return text
+    }
+    return (`![user image](${image})` + '\n\n' + text)
+  }
+
   render () {
     let { post } = this.props
     return (
@@ -59,8 +66,7 @@ export default class FeedCard extends React.Component {
             </View>
           </View>
         </TouchableHighlight>
-        <Image source={{uri: post.content.image}} style={{height: 400, width: null}} />
-        <Text style={styles.cardText}>{post.content.text}</Text>
+        <Markdown>{this.markdownGenerator(post.content.text, post.content.image)}</Markdown>
         <View style={styles.cardFooter}>
           <View style={styles.footerIcons}>
             <Button transparent
