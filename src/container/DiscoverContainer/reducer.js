@@ -1,8 +1,9 @@
 import update from 'immutability-helper'
+import Config from 'react-native-config'
 
 const initialState = {
-  boardHash: 'all',
-  boardName: 'Feed',
+  boardHash: Config.BOARD_ALL,
+  boardName: 'All',
   posts: [],
   lastUUID: '',
   replies: [],
@@ -76,13 +77,13 @@ export default function (state: any = initialState, action: Function) {
   if (action.type === 'ADD_CONTENT_TO_IPFS_FULFILLED') {
     return {
       ...state,
-      ipfsPath: action.payload
+      ipfsPath: action.payload,
+      loading: false
     }
   }
   if (action.type === 'ADD_POST_TO_FORUM_PENDING') {
     return {
-      ...state,
-      loading: true
+      ...state
     }
   }
   if (action.type === 'ADD_POST_TO_FORUM_FULFILLED') {

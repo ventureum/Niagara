@@ -93,30 +93,31 @@ async function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
 
   // get the flatten array of ipfs path, token address, author, rewards, # of replies from forum contract
   const forum = await WalletUtils.getContractInstance('Forum')
-  const postDataFromForumContrat = await forum.methods.getBatchPosts(postsHash).call()
+  const postDataFromForumContract = await forum.methods.getBatchPosts(postsHash).call()
   let posts = []
 
   // Transform the flatten array from forum contract into an array of post objects
   const web3 = WalletUtils.getWeb3Instance()
   let BN = web3.utils.BN
   let precision = 2
-  for (let i = 0; i < postDataFromForumContrat.length; i += 6) {
-    let hex = web3.utils.toBN(postDataFromForumContrat[i])
+  for (let i = 0; i < postDataFromForumContract.length; i += 7) {
+    let hex = web3.utils.toBN(postDataFromForumContract[i])
     let base = new BN(10).pow(new BN(18 - precision))
 
     if (!hex.isZero()) {
       posts.push({
-        hash: postDataFromForumContrat[i],
+        hash: postDataFromForumContract[i],
         token: {
-          address: '0x' + postDataFromForumContrat[i + 1].slice(26, 66),
+          address: '0x' + postDataFromForumContract[i + 1].slice(26, 66),
           symbol: 'VTX'
         },
-        ipfsPath: getMultihashFromBytes32(postDataFromForumContrat[i + 2]),
-        author: '0x' + postDataFromForumContrat[i + 3].substr(26, 40),
-        rewards: (web3.utils.toBN(postDataFromForumContrat[i + 4]).div(base).toNumber()) / (10 ** 2),
-        repliesLength: web3.utils.toDecimal(postDataFromForumContrat[i + 5]),
-        id: feedData.results[i / 6].id,
-        time: feedData.results[i / 6].time
+        ipfsPath: getMultihashFromBytes32(postDataFromForumContract[i + 2]),
+        author: '0x' + postDataFromForumContract[i + 3].substr(26, 40),
+        rewards: (web3.utils.toBN(postDataFromForumContract[i + 4]).div(base).toNumber()) / (10 ** 2),
+        repliesLength: web3.utils.toDecimal(postDataFromForumContract[i + 5]),
+        postType: postDataFromForumContract[i + 6],
+        id: feedData.results[i / 7].id,
+        time: feedData.results[i / 7].time
       })
     } else {
       break
@@ -171,9 +172,20 @@ async function addContentToIPFS (content) {
   @param ipfsPath a bytes32 path hash on IPFS of the post content
   Add the post to Forum contract
 */
-async function addPostToForum (boardId, parentHash, postHash, ipfsPath) {
+async function addPostToForum (boardId, parentHash, postHash, ipfsPath, postType, newTransaction) {
   const forum = await WalletUtils.getContractInstance('Forum')
-  await forum.methods.post(boardId, parentHash, postHash, ipfsPath).send({ gasPrice: GAS_PRICE })
+  return new Promise((resolve, reject) => {
+    forum.methods.post(boardId, parentHash, postHash, ipfsPath, postType).send({ gasPrice: GAS_PRICE })
+      .on('transactionHash', (txHash) => {
+        newTransaction(txHash)
+      })
+      .on('receipt', (receipt) => {
+        resolve(receipt)
+      })
+      .on('error', (error) => {
+        reject(error)
+      })
+  })
 }
 
 /*

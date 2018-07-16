@@ -36,7 +36,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = (dispatch) => ({
   getReplies: (postHash) => dispatch(getReplies(postHash)),
   addContentToIPFS: (content) => dispatch(_addContentToIPFS(content)),
-  addPostToForum: (boardId, parentHash, postHash, ipfsPath) => dispatch(_addPostToForum(boardId, parentHash, postHash, ipfsPath))
+  addPostToForum: (boardId, parentHash, postHash, ipfsPath, postType) => dispatch(_addPostToForum(boardId, parentHash, postHash, ipfsPath, postType))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ReplyContainer)

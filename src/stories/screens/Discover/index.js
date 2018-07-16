@@ -6,6 +6,7 @@ import WalletUtils from '../../../utils/wallet'
 import BoardSearch from '../../components/BoardSearch'
 import NewPostModal from '../../components/NewPostModal'
 import { checkBalanceForTx } from '../../../services/forum'
+import Config from 'react-native-config'
 
 console.ignoredYellowBox = ['Setting a timer']
 
@@ -18,11 +19,13 @@ export default class Discover extends Component {
       addNewPost: false
     }
   }
+
   componentWillReceiveProps (nextProps) {
     if (this.props.boardHash !== nextProps.boardHash) {
       this.props.refreshPosts(nextProps.boardHash)
     }
   }
+
   onRefresh = () => {
     this.props.refreshPosts(this.props.boardHash)
     if (this.flatListRef && this.props.posts.length !== 0) {
@@ -68,9 +71,10 @@ export default class Discover extends Component {
 
       const { ipfsPath } = this.props
       let postHash = '0x' + crypto.randomBytes(32).toString('hex')
-      const boardId = '0x0ba5e3d6ea353a7eae28095f09061ec261c5be59'
+      const boardId = this.props.boardHash
       const noParent = '0x0000000000000000000000000000000000000000000000000000000000000000'
-      await this.props.addPostToForum(boardId, noParent, postHash, ipfsPath)
+      const postType = WalletUtils.getPostTypeHash('POST')
+      await this.props.addPostToForum(boardId, noParent, postHash, ipfsPath, postType)
       Toast.show({
         type: 'success',
         text: 'Comment Sent Successfully!',
@@ -140,9 +144,9 @@ export default class Discover extends Component {
               <Title>{this.props.boardName}</Title>
             </Body>
             <Right>
-              {this.props.boardHash !== 'all'
+              {this.props.boardHash !== Config.BOARD_ALL
                 ? <Button onPress={() => {
-                  this.props.switchBoard('all', 'Feed')
+                  this.props.switchBoard(Config.BOARD_ALL, 'All')
                 }}>
                   <Icon name='backspace' />
                 </Button>

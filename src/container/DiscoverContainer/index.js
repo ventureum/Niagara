@@ -40,7 +40,7 @@ const mapDispatchToProps = (dispatch) => ({
   getMorePosts: (boardHash) => dispatch(getMorePosts('board', boardHash)),
   switchBoard: (boardHash, boardName) => dispatch(switchBoard(boardHash, boardName)),
   addContentToIPFS: (content) => dispatch(_addContentToIPFS(content)),
-  addPostToForum: (boardId, parentHash, postHash, ipfsPath) => dispatch(_addPostToForum(boardId, parentHash, postHash, ipfsPath))
+  addPostToForum: (boardId, parentHash, postHash, ipfsPath, postType) => dispatch(_addPostToForum(boardId, parentHash, postHash, ipfsPath, postType))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(DiscoverContainer)

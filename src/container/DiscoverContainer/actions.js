@@ -1,7 +1,7 @@
 import { batchReadFeedsByBoardId, addContentToIPFS, addPostToForum } from '../../services/forum'
+import { newTransaction } from '../TransactionContainer/actions'
 
 function refreshPosts (feedSlug, feedId) {
-  console.log(feedSlug, feedId)
   return {
     type: 'REFRESH_POSTS',
     payload: batchReadFeedsByBoardId(feedSlug + ':' + feedId)
@@ -46,10 +46,23 @@ function _addContentToIPFS (content) {
   }
 }
 
-function _addPostToForum (boardId, parentHash, postHash, ipfsPath) {
+function __addPostToForum (boardId, parentHash, postHash, ipfsPath, postType, newTransaction) {
   return {
     type: 'ADD_POST_TO_FORUM',
-    payload: addPostToForum(boardId, parentHash, postHash, ipfsPath)
+    payload: addPostToForum(boardId, parentHash, postHash, ipfsPath, postType, newTransaction)
+  }
+}
+
+function _addPostToForum (boardId, parentHash, postHash, ipfsPath, postType) {
+  return (dispatch) => {
+    dispatch(__addPostToForum(
+      boardId,
+      parentHash,
+      postHash,
+      ipfsPath,
+      postType,
+      (txHash) => { dispatch(newTransaction(txHash)) }
+    ))
   }
 }
 

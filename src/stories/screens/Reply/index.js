@@ -47,7 +47,8 @@ export default class Reply extends Component {
         let postHash = '0x' + crypto.randomBytes(32).toString('hex')
         const boardId = post.token.address
         const parentHash = post.hash
-        await this.props.addPostToForum(boardId, parentHash, postHash, ipfsPath)
+        const postType = WalletUtils.getPostTypeHash('COMMENT')
+        await this.props.addPostToForum(boardId, parentHash, postHash, ipfsPath, postType)
         Toast.show({
           type: 'success',
           text: 'Comment Sent Successfully!',

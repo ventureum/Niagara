@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { KeyboardAvoidingView, View, TextInput } from 'react-native'
+import { KeyboardAvoidingView, View, TextInput, Switch } from 'react-native'
 import { Icon, Text, Button, Thumbnail, Spinner } from 'native-base'
 import styles from './styles'
 
@@ -9,9 +9,11 @@ export default class NewPostModal extends Component {
     this.state = ({
       title: null,
       text: null,
-      image: null
+      image: null,
+      toMainnet: false
     })
   }
+
   render () {
     return (
       <KeyboardAvoidingView behavior='padding' enabled style={styles.modalContainer}>
@@ -23,22 +25,31 @@ export default class NewPostModal extends Component {
               this.props.goBack()
             }}
           />
-
-          {this.props.loading
-            ? <Spinner color='green' style={{ paddingBottom: 8 }} />
-            : <Button
-              style={{ height: '70%' }}
-              info
-              rounded
-              onPress={() => {
-                if (this.state.title !== null && this.state.text !== null) {
-                  this.props.goBack(this.state.title, this.state.text, this.state.image)
-                }
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text>{this.state.toMainnet ? 'On-chain' : 'Off-chain'}</Text>
+            <Switch
+              value={this.state.toMainnet}
+              onValueChange={(value) => {
+                this.setState({ toMainnet: value })
               }}
-            >
-              <Text>Tweet</Text>
-            </Button>
-          }
+              style={{marginRight: 3}}
+            />
+            {this.props.loading
+              ? <Spinner color='green' style={{ paddingBottom: 8 }} />
+              : <Button
+                style={{ height: '70%' }}
+                info
+                rounded
+                onPress={() => {
+                  if (this.state.title !== null && this.state.text !== null) {
+                    this.props.goBack(this.state.title, this.state.text, this.state.image)
+                  }
+                }}
+              >
+                <Text>Tweet</Text>
+              </Button>
+            }
+          </View>
         </View>
         <View style={styles.infoContainer}>
           <View style={styles.avatarContainer}>
@@ -66,7 +77,6 @@ export default class NewPostModal extends Component {
               onChangeText={(text) => {
                 this.setState({ text })
               }}
-              maxLength={200}
               value={this.state.text}
             />
           </View>
