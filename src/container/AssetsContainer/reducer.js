@@ -14,7 +14,7 @@ const initialState = {
     value: 0
   }, {
     symbol: 'VTX',
-    address: '0x67c15a89480e7a321021185cdd039a648a5cd6ed',
+    address: '0x0fae0d3958b744376668a9018e14dc96f074526d',
     decimals: 18,
     balance: new BigNumber(0),
     value: 0

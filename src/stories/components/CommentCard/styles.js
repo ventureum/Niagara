@@ -26,7 +26,9 @@ const styles = StyleSheet.create({
   authorContainer: {
     flex: 1,
     flexDirection: 'column',
-    alignItems: 'stretch'
+    alignItems: 'stretch',
+    justifyContent: 'flex-start',
+    flexWrap: 'wrap'
   },
   commentContainer: {
     flex: 1,

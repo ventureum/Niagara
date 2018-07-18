@@ -164,7 +164,13 @@ export default class WalletUtils {
     generate user avatar by its address
   */
   static getAvatar (address) {
-    let identiconData = new Identicon(address, 64).toString()
+    let identiconData
+    if (address !== undefined) {
+      identiconData = new Identicon(address, 64).toString()
+    } else {
+      address = this.getWallet().walletAddress
+      identiconData = new Identicon(address, 64).toString()
+    }
     return ('data:image/png;base64,' + identiconData)
   }
 
