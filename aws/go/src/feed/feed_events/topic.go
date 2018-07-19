@@ -5,7 +5,7 @@ import (
   "github.com/ethereum/go-ethereum/crypto"
 )
 
-var PostEventTopic common.Hash = crypto.Keccak256Hash([]byte("Post(address,bytes32,bytes32,bytes32,bytes32,uint256)"))
+var PostEventTopic common.Hash = crypto.Keccak256Hash([]byte("Post(address,bytes32,bytes32,bytes32,bytes32,bytes4,uint256)"))
 
 var UpdatePostEventTopic common.Hash = crypto.Keccak256Hash([]byte("UpdatePost(address,bytes32,bytes32,uint256)"))
 

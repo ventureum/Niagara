@@ -78,41 +78,41 @@ func (dynamodbClient *DynamodbFeedClient) AddItemIntoFeedEvents(itemForFeedEvent
     TableName: TableNameForFeedEvents,
   }
 
-  _, err = dynamodbClient.c.PutItem(input)
-
-  if err != nil {
+  if _, err := dynamodbClient.c.PutItem(input); err != nil {
     log.Printf("Failed to put item into Feed Events Table: %+v\n", itemForFeedEvents)
     log.Fatal(err)
   }
-
   log.Printf("Successfully added ItemForFeedActivity to Feed Events Table with object: %s\n",
-    GetObjectFromItemForFeedActivity(itemForFeedEvents).Value())
+    itemForFeedEvents.GetObject())
 }
 
-func (dynamodbClient *DynamodbFeedClient) DeleteItemFromFeedEvents(object feed_attributes.Object) {
+func (dynamodbClient *DynamodbFeedClient) DeleteItemFromFeedEvents(objectId string) {
   input := &dynamodb.DeleteItemInput{
     Key: map[string]*dynamodb.AttributeValue{
-      "object": {
-        S: aws.String(object.Value()),
+      "objectId": {
+        S: aws.String(objectId),
       },
     },
+    ReturnValues: aws.String("ALL_OLD"),
     TableName: TableNameForFeedEvents,
   }
 
-  if _, err := dynamodbClient.c.DeleteItem(input); err != nil {
-    log.Printf("Failed to Delete ItemForFeedActivity with object: %s\n", object.Value())
+  deletedItem, err := dynamodbClient.c.DeleteItem(input);
+
+  if err != nil {
+    log.Printf("Failed to Delete ItemForFeedActivity with objectId: %s\n", objectId)
     log.Fatal(err.Error())
   }
-
+  item := unmarshalToItemForFeedActivity(deletedItem.Attributes)
   log.Printf("Successfully deleted ItemForFeedActivity from Feed Events Table with object: %s \n",
-    object.Value())
+    item.GetObject())
 }
 
-func (dynamodbClient *DynamodbFeedClient) ReadItemFromFeedEvents(object feed_attributes.Object) *ItemForFeedActivity {
+func (dynamodbClient *DynamodbFeedClient) ReadItemFromFeedEvents(objectId string) *ItemForFeedActivity {
   input := &dynamodb.GetItemInput{
     Key: map[string]*dynamodb.AttributeValue{
-      "object": {
-        S: aws.String(object.Value()),
+      "objectId": {
+        S: aws.String(objectId),
       },
     },
     TableName: TableNameForFeedEvents,
@@ -121,19 +121,19 @@ func (dynamodbClient *DynamodbFeedClient) ReadItemFromFeedEvents(object feed_att
   result, err := dynamodbClient.c.GetItem(input);
 
   if err != nil {
-    log.Printf("Failed to read ItemForFeedActivity with object: %s\n", object.Value())
+    log.Printf("Failed to read ItemForFeedActivity with objectId: %s\n", objectId)
     log.Fatal(err.Error())
   }
 
-  return unmarshalToItemForFeedActivity(result.Item, object)
+  return unmarshalToItemForFeedActivity(result.Item)
 }
 
-func (dynamodbClient *DynamodbFeedClient) ReadRewardsFromFeedEvents(object feed_attributes.Object) feed_attributes.Reward {
+func (dynamodbClient *DynamodbFeedClient) ReadRewardsFromFeedEvents(objectId string) feed_attributes.Reward {
 
   input := &dynamodb.GetItemInput{
     Key: map[string]*dynamodb.AttributeValue{
-      "object": {
-        S: aws.String(object.Value()),
+      "objectId": {
+        S: aws.String(objectId),
       },
     },
     ProjectionExpression: aws.String("activity.rewards" ),
@@ -143,18 +143,18 @@ func (dynamodbClient *DynamodbFeedClient) ReadRewardsFromFeedEvents(object feed_
   result, err := dynamodbClient.c.GetItem(input);
 
   if err != nil {
-    log.Printf("Failed to read ItemForFeedActivity with object: %s\n", object.Value())
+    log.Printf("Failed to read ItemForFeedActivity with objectId: %s\n", objectId)
     log.Fatal(err.Error())
   }
 
-  itemForFeedActivity := unmarshalToItemForFeedActivity(result.Item, object)
-  return GetRewardsFromItemForFeedActivity(itemForFeedActivity)
+  itemForFeedActivity := unmarshalToItemForFeedActivity(result.Item)
+  return itemForFeedActivity.Activity.Rewards
 }
 
 func (dynamodbClient *DynamodbFeedClient) UpdateItemForFeedEventsWithRewards (
-    object feed_attributes.Object, rewards feed_attributes.Reward) *ItemForFeedActivity {
+    objectId string, rewards feed_attributes.Reward) *ItemForFeedActivity {
 
-  oldRewards := dynamodbClient.ReadRewardsFromFeedEvents(object)
+  oldRewards := dynamodbClient.ReadRewardsFromFeedEvents(objectId)
   newRewards :=  oldRewards.AddToReward(rewards)
 
   input := &dynamodb.UpdateItemInput{
@@ -164,8 +164,8 @@ func (dynamodbClient *DynamodbFeedClient) UpdateItemForFeedEventsWithRewards (
           },
         },
         Key: map[string]*dynamodb.AttributeValue{
-          "object": {
-            S: aws.String(object.Value()),
+          "objectId": {
+            S: aws.String(objectId),
           },
         },
         TableName:        TableNameForFeedEvents,
@@ -175,42 +175,25 @@ func (dynamodbClient *DynamodbFeedClient) UpdateItemForFeedEventsWithRewards (
   updatedValue, err := dynamodbClient.c.UpdateItem(input)
 
   if err != nil {
-    log.Printf("Failed to add rewards %+v to ItemForFeedActivity with object: %s\n", rewards, object.Value())
+    log.Printf("Failed to add rewards %+v to ItemForFeedActivity with objectId: %s\n", rewards, objectId)
     log.Fatal(err.Error())
     return nil
   }
 
-  log.Printf("Successfully added rewards %s to ItemForFeedActivity with object: %s\n", rewards, object.Value())
-  item := unmarshalToItemForFeedActivity(updatedValue.Attributes, object)
-  updatedRewards := GetRewardsFromItemForFeedActivity(item)
-  log.Printf("Rewards updated to %s for ItemForFeedActivity with object: %s\n", updatedRewards, object.Value())
+  item := unmarshalToItemForFeedActivity(updatedValue.Attributes)
+  updatedRewards := item.Activity.Rewards
+  log.Printf("Successfully added rewards %s to ItemForFeedActivity with object: %s\n", rewards, item.GetObject())
+  log.Printf("Rewards updated to %s for ItemForFeedActivity with object: %s\n", updatedRewards, item.GetObject())
   return item
 }
 
-func unmarshalToItemForFeedActivity(
-    item map[string]*dynamodb.AttributeValue , object feed_attributes.Object) *ItemForFeedActivity {
+func unmarshalToItemForFeedActivity(item map[string]*dynamodb.AttributeValue) *ItemForFeedActivity {
   var itemForFeedActivity ItemForFeedActivity
 
-  if object.ObjType == feed_attributes.PostObjectType {
-    itemForFeedPostActivity := ItemForFeedPostActivity{}
-    err := dynamodbattribute.UnmarshalMap(item, &itemForFeedPostActivity)
-    if err != nil {
-      log.Printf("Failed to unmarshal ItemForFeedActivity with object: %s\n", object.Value())
-      log.Fatal(err.Error())
-    }
-    itemForFeedActivity = itemForFeedPostActivity
-
+  err := dynamodbattribute.UnmarshalMap(item, &itemForFeedActivity)
+  if err != nil {
+    log.Printf("Failed to unmarshal ItemForFeedActivity with object: %s\n", itemForFeedActivity.GetObject())
+    log.Fatal(err.Error())
   }
-
-  if object.ObjType == feed_attributes.CommentObjectType {
-    itemForFeedCommentActivity := ItemForCommentActivity{}
-    err := dynamodbattribute.UnmarshalMap(item, &itemForFeedCommentActivity)
-    if err != nil {
-      log.Printf("Failed to unmarshal ItemForFeedActivity with object: %s\n", object.Value())
-      log.Fatal(err.Error())
-    }
-    itemForFeedActivity = itemForFeedCommentActivity
-  }
-
   return &itemForFeedActivity
 }

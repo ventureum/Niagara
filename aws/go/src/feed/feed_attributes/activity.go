@@ -1,66 +1,37 @@
 package feed_attributes
 
-import (
-  "reflect"
-)
 
-
-type Activity interface{}
-
-type BaseActivity struct {
+type Activity struct {
   Actor Actor `json:"actor"`
   Verb Verb `json:"verb"`
   Object Object  `json:"object"`
   ForeignId Object `json:"foreignId"`
   Time BlockTimestamp `json:"time"`
-  To []FeedId `json:"to"`
-}
-
-type PostActivity struct {
-  BaseActivity
+  TypeHash TypeHash `json:"typeHash"`
   Rewards Reward `json:"rewards"`
+  To []FeedId `json:"to"`
+  Extra map[string]interface{} `json:"extra"`
 }
-
-type CommentActivity struct {
-  BaseActivity
-  Post Object `json:"post"`
-}
-
 
 func CreateNewActivity(
     actor Actor,
     verb Verb,
     obj Object,
     time BlockTimestamp,
+    typeHash TypeHash,
+    rewards Reward,
     to []FeedId,
-    extraParam interface{}) *Activity {
-    var activity Activity
-    if verb == SubmitVerb && reflect.TypeOf(extraParam) == reflect.TypeOf(Reward("10000")) {
-      activity = PostActivity{
-        BaseActivity: BaseActivity{
+    extraParam map[string]interface{}) *Activity {
+
+  return &Activity{
           Actor: actor,
           Verb: verb,
           Object: obj,
           ForeignId: obj,
           Time: time,
+          TypeHash: typeHash,
+          Rewards: rewards,
           To: to,
-        },
-        Rewards: extraParam.(Reward),
-      }
-    } else if verb == ReplyVerb && reflect.TypeOf(extraParam) == reflect.TypeOf(Object{}) {
-      activity = CommentActivity{
-        BaseActivity: BaseActivity{
-          Actor: actor,
-          Verb: verb,
-          Object: obj,
-          ForeignId: obj,
-          Time: time,
-          To: to,
-        },
-        Post: extraParam.(Object),
-      }
-    } else {
-      return nil
-    }
-    return &activity
+          Extra: extraParam,
+  }
 }

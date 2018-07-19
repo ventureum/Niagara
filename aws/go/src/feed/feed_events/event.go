@@ -10,13 +10,13 @@ type Event interface{}
 
 var NullHashString string = common.HexToHash("0x0").String()
 
-
 type PostEventResult struct {
   Poster common.Address  // indexed
   BoardId common.Hash    // indexed
   ParentHash common.Hash
   PostHash common.Hash   // indexed
   IpfsPath common.Hash
+  TypeHash [4]byte
   Timestamp *big.Int
 }
 
@@ -26,6 +26,7 @@ type PostEvent struct {
   ParentHash string
   PostHash string   // indexed
   IpfsPath string
+  TypeHash string
   Timestamp *big.Int
 }
 
@@ -66,6 +67,7 @@ func (postEventResult *PostEventResult) ToPostEvent() *PostEvent {
     ParentHash: postEventResult.ParentHash.String(),
     PostHash: postEventResult.PostHash.String(),
     IpfsPath: postEventResult.IpfsPath.String(),
+    TypeHash: common.Bytes2Hex(postEventResult.TypeHash[:]),
     Timestamp: postEventResult.Timestamp,
   }
 }

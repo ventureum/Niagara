@@ -30,6 +30,11 @@ const PostEventABI string = `[{
     },
     {
       "indexed": false,
+      "name": "typeHash",
+      "type": "bytes4"
+    },
+    {
+      "indexed": false,
       "name": "timestamp",
       "type": "uint256"
     }

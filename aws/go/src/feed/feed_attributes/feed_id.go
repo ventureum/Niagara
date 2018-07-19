@@ -4,6 +4,7 @@ import (
   "strings"
   "log"
   "utils"
+  "github.com/ethereum/go-ethereum/crypto"
 )
 
 
@@ -21,9 +22,9 @@ const (
   CommentFeedSlug FeedSlug = "comment"
 )
 
-const (
-  AllUserType UserId = "all"
-)
+
+var AllBoardIds = UserId(crypto.Keccak256Hash([]byte("%__AllBoardIds__%")).String())
+
 
 func CreateFeedId(feedSlug string, userid string) FeedId {
   return FeedId {

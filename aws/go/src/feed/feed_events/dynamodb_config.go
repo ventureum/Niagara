@@ -8,15 +8,23 @@ import (
 
 var AttributeDefinitionsForFeedEvents = []*dynamodb.AttributeDefinition{
   {
-    AttributeName: aws.String("object"),
+    AttributeName: aws.String("objectType"),
+    AttributeType: aws.String("S"),
+  },
+  {
+    AttributeName: aws.String("objectId"),
     AttributeType: aws.String("S"),
   },
 }
 
 var KeySchemaForFeedEvents = []*dynamodb.KeySchemaElement{
   {
-    AttributeName: aws.String("object"),
+    AttributeName: aws.String("objectType"),
     KeyType:       aws.String("HASH"),
+  },
+  {
+    AttributeName: aws.String("objectId"),
+    KeyType:       aws.String("RANGE"),
   },
 }
 
