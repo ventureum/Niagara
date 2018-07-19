@@ -190,7 +190,7 @@ export default class WalletUtils {
     // Modify the following token info for testing
     this.tokens.push({
       'symbol': 'VTX',
-      'address': '0x89544e0dfc02fff57200785c274effd87540888f',
+      'address': '0xdd998c0a031d4a46ec520ecfcbf4ee5ca9ae2cd0',
       'decimals': 18,
       'name': 'VetX Token'
     })
@@ -225,14 +225,5 @@ export default class WalletUtils {
       return rv
     }
     return null
-  }
-
-  /*
-     Return the bytes4 hash value of post type
-     @param {string} type - type of the post
-   */
-  static getPostTypeHash (type) {
-    const _web3 = this.getWeb3Instance()
-    return _web3.eth.abi.encodeFunctionSignature(type)
   }
 }

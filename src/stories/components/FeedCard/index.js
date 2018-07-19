@@ -16,13 +16,6 @@ import Markdown from 'react-native-markdown-renderer'
 let moment = require('moment')
 
 export default class FeedCard extends React.Component {
-  markdownGenerator = (text, image) => {
-    if (image === undefined) {
-      return text
-    }
-    return (`![user image](${image})` + '\n\n' + text)
-  }
-
   render () {
     let { post } = this.props
     return (
@@ -66,7 +59,7 @@ export default class FeedCard extends React.Component {
             </View>
           </View>
         </TouchableHighlight>
-        <Markdown>{this.markdownGenerator(post.content.text, post.content.image)}</Markdown>
+        <Markdown>{post.content.text}</Markdown>
         <View style={styles.cardFooter}>
           <View style={styles.footerIcons}>
             <Button transparent

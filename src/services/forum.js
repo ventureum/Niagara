@@ -198,4 +198,13 @@ async function checkBalanceForTx () {
   return userBalance > MINIMUM_BALANCE
 }
 
-export { batchReadFeedsByBoardId, addContentToIPFS, addPostToForum, checkBalanceForTx }
+/*
+   Return the bytes4 hash value of post type
+   @param {string} type - type of the post
+ */
+function getPostTypeHash (type) {
+  const web3 = WalletUtils.getWeb3Instance()
+  return web3.eth.abi.encodeFunctionSignature(type)
+}
+
+export { batchReadFeedsByBoardId, addContentToIPFS, addPostToForum, checkBalanceForTx, getPostTypeHash }

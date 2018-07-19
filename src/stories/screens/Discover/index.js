@@ -5,7 +5,7 @@ import FeedCard from '../../components/FeedCard'
 import WalletUtils from '../../../utils/wallet'
 import BoardSearch from '../../components/BoardSearch'
 import NewPostModal from '../../components/NewPostModal'
-import { checkBalanceForTx } from '../../../services/forum'
+import { checkBalanceForTx, getPostTypeHash } from '../../../services/forum'
 import { BOARD_ALL_HASH } from '../../../utils/constants.js'
 
 console.ignoredYellowBox = ['Setting a timer']
@@ -57,14 +57,13 @@ export default class Discover extends Component {
     )
   }
 
-  onAddNewPost = async (title, text, image) => {
+  onAddNewPost = async (title, text) => {
     const enoughBalance = await checkBalanceForTx()
     if (enoughBalance) {
       let crypto = require('crypto')
       const content = {
         title: title,
-        text: text,
-        image: image
+        text: text
       }
 
       await this.props.addContentToIPFS(content)
@@ -73,7 +72,7 @@ export default class Discover extends Component {
       let postHash = '0x' + crypto.randomBytes(32).toString('hex')
       const boardId = this.props.boardHash
       const noParent = '0x0000000000000000000000000000000000000000000000000000000000000000'
-      const postType = WalletUtils.getPostTypeHash('POST')
+      const postType = getPostTypeHash('POST')
       await this.props.addPostToForum(boardId, noParent, postHash, ipfsPath, postType)
       Toast.show({
         type: 'success',
@@ -106,9 +105,9 @@ export default class Discover extends Component {
     this.setState({ addNewPost: visible })
   }
 
-  backFromNewPost = async (title, text, image) => {
+  backFromNewPost = async (title, text) => {
     if (title !== undefined && text !== undefined) {
-      await this.onAddNewPost(title, text, image)
+      await this.onAddNewPost(title, text)
     }
     this.setState({ addNewPost: false })
   }

@@ -9,7 +9,6 @@ export default class NewPostModal extends Component {
     this.state = ({
       title: null,
       text: null,
-      image: null,
       toMainnet: false
     })
   }
@@ -42,7 +41,7 @@ export default class NewPostModal extends Component {
                 rounded
                 onPress={() => {
                   if (this.state.title !== null && this.state.text !== null) {
-                    this.props.goBack(this.state.title, this.state.text, this.state.image)
+                    this.props.goBack(this.state.title, this.state.text)
                   }
                 }}
               >
@@ -62,13 +61,6 @@ export default class NewPostModal extends Component {
                 this.setState({ title })
               }}
               value={this.state.title}
-            />
-            <TextInput
-              placeholder='Image URL'
-              onChangeText={(image) => {
-                this.setState({ image })
-              }}
-              value={this.state.image}
             />
             <TextInput
               placeholder='Share your ideas!'
