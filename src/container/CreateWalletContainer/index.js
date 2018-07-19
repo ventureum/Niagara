@@ -3,6 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import CreateWallet from '../../stories/screens/CreateWallet'
 import { setPinCode, setWalletAddress, setPrivateKey } from './actions'
+
 export interface Props {
   navigation: any,
   setPinCode: Function,

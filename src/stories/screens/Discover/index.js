@@ -6,7 +6,7 @@ import WalletUtils from '../../../utils/wallet'
 import BoardSearch from '../../components/BoardSearch'
 import NewPostModal from '../../components/NewPostModal'
 import { checkBalanceForTx } from '../../../services/forum'
-import Config from 'react-native-config'
+import { BOARD_ALL_HASH } from '../../../utils/constants.js'
 
 console.ignoredYellowBox = ['Setting a timer']
 
@@ -144,9 +144,9 @@ export default class Discover extends Component {
               <Title>{this.props.boardName}</Title>
             </Body>
             <Right>
-              {this.props.boardHash !== Config.BOARD_ALL
+              {this.props.boardHash !== BOARD_ALL_HASH
                 ? <Button onPress={() => {
-                  this.props.switchBoard(Config.BOARD_ALL, 'All')
+                  this.props.switchBoard(BOARD_ALL_HASH, 'All')
                 }}>
                   <Icon name='backspace' />
                 </Button>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Discover from '../../stories/screens/Discover'
-import { refreshPosts, getMorePosts, switchBoard, _addContentToIPFS, _addPostToForum } from './actions'
+import { refreshPosts, getMorePosts, switchBoard, addContentToIPFS, addPostToForum } from './actions'
 
 class DiscoverContainer extends Component {
   constructor (props) {
@@ -39,8 +39,8 @@ const mapDispatchToProps = (dispatch) => ({
   refreshPosts: (boardHash) => dispatch(refreshPosts('board', boardHash)),
   getMorePosts: (boardHash) => dispatch(getMorePosts('board', boardHash)),
   switchBoard: (boardHash, boardName) => dispatch(switchBoard(boardHash, boardName)),
-  addContentToIPFS: (content) => dispatch(_addContentToIPFS(content)),
-  addPostToForum: (boardId, parentHash, postHash, ipfsPath, postType) => dispatch(_addPostToForum(boardId, parentHash, postHash, ipfsPath, postType))
+  addContentToIPFS: (content) => dispatch(addContentToIPFS(content)),
+  addPostToForum: (boardId, parentHash, postHash, ipfsPath, postType) => dispatch(addPostToForum(boardId, parentHash, postHash, ipfsPath, postType))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(DiscoverContainer)

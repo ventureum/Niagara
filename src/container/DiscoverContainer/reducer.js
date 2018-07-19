@@ -1,8 +1,8 @@
 import update from 'immutability-helper'
-import Config from 'react-native-config'
+import { BOARD_ALL_HASH } from '../../utils/constants.js'
 
 const initialState = {
-  boardHash: Config.BOARD_ALL,
+  boardHash: BOARD_ALL_HASH,
   boardName: 'All',
   posts: [],
   lastUUID: '',
