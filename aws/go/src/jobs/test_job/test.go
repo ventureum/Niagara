@@ -29,7 +29,9 @@ func main () {
     feed_attributes.CreateFeedIdFromValue("board:all"),
     feed_attributes.CreateFeedIdFromValue("board:0x01"),
   }
-  postActivity1 := feed_attributes.CreateNewActivity(actor1, verb1, object1, time1, to1, rewards1)
+  typeHash1 := feed_attributes.PostTypeHash
+  postActivity1 := feed_attributes.CreateNewActivity(
+    actor1, verb1, object1, time1, typeHash1, rewards1, to1, map[string]interface{}{})
 
   if postActivity1 == nil {
     log.Fatal("falied to create post activity 1")
@@ -44,13 +46,13 @@ func main () {
     feed_attributes.CreateFeedIdFromValue("board:all"),
     feed_attributes.CreateFeedIdFromValue("board:0x02"),
   }
-  postActivity2 := feed_attributes.CreateNewActivity(actor2, verb2, object2, time2, to2, rewards2)
+  typeHash2 := feed_attributes.PostTypeHash
+  postActivity2 := feed_attributes.CreateNewActivity(
+    actor2, verb2, object2, time2, typeHash2, rewards2, to2, map[string]interface{}{})
 
   if postActivity2 == nil {
     log.Fatal("falied to create post activity 2")
   }
-
-
 
   actor3 := feed_attributes.Actor("0x02")
   verb3 := feed_attributes.ReplyVerb
@@ -59,9 +61,13 @@ func main () {
   to3 := []feed_attributes.FeedId{
     feed_attributes.CreateFeedIdFromValue("comment:0x10022d8f528048ea7dc39fd660d2ac1f1c959560"),
   }
+  typeHash3 := feed_attributes.CommentTypeHash
   post := feed_attributes.CreateObjectFromValue("post:0x02")
+  extra := map[string]interface{}{
+    "post": post,
+  }
 
-  commentActivity1 := feed_attributes.CreateNewActivity(actor3, verb3, object3, time3, to3, post)
+  commentActivity1 := feed_attributes.CreateNewActivity(actor3, verb3, object3, time3, typeHash3, rewards2, to3, extra)
   if  commentActivity1 == nil {
     log.Fatal("falied to create comment activity 1")
   }
@@ -103,15 +109,15 @@ func main () {
   item := feed_events.CreateItemForFeedActivity(postActivity1)
 
   dynamodbFeedClient.AddItemIntoFeedEvents(item)
-  expectedRewards := dynamodbFeedClient.ReadRewardsFromFeedEvents(object1)
+  expectedRewards := dynamodbFeedClient.ReadRewardsFromFeedEvents(object1.ObjId)
   log.Printf("expected rewards: %s\n", expectedRewards)
 
-  item = dynamodbFeedClient.ReadItemFromFeedEvents(object1)
-  log.Println(feed_events.GetRewardsFromItemForFeedActivity(item))
+  item = dynamodbFeedClient.ReadItemFromFeedEvents(object1.ObjId)
+  log.Println(item.Activity.Rewards)
   log.Printf("expected item: %+v\n",(*item))
 
   rewards2 = feed_attributes.CreateRewardFromBigInt(bigNumber2)
-  item = dynamodbFeedClient.UpdateItemForFeedEventsWithRewards(object1, rewards2)
-  log.Println(feed_events.GetRewardsFromItemForFeedActivity(item))
+  item = dynamodbFeedClient.UpdateItemForFeedEventsWithRewards(object1.ObjId, rewards2)
+  log.Println(item.Activity.Rewards)
   log.Printf("expected item: %+v\n",(*item))
 }

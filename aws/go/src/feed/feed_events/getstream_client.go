@@ -4,7 +4,6 @@ import (
   "gopkg.in/GetStream/stream-go2.v1"
   "log"
   "feed/feed_attributes"
-  "reflect"
   "time"
 )
 
@@ -31,63 +30,41 @@ func (getStreamClient *GetStreamClient) CreateFlatFeedFromFeedId(feedId feed_att
 }
 
 func (getStreamClient *GetStreamClient) AddFeedActivityToGetStream(activity *feed_attributes.Activity) {
-  switch reflect.TypeOf(*activity) {
-    case reflect.TypeOf(feed_attributes.PostActivity{}):
-      postActivity := (*activity).(feed_attributes.PostActivity)
-      actor := string(postActivity.Actor)
-      verb := string(postActivity.Verb)
-      obj := postActivity.Object.Value()
-      timestamp := postActivity.Time
-      streamActivity := stream.Activity{
-        Actor: actor,
-        Verb: verb,
-        Object: obj,
-        Time: stream.Time{
-          Time: time.Unix(timestamp.ToInt64(), 0),
-        },
-        ForeignID: obj,
-        To: feed_attributes.ConvertToStringArray(postActivity.To),
-        Extra: map[string]interface{}{
-          "rewards": postActivity.Rewards,
-        },
-      }
-
-      flatFeed := getStreamClient.CreateFlatFeed(string(feed_attributes.UserFeedSlug), actor)
-      flatFeed.AddActivities(streamActivity)
-      log.Printf("Added feed activity to GetStream with object: %s by user %s with stream activty: %v+\n", obj, actor, streamActivity)
-
-    case reflect.TypeOf(feed_attributes.CommentActivity{}):
-      commentActivity := (*activity).(feed_attributes.CommentActivity)
-      actor := string(commentActivity.Actor)
-      verb := string(commentActivity.Verb)
-      obj := commentActivity.Object.Value()
-      timestamp := commentActivity.Time
-      streamActivity := stream.Activity{
-        Actor: actor,
-        Verb: verb,
-        Object: obj,
-        Time: stream.Time{
-          Time: time.Unix(timestamp.ToInt64(), 0).UTC(),
-        },
-        ForeignID: obj,
-        To: feed_attributes.ConvertToStringArray(commentActivity.To),
-        Extra: map[string]interface{}{
-          "post": commentActivity.Post.Value(),
-        },
-      }
-
-      flatFeed := getStreamClient.CreateFlatFeed(string(feed_attributes.UserFeedSlug), actor)
-      flatFeed.AddActivities(streamActivity)
-      log.Printf("Added feed activity to GetStream with object: %s by user %s with stream activty: %v+\n", obj, actor, streamActivity)
+  actor := string(activity.Actor)
+  verb := string(activity.Verb)
+  obj := activity.Object.Value()
+  timestamp := activity.Time
+  extra := map[string]interface{} {
+    "rewards": string(activity.Rewards),
+    "typeHash": activity.TypeHash.Value(),
   }
+  for k, v := range activity.Extra {
+    extra[k] = v
+  }
+  streamActivity := stream.Activity{
+    Actor: actor,
+    Verb: verb,
+    Object: obj,
+    Time: stream.Time{
+      Time: time.Unix(timestamp.ToInt64(), 0),
+    },
+    ForeignID: obj,
+    To: feed_attributes.ConvertToStringArray(activity.To),
+    Extra: extra,
+  }
+
+  flatFeed := getStreamClient.CreateFlatFeed(string(feed_attributes.UserFeedSlug), actor)
+  flatFeed.AddActivities(streamActivity)
+  log.Printf("Added feed activity to GetStream with object: %s by user %s with stream activty: %v+\n",
+    obj, actor, streamActivity)
 }
 
 func (getStreamClient *GetStreamClient) GetAllFeedActivitiesByFeedId(feedId feed_attributes.FeedId) {
   flatFeed := getStreamClient.c.FlatFeed(string(feedId.FeedSlug), string(feedId.UserId))
   flatFeedResponse, err := flatFeed.GetActivities(stream.WithActivitiesLimit(10))
   if err != nil {
-   log.Printf("Failed to get activities for feedId: %s\n", feedId.Value())
-   log.Fatal(err.Error())
+    log.Printf("Failed to get activities for feedId: %s\n", feedId.Value())
+    log.Fatal(err.Error())
   }
   log.Printf("%+v\n",flatFeedResponse.Results)
 }

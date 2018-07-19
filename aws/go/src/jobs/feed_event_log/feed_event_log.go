@@ -6,12 +6,11 @@ import (
   "feed/feed_events"
 )
 
-
 func main() {
   forumAddress := os.Getenv("FORUM_ADDRESS")
 
   if forumAddress == "" {
-     log.Fatal("forum address is not set yet")
+    log.Fatal("forum address is not set yet")
   }
 
   log.Printf("Get Forum Address: %s\n", forumAddress)

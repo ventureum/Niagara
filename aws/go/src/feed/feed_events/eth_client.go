@@ -138,18 +138,14 @@ func processEvent(event *Event, getStreamClient *GetStreamClient, dynamodbClient
        dynamodbClient.AddItemIntoFeedEvents(CreateItemForFeedActivity(activity))
     case reflect.TypeOf(UpvoteEvent{}):
        upvoteEvent := (*event).(UpvoteEvent)
-       updatedObj := feed_attributes.Object{
-         ObjType: feed_attributes.PostObjectType,
-         ObjId: upvoteEvent.PostHash,
-       }
        rewards := feed_attributes.CreateRewardFromBigInt(upvoteEvent.Value)
-       dynamodbClient.UpdateItemForFeedEventsWithRewards(updatedObj, rewards)
+       dynamodbClient.UpdateItemForFeedEventsWithRewards(upvoteEvent.PostHash, rewards)
   }
 }
 
 func convertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity {
   var verb feed_attributes.Verb
-  var extraParam interface{}
+  var extraParam map[string]interface{}
   var to []feed_attributes.FeedId
   var obj feed_attributes.Object
   if postEvent.ParentHash == NullHashString {
@@ -158,15 +154,10 @@ func convertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity 
       ObjId: postEvent.PostHash,
     }
     verb = feed_attributes.SubmitVerb
-    extraParam = feed_attributes.Reward("0")
     to = []feed_attributes.FeedId {
       {
-        FeedSlug: feed_attributes.UserFeedSlug,
-        UserId: feed_attributes.UserId(postEvent.PostHash),
-      },
-      {
         FeedSlug: feed_attributes.BoardFeedSlug,
-        UserId: feed_attributes.AllUserType,
+        UserId: feed_attributes.AllBoardIds,
       },
       {
         FeedSlug: feed_attributes.BoardFeedSlug,
@@ -179,15 +170,13 @@ func convertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity 
       ObjId: postEvent.PostHash,
     }
     verb = feed_attributes.ReplyVerb
-    extraParam = feed_attributes.Object{
-      ObjType: feed_attributes.PostObjectType,
-      ObjId: postEvent.ParentHash,
+    extraParam = map[string]interface{} {
+      "post": feed_attributes.Object{
+        ObjType: feed_attributes.PostObjectType,
+        ObjId: postEvent.ParentHash,
+      },
     }
     to = []feed_attributes.FeedId {
-      {
-        FeedSlug: feed_attributes.UserFeedSlug,
-        UserId: feed_attributes.UserId(postEvent.PostHash),
-      },
       {
         FeedSlug: feed_attributes.CommentFeedSlug,
         UserId: feed_attributes.UserId(postEvent.ParentHash),
@@ -197,5 +186,7 @@ func convertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity 
 
   actor := feed_attributes.Actor(postEvent.Poster)
   timeStamp := feed_attributes.BlockTimestamp(postEvent.Timestamp.String())
-  return feed_attributes.CreateNewActivity(actor, verb, obj, timeStamp, to, extraParam)
+  typeHash := feed_attributes.CreateFromHashStr(postEvent.TypeHash)
+  rewards := feed_attributes.Reward("0")
+  return feed_attributes.CreateNewActivity(actor, verb, obj, timeStamp, typeHash, rewards, to, extraParam)
 }
