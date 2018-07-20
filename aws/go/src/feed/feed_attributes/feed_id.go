@@ -23,7 +23,7 @@ const (
 )
 
 
-var AllBoardIds = UserId(crypto.Keccak256Hash([]byte("%__AllBoardIds__%")).String())
+var AllBoardId = UserId(crypto.Keccak256Hash([]byte("%__AllBoardId__%")).String())
 
 
 func CreateFeedId(feedSlug string, userid string) FeedId {
