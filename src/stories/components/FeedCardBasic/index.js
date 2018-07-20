@@ -2,7 +2,8 @@ import * as React from 'react'
 
 import {
   View,
-  Text
+  Text,
+  TouchableWithoutFeedback
 } from 'react-native'
 
 import {
@@ -18,6 +19,7 @@ let moment = require('moment')
 export default class FeedCard extends React.Component {
   render () {
     let { post } = this.props
+
     return (
       <View style={styles.card}>
         <View style={styles.header}>
@@ -43,20 +45,28 @@ export default class FeedCard extends React.Component {
             </Text>
           </View>
         </View>
-        <Text
-          style={{
-            fontWeight: 'bold',
-            fontSize: 16,
-            color: 'black'
-          }}
-        >
-          {post.content.title}
-        </Text>
-        <Markdown >{post.content.text}</Markdown>
+        <TouchableWithoutFeedback onPress={this.props.feedCardDetails.bind(this, post)}>
+          <View>
+            <Text
+              style={{
+                fontWeight: 'bold',
+                fontSize: 16,
+                color: 'black'
+              }}
+            >
+              {post.content.title}
+            </Text>
+            {(post.content.image === undefined)
+              ? <Markdown >{post.content.subtitle}</Markdown>
+              : <Markdown >{`![user image](${post.content.image})\n\n${post.content.subtitle}`}</Markdown>
+            }
+          </View>
+        </TouchableWithoutFeedback>
         <View style={styles.cardFooter}>
           <View style={styles.footerIcons}>
             <Button transparent
               dark
+              onPress={this.props.upvote.bind(this, post)}
             >
               <Icon name='ios-heart-outline' />
               <Text style={styles.badgeCount}>{post.rewards} {post.token.symbol}</Text>
@@ -66,6 +76,7 @@ export default class FeedCard extends React.Component {
             <Button
               transparent
               dark
+              onPress={this.props.feedCardDetails.bind(this, post)}
             >
               <Icon name='ios-text-outline' />
               <Text style={styles.badgeCount}>{post.repliesLength}</Text>

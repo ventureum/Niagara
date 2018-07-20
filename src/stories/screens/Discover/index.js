@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { FlatList, RefreshControl, View } from 'react-native'
 import { Container, Body, Header, Left, Right, Button, Icon, Title, Text, Content, Fab, Toast } from 'native-base'
-import FeedCard from '../../components/FeedCard'
+import FeedCardBasic from '../../components/FeedCardBasic'
 import WalletUtils from '../../../utils/wallet'
 import BoardSearch from '../../components/BoardSearch'
 import NewPostModal from '../../components/NewPostModal'
@@ -50,20 +50,22 @@ export default class Discover extends Component {
       avatar: WalletUtils.getAvatar(item.author)
     }
     return (
-      <FeedCard post={item}
+      <FeedCardBasic post={item}
         navigation={this.props.navigation}
         upvote={this.toUpvote}
         feedCardDetails={this.toReply} />
     )
   }
 
-  onAddNewPost = async (title, text) => {
+  onAddNewPost = async (title, text, image, subtitle) => {
     const enoughBalance = await checkBalanceForTx()
     if (enoughBalance) {
       let crypto = require('crypto')
       const content = {
         title: title,
-        text: text
+        text: text,
+        image: image,
+        subtitle: subtitle
       }
 
       await this.props.addContentToIPFS(content)
@@ -105,9 +107,9 @@ export default class Discover extends Component {
     this.setState({ addNewPost: visible })
   }
 
-  backFromNewPost = async (title, text) => {
-    if (title !== undefined && text !== undefined) {
-      await this.onAddNewPost(title, text)
+  backFromNewPost = async (title, text, image, subtitle) => {
+    if (title !== null && text !== null) {
+      await this.onAddNewPost(title, text, image, subtitle)
     }
     this.setState({ addNewPost: false })
   }

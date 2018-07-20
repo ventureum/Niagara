@@ -159,6 +159,7 @@ async function addContentToIPFS (content) {
     toIPFS
   )
 
+  console.log('IPFS path:', IPFSHash.data.body[0].path)
   // translate multiHash into bytes32 hash
   const ipfsPath = getBytes32FromMultiash(IPFSHash.data.body[0].path).digest
 
