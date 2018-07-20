@@ -13,6 +13,9 @@ import (
   "strings"
   "reflect"
   "feed/feed_attributes"
+  "feed/dynamodb_config/client_config"
+  "feed/dynamodb_config/feed_item"
+  "feed/dynamodb_config/post_config"
 )
 
 
@@ -58,7 +61,7 @@ func createFilterQuery(forumAddressHex string) ethereum.FilterQuery {
 }
 
 func (client *EthClient) SubscribeFilterLogs(
-    forumAddressHex string, getStreamClient *GetStreamClient, dynamodbClient *DynamodbFeedClient) {
+    forumAddressHex string, getStreamClient *GetStreamClient, dynamodbClient *client_config.DynamodbFeedClient) {
   logs := make(chan types.Log)
   filterQuery := createFilterQuery(forumAddressHex)
   sub, err := client.c.SubscribeFilterLogs(context.Background(), filterQuery, logs)
@@ -129,17 +132,24 @@ func matchEvent(topics []common.Hash, data []byte) (*Event, error) {
   return nil, nil
 }
 
-func processEvent(event *Event, getStreamClient *GetStreamClient, dynamodbClient *DynamodbFeedClient) {
+func processEvent(
+  event *Event, getStreamClient *GetStreamClient, dynamodbClient *client_config.DynamodbFeedClient) {
+  postExecutor := post_config.PostExecutor{DynamodbFeedClient: *dynamodbClient}
   switch reflect.TypeOf(*event) {
     case reflect.TypeOf(PostEvent{}):
        postEvent := (*event).(PostEvent)
        activity := convertPostEventToActivity(&postEvent)
        getStreamClient.AddFeedActivityToGetStream(activity)
-       dynamodbClient.AddItemIntoFeedEvents(CreateItemForFeedActivity(activity))
+       postExecutor.AddPostItem(feed_item.CreatePostItem(activity))
     case reflect.TypeOf(UpvoteEvent{}):
        upvoteEvent := (*event).(UpvoteEvent)
        rewards := feed_attributes.CreateRewardFromBigInt(upvoteEvent.Value)
-       dynamodbClient.UpdateItemForFeedEventsWithRewards(upvoteEvent.PostHash, rewards)
+       // TODO(david.shao): add support for reply
+       obj := feed_attributes.Object{
+         ObjType: feed_attributes.PostObjectType,
+         ObjId: upvoteEvent.PostHash,
+       }
+       postExecutor.UpdateRewards(obj, rewards)
   }
 }
 
@@ -157,7 +167,7 @@ func convertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity 
     to = []feed_attributes.FeedId {
       {
         FeedSlug: feed_attributes.BoardFeedSlug,
-        UserId: feed_attributes.AllBoardIds,
+        UserId: feed_attributes.AllBoardId,
       },
       {
         FeedSlug: feed_attributes.BoardFeedSlug,
