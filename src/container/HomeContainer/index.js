@@ -5,6 +5,7 @@ import { TabNavigator } from 'react-navigation'
 import { Button, Text, Icon, Footer, FooterTab } from 'native-base'
 import Assets from '../AssetsContainer'
 import Discover from '../DiscoverContainer'
+import Profile from '../ProfileContainer'
 
 export interface Props {
   navigation: any;
@@ -13,7 +14,8 @@ export default (MainScreenNavigator = TabNavigator(
   {
     Assets: { screen: Assets },
     TCR: { screen: TCRContainer },
-    Discover: {screen: Discover}
+    Discover: { screen: Discover },
+    Profile: {screen: Profile}
   },
   {
     tabBarPosition: 'bottom',

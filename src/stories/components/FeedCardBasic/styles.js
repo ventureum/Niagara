@@ -9,7 +9,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#bbb',
     borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'column',
-    alignItems: 'stretch'
+    alignItems: 'stretch',
+    flexWrap: 'wrap'
   },
   cardFooter: {
     flexDirection: 'row',

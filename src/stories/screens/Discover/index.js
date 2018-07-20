@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { FlatList, RefreshControl, View } from 'react-native'
 import { Container, Body, Header, Left, Right, Button, Icon, Title, Text, Content, Fab, Toast } from 'native-base'
-import FeedCard from '../../components/FeedCard'
+import FeedCardBasic from '../../components/FeedCardBasic'
 import WalletUtils from '../../../utils/wallet'
 import BoardSearch from '../../components/BoardSearch'
 import NewPostModal from '../../components/NewPostModal'
-import { checkBalanceForTx } from '../../../services/forum'
+import { checkBalanceForTx, getPostTypeHash } from '../../../services/forum'
+import { BOARD_ALL_HASH } from '../../../utils/constants.js'
 
 console.ignoredYellowBox = ['Setting a timer']
 
@@ -18,11 +19,13 @@ export default class Discover extends Component {
       addNewPost: false
     }
   }
+
   componentWillReceiveProps (nextProps) {
     if (this.props.boardHash !== nextProps.boardHash) {
       this.props.refreshPosts(nextProps.boardHash)
     }
   }
+
   onRefresh = () => {
     this.props.refreshPosts(this.props.boardHash)
     if (this.flatListRef && this.props.posts.length !== 0) {
@@ -47,30 +50,32 @@ export default class Discover extends Component {
       avatar: WalletUtils.getAvatar(item.author)
     }
     return (
-      <FeedCard post={item}
+      <FeedCardBasic post={item}
         navigation={this.props.navigation}
         upvote={this.toUpvote}
         feedCardDetails={this.toReply} />
     )
   }
 
-  onAddNewPost = async (title, text, image) => {
+  onAddNewPost = async (title, text, image, subtitle) => {
     const enoughBalance = await checkBalanceForTx()
     if (enoughBalance) {
       let crypto = require('crypto')
       const content = {
         title: title,
         text: text,
-        image: image
+        image: image,
+        subtitle: subtitle
       }
 
       await this.props.addContentToIPFS(content)
 
       const { ipfsPath } = this.props
       let postHash = '0x' + crypto.randomBytes(32).toString('hex')
-      const boardId = '0x0ba5e3d6ea353a7eae28095f09061ec261c5be59'
+      const boardId = this.props.boardHash
       const noParent = '0x0000000000000000000000000000000000000000000000000000000000000000'
-      await this.props.addPostToForum(boardId, noParent, postHash, ipfsPath)
+      const postType = getPostTypeHash('POST')
+      await this.props.addPostToForum(boardId, noParent, postHash, ipfsPath, postType)
       Toast.show({
         type: 'success',
         text: 'Comment Sent Successfully!',
@@ -102,9 +107,9 @@ export default class Discover extends Component {
     this.setState({ addNewPost: visible })
   }
 
-  backFromNewPost = async (title, text, image) => {
-    if (title !== undefined && text !== undefined) {
-      await this.onAddNewPost(title, text, image)
+  backFromNewPost = async (title, text, image, subtitle) => {
+    if (title !== null && text !== null) {
+      await this.onAddNewPost(title, text, image, subtitle)
     }
     this.setState({ addNewPost: false })
   }
@@ -140,9 +145,9 @@ export default class Discover extends Component {
               <Title>{this.props.boardName}</Title>
             </Body>
             <Right>
-              {this.props.boardHash !== 'all'
+              {this.props.boardHash !== BOARD_ALL_HASH
                 ? <Button onPress={() => {
-                  this.props.switchBoard('all', 'Feed')
+                  this.props.switchBoard(BOARD_ALL_HASH, 'All')
                 }}>
                   <Icon name='backspace' />
                 </Button>

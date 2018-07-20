@@ -17,6 +17,8 @@ import Assets from './container/AssetsContainer'
 import SendAndReceive from './container/SendAndReceiveContainer'
 import Discover from './container/DiscoverContainer'
 import Reply from './container/ReplyContainer'
+import Profile from './container/ProfileContainer'
+import Transaction from './container/TransactionContainer'
 
 const Drawer = DrawerNavigator(
   {
@@ -43,7 +45,9 @@ const App = StackNavigator(
     Assets: { screen: Assets },
     SendAndReceive: { screen: SendAndReceive },
     Discover: { screen: Discover },
-    Reply: { screen: Reply }
+    Reply: { screen: Reply },
+    Profile: { screen: Profile },
+    Transaction: {screen: Transaction}
   },
   {
     initialRouteName: 'Login',

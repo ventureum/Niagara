@@ -11,13 +11,6 @@ import Markdown from 'react-native-markdown-renderer'
 let moment = require('moment')
 
 export default class CommentCard extends React.Component {
-  markdownGenerator = (text, image) => {
-    if (image === undefined) {
-      return text
-    }
-    return (`![user image](${image})` + '\n\n' + text)
-  }
-
   render () {
     let { post } = this.props
     return (
@@ -40,7 +33,7 @@ export default class CommentCard extends React.Component {
             </Text>
           </View>
           <View style={styles.commentContainer} >
-            <Markdown> {this.markdownGenerator(post.content.text, post.content.image)} </Markdown>
+            <Markdown> {post.content.text} </Markdown>
           </View>
         </View>
       </View >
