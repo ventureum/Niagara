@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { FlatList } from 'react-native'
+import Search from '../../../utils/search.js'
 import {
   Item,
   Input,
@@ -26,24 +27,28 @@ class BoardSearch extends React.Component {
   }
 
   renderItem = ({item}) => {
+    console.log('render: ', item)
     return (
       <ListItem
         onPress={() => {
-          this.props.switchBoard(item.address, item.symbol)
+          this.props.switchBoard(item.key, item.value)
           this.props.goBack()
         }} >
         <Body>
-          <Text> {item.symbol} </Text>
-          <Text note> {item.address} </Text>
+          <Text> b/{item.key} </Text>
+          <Text note> {item.value} </Text>
         </Body>
       </ListItem>)
   }
 
   handleTextChange = (text) => {
-    let tokens = WalletUtils.getToken(text.toUpperCase(), null)
-    this.setState({
-      boards: tokens
-    })
+    let rv = Search.searchBoards(text)
+
+    if (rv) {
+      this.setState({
+        boards: rv
+      })
+    }
   }
 
   render () {
@@ -69,7 +74,7 @@ class BoardSearch extends React.Component {
           ? <FlatList
             data={boards}
             renderItem={this.renderItem}
-            keyExtractor={(item, index) => item.address}
+            keyExtractor={(item, index) => item.key}
           />
           : <Card>
             <CardItem>

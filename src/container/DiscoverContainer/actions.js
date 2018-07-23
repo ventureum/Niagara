@@ -66,7 +66,7 @@ function addPostToForum (boardId, parentHash, postHash, ipfsPath, postType) {
   }
 }
 
-function switchBoard (boardHash, boardName) {
+function switchBoard (boardName, boardHash) {
   return {
     type: 'SWITCH_BOARD',
     meta: {
