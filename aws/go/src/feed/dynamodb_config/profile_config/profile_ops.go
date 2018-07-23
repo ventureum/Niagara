@@ -28,7 +28,7 @@ func (profileExecutor *ProfileExecutor) DeleteProfileTable() {
 
 func (profileExecutor *ProfileExecutor) AddProfileItem(profileItem *feed_item.ProfileItem) {
   var feedItem feed_item.FeedItem = *profileItem
-  profileExecutor.AddItem(&feedItem, TableNameForProfile)
+  profileExecutor.AddItem(&feedItem, TableNameForProfile, "")
 }
 
 func (profileExecutor *ProfileExecutor) DeleteProfileItem(userAddress string) {

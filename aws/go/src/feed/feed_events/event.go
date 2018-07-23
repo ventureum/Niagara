@@ -46,18 +46,18 @@ type UpdatePostEvent struct {
 }
 
 type UpvoteEventResult struct {
-  Poster common.Address // indexed
-  BoardId common.Hash   // indexed
-  PostHash common.Hash  // indexed
-  Value *big.Int
+  Upvoter   common.Address // indexed
+  BoardId   common.Hash    // indexed
+  PostHash  common.Hash    // indexed
+  Value     *big.Int
   Timestamp *big.Int
 }
 
 type UpvoteEvent struct {
-  Poster string    // indexed
-  BoardId string   // indexed
-  PostHash string  // indexed
-  Value *big.Int
+  Upvoter   string // indexed
+  BoardId   string // indexed
+  PostHash  string // indexed
+  Value     *big.Int
   Timestamp *big.Int
 }
 
@@ -84,10 +84,10 @@ func (updatePostEventResult *UpdatePostEventResult) ToUpdatePostEvent() *UpdateP
 
 func (upvoteEventResult *UpvoteEventResult) ToUpvoteEvent() *UpvoteEvent{
   return &UpvoteEvent {
-    Poster: upvoteEventResult.Poster.String(),
-    BoardId: upvoteEventResult.BoardId.String(),
-    PostHash: upvoteEventResult.PostHash.String(),
-    Value: upvoteEventResult.Value,
+    Upvoter:   upvoteEventResult.Upvoter.String(),
+    BoardId:   upvoteEventResult.BoardId.String(),
+    PostHash:  upvoteEventResult.PostHash.String(),
+    Value:     upvoteEventResult.Value,
     Timestamp: upvoteEventResult.Timestamp,
   }
 }

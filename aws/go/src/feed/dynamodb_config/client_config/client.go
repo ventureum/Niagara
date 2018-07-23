@@ -68,7 +68,7 @@ func (dynamodbClient *DynamodbFeedClient) DeleteTable(tableName *string) {
   }
 }
 
-func (dynamodbClient *DynamodbFeedClient) AddItem(item *feed_item.FeedItem, tableName *string) {
+func (dynamodbClient *DynamodbFeedClient) AddItem(item *feed_item.FeedItem, tableName *string, conditionExpression string) {
   mapInfo, err := dynamodbattribute.MarshalMap(*item)
 
   if err != nil {
@@ -79,6 +79,10 @@ func (dynamodbClient *DynamodbFeedClient) AddItem(item *feed_item.FeedItem, tabl
   input := &dynamodb.PutItemInput{
     Item: mapInfo,
     TableName: tableName,
+  }
+
+  if conditionExpression != "" {
+    input.ConditionExpression = aws.String(conditionExpression)
   }
 
   if _, err := dynamodbClient.C.PutItem(input); err != nil {

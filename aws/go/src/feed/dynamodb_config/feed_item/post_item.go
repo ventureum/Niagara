@@ -6,7 +6,6 @@ import (
 
 
 type PostItem struct {
-  ObjectType string `json:"objectType"`
   ObjectId string `json:"objectId"`
   Activity feed_attributes.Activity `json:"activity"`
 }
@@ -14,12 +13,11 @@ type PostItem struct {
 
 func CreatePostItem(activity *feed_attributes.Activity) *PostItem {
   return &PostItem {
-    ObjectType: string(activity.Object.ObjType),
     ObjectId: activity.Object.ObjId,
     Activity: *activity,
   }
 }
 
 func (itemForPost *PostItem) GetObject() string {
-  return itemForPost.ObjectType + ":" + itemForPost.ObjectId
+  return string(itemForPost.Activity.Object.ObjType) + ":" + itemForPost.ObjectId
 }

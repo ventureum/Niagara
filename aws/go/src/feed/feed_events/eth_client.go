@@ -122,7 +122,7 @@ func matchEvent(topics []common.Hash, data []byte) (*Event, error) {
       if err != nil {
         return nil, err
       }
-      upvoteEventResult.Poster = common.BytesToAddress(topics[1].Bytes())
+      upvoteEventResult.Upvoter = common.BytesToAddress(topics[1].Bytes())
       upvoteEventResult.BoardId = topics[2]
       upvoteEventResult.PostHash = topics[3]
       event = *upvoteEventResult.ToUpvoteEvent()
@@ -144,12 +144,7 @@ func processEvent(
     case reflect.TypeOf(UpvoteEvent{}):
        upvoteEvent := (*event).(UpvoteEvent)
        rewards := feed_attributes.CreateRewardFromBigInt(upvoteEvent.Value)
-       // TODO(david.shao): add support for reply
-       obj := feed_attributes.Object{
-         ObjType: feed_attributes.PostObjectType,
-         ObjId: upvoteEvent.PostHash,
-       }
-       postExecutor.UpdateRewards(obj, rewards)
+       postExecutor.UpdateRewards(upvoteEvent.PostHash, rewards)
   }
 }
 

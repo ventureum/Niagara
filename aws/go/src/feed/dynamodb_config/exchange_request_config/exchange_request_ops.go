@@ -27,7 +27,7 @@ func (exchangeRequestExecutor *ExchangeRequestExecutor) DeleteExchangeRequestTab
 
 func (exchangeRequestExecutor *ExchangeRequestExecutor) AddExchangeRequestItem(exchangeRequestItem *feed_item.ExchangeRequestItem) {
   var feedItem feed_item.FeedItem = *exchangeRequestItem
-  exchangeRequestExecutor.AddItem(&feedItem, TableNameForExchangeRequest)
+  exchangeRequestExecutor.AddItem(&feedItem, TableNameForExchangeRequest, "")
 }
 
 func (exchangeRequestExecutor *ExchangeRequestExecutor) DeleteExchangeRequestItem(address string) {
