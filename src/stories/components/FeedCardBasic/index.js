@@ -51,7 +51,8 @@ export default class FeedCard extends React.Component {
               style={{
                 fontWeight: 'bold',
                 fontSize: 16,
-                color: 'black'
+                color: 'black',
+                paddingLeft: 10
               }}
             >
               {post.content.title}

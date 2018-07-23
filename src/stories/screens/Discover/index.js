@@ -5,6 +5,7 @@ import FeedCardBasic from '../../components/FeedCardBasic'
 import WalletUtils from '../../../utils/wallet'
 import BoardSearch from '../../components/BoardSearch'
 import NewPostModal from '../../components/NewPostModal'
+import SpecialPostCard from '../../components/SpecialPostCard'
 import { checkBalanceForTx, getPostTypeHash } from '../../../services/forum'
 import { BOARD_ALL_HASH } from '../../../utils/constants.js'
 
@@ -161,6 +162,8 @@ export default class Discover extends Component {
               </Button>
             </Right>
           </Header>
+          <SpecialPostCard type='Audits' />
+          <SpecialPostCard type='Airdrops' />
           {
             this.props.posts.length === 0
               ? <Content contentContainerStyle={{ flex: 1, justifyContent: 'center', flexDirection: 'row', alignItems: 'center' }}

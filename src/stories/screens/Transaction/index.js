@@ -10,7 +10,7 @@ export default class Transaction extends Component {
     )
   }
   render () {
-    let transactions = this.props.transactions.reverse()
+    let { transactions } = this.props
     return (
       <Container>
         <Header >

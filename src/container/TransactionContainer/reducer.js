@@ -5,55 +5,54 @@ const initialState = {
   loading: false
 }
 
-export default function (state = initialState, action) {
+export default function reducer (state = initialState, action) {
   if (action.type === 'NEW_TRANSACTION') {
     return (
       update(
-        state, { transactions: { $push: [{ hash: action.payload, status: 'Pending', timestamp: moment.utc().format('X') }] } }
+        state, { transactions: { $unshift: [{ hash: action.payload, status: 'Pending', timestamp: moment.utc().format('X') }] } }
       )
     )
   }
 
-  if (action.type === 'UPDATE_TRANSACTION_FULFILLED' && action.payload !== null) {
+  if (action.type === 'UPDATE_TRANSACTION_FULFILLED') {
     let targetIndex = -1
-    for (let j = 0; j < action.payload.length; j++) {
-      for (let i = 0; i < state.transactions.length; i++) {
-        if (state.transactions[i].hash === action.payload[j].transactionHash) {
-          targetIndex = i
-        }
+    if (action.payload === undefined || action.payload.length === 0) {
+      return {
+        ...state,
+        loading: false
+      }
+    }
+    for (let i = 0; i < state.transactions.length; i++) {
+      if (state.transactions[i].hash === action.payload[0].transactionHash) {
+        targetIndex = i
       }
       if (targetIndex !== -1) {
         return update(
-          update(
-            state,
-            {
-              transactions: {
-                [targetIndex]:
-                {
-                  $set: { ...state.transactions[targetIndex], status: 'Fulfilled', receipt: action.payload[j] }
-                }
+          reducer(state, { type: 'UPDATE_TRANSACTION_FULFILLED', payload: action.payload.slice(1) }),
+          {
+            transactions: {
+              [targetIndex]:
+              {
+                $set: { ...state.transactions[targetIndex], status: 'Fulfilled', receipt: action.payload[0] }
               }
             }
-          ),
-          { loading: { $set: false } }
+          }
         )
       }
     }
-    return {
-      ...state,
-      loading: false
-    }
   }
+
   if (action.type === 'UPDATE_TRANSACTION_PENDING') {
     return {
       ...state,
       loading: true
     }
   }
+
   if (action.type === 'UPDATE_TRANSACTION_REJECTED') {
     return {
       ...state,
-      loading: true
+      loading: false
     }
   }
   return state
