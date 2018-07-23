@@ -138,7 +138,7 @@ func processEvent(
   switch reflect.TypeOf(*event) {
     case reflect.TypeOf(PostEvent{}):
        postEvent := (*event).(PostEvent)
-       activity := convertPostEventToActivity(&postEvent)
+       activity := ConvertPostEventToActivity(&postEvent)
        getStreamClient.AddFeedActivityToGetStream(activity)
        postExecutor.AddPostItem(feed_item.CreatePostItem(activity))
     case reflect.TypeOf(UpvoteEvent{}):
@@ -153,7 +153,7 @@ func processEvent(
   }
 }
 
-func convertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity {
+func ConvertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity {
   var verb feed_attributes.Verb
   var extraParam map[string]interface{}
   var to []feed_attributes.FeedId
@@ -195,8 +195,8 @@ func convertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity 
   }
 
   actor := feed_attributes.Actor(postEvent.Poster)
-  timeStamp := feed_attributes.BlockTimestamp(postEvent.Timestamp.String())
-  typeHash := feed_attributes.CreateFromHashStr(postEvent.TypeHash)
+  timeStamp := postEvent.Timestamp
+  typeHash := postEvent.TypeHash
   rewards := feed_attributes.Reward("0")
   return feed_attributes.CreateNewActivity(actor, verb, obj, timeStamp, typeHash, rewards, to, extraParam)
 }
