@@ -147,7 +147,7 @@ export default class Discover extends Component {
             <Right>
               {this.props.boardHash !== BOARD_ALL_HASH
                 ? <Button onPress={() => {
-                  this.props.switchBoard(BOARD_ALL_HASH, 'All')
+                  this.props.switchBoard('All', BOARD_ALL_HASH)
                 }}>
                   <Icon name='backspace' />
                 </Button>
