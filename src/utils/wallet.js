@@ -8,6 +8,7 @@ import Token from './contracts/VetXToken'
 import tokenData from './tokens.json'
 import Forum from './contracts/Forum'
 import Identicon from 'identicon.js'
+import { Toast } from 'native-base'
 
 export default class WalletUtils {
   static ERC20 = './abi/ERC20.js'
@@ -17,6 +18,61 @@ export default class WalletUtils {
   static addressToToken = {}
   static symbolToToken = {}
   static tokens = []
+
+  /*
+    This function provides components with the functionality to send ether/ERC20 transaction.
+    @param receiverAddress The address of the receiver
+    @param tokenSymbol The symbol of the token
+    @param tokenAddress The address of the token
+    @param amount The amount to be send
+    @param gasLimit The gas limit for the transaction
+    @param newTransaction A callback function to be called when a new transaction
+      is sent but before receipt is issued
+  */
+  static async sendTransaction (receiverAddress, tokenSymbol, tokenAddress, amount, gasLimit = 500000, newTransaction) {
+    const { walletReducer } = store.getState()
+
+    const _web3 = this.getWeb3Instance()
+    let promise
+    if (tokenSymbol === 'ETH' && tokenAddress === null) {
+      const value = _web3.utils.toWei(amount, 'ether')
+      promise = _web3.eth.sendTransaction({
+        from: walletReducer.walletAddress,
+        to: receiverAddress,
+        value: value,
+        gas: gasLimit
+      })
+    } else {
+      const tokenInstance = this.getERC20Instance(tokenAddress)
+      let decimals = await tokenInstance.methods.decimals().call()
+      let BN = _web3.utils.BN
+      let base = (new BN(10)).pow(new BN(decimals))
+      let value = base.mul(new BN(amount))
+      promise = tokenInstance.methods.transfer(receiverAddress, value).send({
+        from: walletReducer.walletAddress,
+        gas: gasLimit
+      })
+    }
+    promise.on('transactionHash', (hash) => {
+      newTransaction(hash)
+    }).on('error', (error) => {
+      Toast.show({
+        text: error,
+        position: 'center',
+        buttonText: 'Okay',
+        type: 'danger',
+        duration: 10000
+      })
+    }).on('receipt', () => {
+      Toast.show({
+        text: 'Transaction is fulfilled!',
+        buttonText: 'Okay',
+        type: 'success',
+        position: 'center',
+        duration: 10000
+      })
+    })
+  }
 
   /*
    * Reads an Web3 wallet instance from Redux store
@@ -112,10 +168,8 @@ export default class WalletUtils {
 
     return new Promise((resolve, reject) => {
       const instance = this.getERC20Instance(contractAddress)
-      console.log(instance)
       instance.methods.balanceOf(walletReducer.walletAddress).call((error, decimalsBalance) => {
         if (error) {
-          console.log('this is the problem:', error)
           reject(error)
         }
 

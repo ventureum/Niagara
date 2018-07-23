@@ -135,61 +135,6 @@ async function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
 }
 
 /*
-  @param content is a jsObject in a form of
-    content ={
-      title: "",
-      text: "",
-      image: ""
-    }
-  @param return the bytes32 path hash on IPFS of the content
-  Add a given content to IPFS
-*/
-async function addContentToIPFS (content) {
-  // prepare data for IPFS post
-  const buf = Buffer.from(JSON.stringify(content))
-  const data = buf.toJSON()
-  const toIPFS = {
-    'command': 'add',
-    'data': data
-  }
-
-  // post content to IPFS
-  const IPFSHash = await axios.post(
-    Config.IPFS_POST_API,
-    toIPFS
-  )
-
-  console.log('IPFS path:', IPFSHash.data.body[0].path)
-  // translate multiHash into bytes32 hash
-  const ipfsPath = getBytes32FromMultiash(IPFSHash.data.body[0].path).digest
-
-  return ipfsPath
-}
-
-/*
-  @param boardId A bytes32 hash of the boardID
-  @param parentHash A bytes32 hash of the post's parent
-  @param postHash A bytes32 hash of the post
-  @param ipfsPath a bytes32 path hash on IPFS of the post content
-  Add the post to Forum contract
-*/
-async function addPostToForum (boardId, parentHash, postHash, ipfsPath, postType, newTransaction) {
-  const forum = await WalletUtils.getContractInstance('Forum')
-  return new Promise((resolve, reject) => {
-    forum.methods.post(boardId, parentHash, postHash, ipfsPath, postType).send({ gasPrice: GAS_PRICE })
-      .on('transactionHash', (txHash) => {
-        newTransaction(txHash)
-      })
-      .on('receipt', (receipt) => {
-        resolve(receipt)
-      })
-      .on('error', (error) => {
-        reject(error)
-      })
-  })
-}
-
-/*
   Check if the user has enough ether for a tx
   @return true if the user has enough ether
 */
@@ -208,11 +153,30 @@ function getPostTypeHash (type) {
   return web3.eth.abi.encodeFunctionSignature(type)
 }
 
-async function newPost (content, boardId, parentHash, postType, newContentToIPFS, newTransaction) {
+/*
+  @param content is a jsObject in a form of
+    content ={
+      title: "",
+      text: "",
+      image: "",
+      subtitle: ""
+    }
+  /*
+  @param boardId A bytes32 hash of the boardID
+  @param parentHash A bytes32 hash of the post's parent
+  @param postHash A bytes32 hash of the post
+  @param postType A bytes4 hash of the post's type
+  @param newContentToIPFS A callback function to be used when
+    a new content is added to IPFS. It takes an IPFS path strign as parameter.
+  @param newTransaction A callback function to be used when
+    a new transaction is sent but before receipt. It takes a transaction hash as parameter.
+*/
+
+function newPost (content, boardId, parentHash, postType, newContentToIPFS, newTransaction) {
   return new Promise(async (resolve, reject) => {
     const enoughBalance = await checkBalanceForTx()
     if (!enoughBalance) {
-      reject('You do not have enough ether')
+      reject(new Error('You do not have enough ethers'))
     }
     // prepare data for IPFS post
     const buf = Buffer.from(JSON.stringify(content))
@@ -230,7 +194,6 @@ async function newPost (content, boardId, parentHash, postType, newContentToIPFS
     if (newContentToIPFS !== undefined) {
       newContentToIPFS(IPFSHash.data.body[0].path)
     }
-    console.log('IPFS path:', IPFSHash.data.body[0].path)
     // translate multiHash into bytes32 hash
     const ipfsPath = getBytes32FromMultiash(IPFSHash.data.body[0].path).digest
 
@@ -255,4 +218,4 @@ async function newPost (content, boardId, parentHash, postType, newContentToIPFS
   )
 }
 
-export { batchReadFeedsByBoardId, addContentToIPFS, addPostToForum, checkBalanceForTx, getPostTypeHash, newPost }
+export { batchReadFeedsByBoardId, checkBalanceForTx, getPostTypeHash, newPost }

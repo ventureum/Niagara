@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import {
-  Toast,
   Container,
   Header,
   Form,
@@ -18,99 +17,28 @@ import {
   Body,
   Footer
 } from 'native-base'
-import wallet from '../../../utils/wallet'
 
-let web3
 export default class SendPage extends Component {
   constructor (props) {
     super(props)
-    web3 = wallet.getWeb3Instance()
-    if (this.props.address) {
-      this.state = {
-        transactionState: 'normal',
-        receiverAddr: null,
-        amount: 0,
-        balance: this.props.balance,
-        address: this.props.address,
-        symbol: this.props.symbol,
-        decimals: this.props.decimals
+    this.state = {
+      receiverAddr: null,
+      amount: 0
+    }
+  }
+
+  sendTx = async (receiverAddr, tokenSymbol, tokenAddr, amount) => {
+    if (this.state.amount !== 0) {
+      if (tokenSymbol === 'ETH') {
+        // ether
+        this.props.sendTransaction(receiverAddr, tokenSymbol, null, amount)
+      } else {
+        // other ERC20 tokens
+        this.props.sendTransaction(receiverAddr, tokenSymbol, tokenAddr, amount)
       }
     }
-  }
-
-  componentDidMount () {
-    wallet.getBalance({
-      address: this.state.address,
-      symbol: this.state.symbol,
-      decimals: this.state.decimals
-    }).then((balance) => {
-      this.setState({ balance })
-    })
-  }
-  sendTx = () => {
-    const sender = web3.eth.defaultAccount
-    const receiver = this.state.receiverAddr
-    const amount = web3.utils.toWei(this.state.amount, 'ether')
-
-    if (this.state.symbol === 'ETH') {
-      web3.eth.sendTransaction({
-        from: sender,
-        to: receiver,
-        value: amount,
-        gas: 500000
-      }).on('transactionHash', (hash) => {
-        this.setState({ transactionState: 'pending' })
-      }).on('error', (error, rec) => {
-        Toast.show({
-          text: 'Error in sending transaction!',
-          position: 'center',
-          buttonText: 'Okay',
-          type: 'danger',
-          duration: 10000
-        })
-        this.setState({ transactionState: 'normal' })
-      }).on('receipt', (receipt) => {
-        this.setState({ transactionState: 'normal' }, () => {
-          Toast.show({
-            text: 'Transaction is fulfilled!',
-            buttonText: 'Okay',
-            type: 'success',
-            position: 'center',
-            duration: 10000
-          })
-          this.props.navigation.goBack()
-        })
-      })
-    } else {
-      // Other ERC20 Token:
-      const tokenInstance = wallet.getERC20Instance(this.state.address)
-      tokenInstance.methods.transfer(receiver, amount).send({
-        from: sender,
-        gas: 500000
-      }).on('transactionHash', (hash) => {
-        this.setState({ transactionState: 'pending' })
-      }).on('error', (error) => {
-        Toast.show({
-          text: 'Error in sending transaction!',
-          position: 'center',
-          buttonText: 'Okay',
-          type: 'danger',
-          duration: 10000
-        })
-        this.setState({ transactionState: 'normal' })
-      }).on('receipt', (receipt) => {
-        this.setState({ transactionState: 'normal' }, () => {
-          Toast.show({
-            text: 'Transaction is fulfilled!',
-            position: 'center',
-            buttonText: 'Okay',
-            type: 'success',
-            duration: 10000
-          })
-          this.props.navigation.goBack()
-        })
-      })
-    }
+    this.setState({ amount: 0 })
+    this.props.navigation.goBack()
   }
 
   returnData (data) {
@@ -118,20 +46,6 @@ export default class SendPage extends Component {
   }
 
   render () {
-    let button
-    if (this.state.transactionState === 'pending') {
-      button = (
-        <Button block onPress={this.sendTx}>
-          <Spinner />
-        </Button>
-      )
-    } else {
-      button = (
-        <Button block onPress={this.sendTx}>
-          <Text>Send</Text>
-        </Button>
-      )
-    }
     return (
       <Container>
         <Header>
@@ -149,7 +63,7 @@ export default class SendPage extends Component {
                 () => this.props.navigation.navigate('QRScaner', { returnData: this.returnData.bind(this) })
               }
             >
-              <Icon name='qrcode-scan' />
+              <Icon name='list' />
             </Button>
           </Right>
         </Header>
@@ -164,11 +78,11 @@ export default class SendPage extends Component {
             </Item>
             <Item>
               <Label>Symbol:</Label>
-              <Input disabled value={String(this.state.symbol)} />
+              <Input disabled value={String(this.props.tokenSymbol)} />
             </Item>
             <Item>
               <Label>Balance:</Label>
-              <Input disabled value={String(this.state.balance)} />
+              <Input disabled value={String(this.props.tokenBalance)} />
             </Item>
             <Item >
               <Input placeholder='Amount'
@@ -179,7 +93,16 @@ export default class SendPage extends Component {
         </Content>
         <Footer>
           <Right>
-            {button}
+            {this.props.loading
+              ? <Button block>
+                <Spinner />
+              </Button>
+              : <Button block onPress={() => {
+                this.sendTx(this.state.receiverAddr, this.props.tokenSymbol, this.props.tokenAddress, this.state.amount)
+              }}>
+                <Text>Send</Text>
+              </Button>
+            }
           </Right>
         </Footer>
       </Container>

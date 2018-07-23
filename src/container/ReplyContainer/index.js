@@ -18,8 +18,6 @@ class ReplyContainer extends Component {
     return (
       <Reply post={this.state.post}
         replies={this.props.replies}
-        addContentToIPFS={this.props.addContentToIPFS}
-        addPostToForum={this.props.addPostToForum}
         loading={this.props.loading}
         newPost={this.props.newPost}
         errorMessage={this.props.errorMessage}

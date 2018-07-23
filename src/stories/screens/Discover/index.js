@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { FlatList, RefreshControl, View } from 'react-native'
-import { Container, Body, Header, Left, Right, Button, Icon, Title, Text, Content, Fab, Toast } from 'native-base'
+import { Container, Body, Header, Left, Right, Button, Icon, Title, Text, Content, Fab } from 'native-base'
 import FeedCardBasic from '../../components/FeedCardBasic'
 import WalletUtils from '../../../utils/wallet'
 import BoardSearch from '../../components/BoardSearch'
 import NewPostModal from '../../components/NewPostModal'
 import SpecialPostCard from '../../components/SpecialPostCard'
-import { checkBalanceForTx, getPostTypeHash } from '../../../services/forum'
+import { getPostTypeHash } from '../../../services/forum'
 import { BOARD_ALL_HASH } from '../../../utils/constants.js'
 
 console.ignoredYellowBox = ['Setting a timer']
@@ -67,7 +67,8 @@ export default class Discover extends Component {
     }
 
     const boardId = this.props.boardHash
-    const noParent = '0x0000000000000000000000000000000000000000000000000000000000000000'
+    const web3 = WalletUtils.getWeb3Instance()
+    const noParent = web3.utils.padRight('0x0', 64)
     const postType = getPostTypeHash('POST')
     await this.props.newPost(content, boardId, noParent, postType)
 
