@@ -1,6 +1,9 @@
 package feed_attributes
 
-import "math/big"
+import (
+  "math/big"
+  "time"
+)
 
 type BlockTimestamp string
 
@@ -17,4 +20,8 @@ func (blockTimestamp BlockTimestamp) ToBigInt() *big.Int {
 
 func (blockTimestamp BlockTimestamp) ToInt64() int64 {
   return blockTimestamp.ToBigInt().Int64()
+}
+
+func CreateBlockTimestampFromNow() BlockTimestamp {
+  return BlockTimestamp(time.Now().UTC().String())
 }
