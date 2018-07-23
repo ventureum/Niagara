@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Reply from '../../stories/screens/Reply'
-import { getReplies, addContentToIPFS, addPostToForum } from '../DiscoverContainer/actions'
+import { getReplies, newPost } from '../DiscoverContainer/actions'
 
 class ReplyContainer extends Component {
   constructor (props) {
@@ -21,7 +21,8 @@ class ReplyContainer extends Component {
         addContentToIPFS={this.props.addContentToIPFS}
         addPostToForum={this.props.addPostToForum}
         loading={this.props.loading}
-        ipfsPath={this.props.ipfsPath}
+        newPost={this.props.newPost}
+        errorMessage={this.props.errorMessage}
       />
     )
   }
@@ -30,13 +31,12 @@ class ReplyContainer extends Component {
 const mapStateToProps = state => ({
   replies: state.discoverReducer.replies,
   loading: state.discoverReducer.loading,
-  ipfsPath: state.discoverReducer.ipfsPath
+  errorMessage: state.discoverReducer.errorMessage
 })
 
 const mapDispatchToProps = (dispatch) => ({
   getReplies: (postHash) => dispatch(getReplies(postHash)),
-  addContentToIPFS: (content) => dispatch(addContentToIPFS(content)),
-  addPostToForum: (boardId, parentHash, postHash, ipfsPath, postType) => dispatch(addPostToForum(boardId, parentHash, postHash, ipfsPath, postType))
+  newPost: (content, boardId, parentHash, postType) => dispatch(newPost(content, boardId, parentHash, postType))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ReplyContainer)

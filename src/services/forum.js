@@ -208,4 +208,51 @@ function getPostTypeHash (type) {
   return web3.eth.abi.encodeFunctionSignature(type)
 }
 
-export { batchReadFeedsByBoardId, addContentToIPFS, addPostToForum, checkBalanceForTx, getPostTypeHash }
+async function newPost (content, boardId, parentHash, postType, newContentToIPFS, newTransaction) {
+  return new Promise(async (resolve, reject) => {
+    const enoughBalance = await checkBalanceForTx()
+    if (!enoughBalance) {
+      reject('You do not have enough ether')
+    }
+    // prepare data for IPFS post
+    const buf = Buffer.from(JSON.stringify(content))
+    const data = buf.toJSON()
+    const toIPFS = {
+      'command': 'add',
+      'data': data
+    }
+
+    // post content to IPFS
+    const IPFSHash = await axios.post(
+      Config.IPFS_POST_API,
+      toIPFS
+    )
+    if (newContentToIPFS !== undefined) {
+      newContentToIPFS(IPFSHash.data.body[0].path)
+    }
+    console.log('IPFS path:', IPFSHash.data.body[0].path)
+    // translate multiHash into bytes32 hash
+    const ipfsPath = getBytes32FromMultiash(IPFSHash.data.body[0].path).digest
+
+    // add post to forum contract
+    const forum = await WalletUtils.getContractInstance('Forum')
+    let crypto = require('crypto')
+    let postHash = '0x' + crypto.randomBytes(32).toString('hex')
+
+    forum.methods.post(boardId, parentHash, postHash, ipfsPath, postType).send({ gasPrice: GAS_PRICE })
+      .on('transactionHash', (txHash) => {
+        if (newContentToIPFS !== undefined) {
+          newTransaction(txHash)
+        }
+      })
+      .on('receipt', (receipt) => {
+        resolve(receipt)
+      })
+      .on('error', (error) => {
+        reject(error)
+      })
+  }
+  )
+}
+
+export { batchReadFeedsByBoardId, addContentToIPFS, addPostToForum, checkBalanceForTx, getPostTypeHash, newPost }

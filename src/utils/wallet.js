@@ -112,8 +112,10 @@ export default class WalletUtils {
 
     return new Promise((resolve, reject) => {
       const instance = this.getERC20Instance(contractAddress)
+      console.log(instance)
       instance.methods.balanceOf(walletReducer.walletAddress).call((error, decimalsBalance) => {
         if (error) {
+          console.log('this is the problem:', error)
           reject(error)
         }
 

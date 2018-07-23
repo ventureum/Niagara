@@ -23,7 +23,7 @@ export default class FeedCard extends React.Component {
     return (
       <View style={styles.card}>
         <View style={styles.header}>
-          <Thumbnail source={{ uri: post.avatar }} />
+          <Thumbnail small source={{ uri: post.avatar }} />
           <View
             style={{
               flexDirection: 'column',

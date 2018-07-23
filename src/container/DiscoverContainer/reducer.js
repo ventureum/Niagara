@@ -8,7 +8,8 @@ const initialState = {
   lastUUID: '',
   replies: [],
   loading: false,
-  ipfsPath: ''
+  ipfsPath: '',
+  errorMessage: ''
 }
 
 export default function (state: any = initialState, action: Function) {
@@ -18,80 +19,80 @@ export default function (state: any = initialState, action: Function) {
       return {
         ...state,
         loading: false,
-        posts: []
+        posts: [],
+        errorMessage: ''
       }
     }
     return {
       ...state,
       posts: action.payload,
       lastUUID: action.payload[length - 1].id,
-      loading: false
+      loading: false,
+      errorMessage: ''
     }
   }
 
   if (action.type === 'REFRESH_POSTS_PENDING') {
     return {
       ...state,
-      loading: true
+      loading: true,
+      errorMessage: ''
     }
   }
-
+  if (action.type === 'REFRESH_POSTS_REJECTED') {
+    return {
+      ...state,
+      loading: false,
+      errorMessage: action.payload
+    }
+  }
   if (action.type === 'GET_MORE_POSTS_FULFILLED') {
     const length = action.payload.length
     if (length === 0) {
       return {
         ...state,
-        loading: false
+        loading: false,
+        errorMessage: ''
       }
     }
     return update(
       update(
         update(
-          state,
-          { posts: { $push: action.payload } }
+          update(
+            state,
+            { posts: { $push: action.payload } }
+          ),
+          { lastUUID: { $set: action.payload[length - 1].id } }
         ),
-        { lastUUID: { $set: action.payload[length - 1].id } }
+        { loading: { $set: false } }
       ),
-      { loading: { $set: false } }
+      {errorMessage: {$set: ''}}
     )
   }
+
   if (action.type === 'GET_REPLIES_PENDING') {
     return {
       ...state,
-      loading: true
+      loading: true,
+      errorMessage: ''
     }
   }
   if (action.type === 'GET_REPLIES_FULFILLED') {
     return {
       ...state,
       loading: false,
-      replies: action.payload
+      replies: action.payload,
+      errorMessage: ''
     }
   }
-  if (action.type === 'ADD_CONTENT_TO_IPFS_PENDING') {
+  if (action.type === 'GET_REPLIES_REJECTED') {
     return {
       ...state,
-      loading: true
+      loading: false,
+      errorMessage: action.payload
     }
   }
-  if (action.type === 'ADD_CONTENT_TO_IPFS_FULFILLED') {
-    return {
-      ...state,
-      ipfsPath: action.payload,
-      loading: false
-    }
-  }
-  if (action.type === 'ADD_POST_TO_FORUM_PENDING') {
-    return {
-      ...state
-    }
-  }
-  if (action.type === 'ADD_POST_TO_FORUM_FULFILLED') {
-    return {
-      ...state,
-      loading: false
-    }
-  }
+
   if (action.type === 'SWITCH_BOARD') {
     return {
       ...state,
@@ -100,5 +101,30 @@ export default function (state: any = initialState, action: Function) {
       posts: []
     }
   }
+
+  if (action.type === 'NEW_POST_PENDING') {
+    return {
+      ...state,
+      loading: true,
+      errorMessage: ''
+    }
+  }
+
+  if (action.type === 'NEW_POST_REJECTED') {
+    return {
+      ...state,
+      loading: false,
+      errorMessage: action.payload
+    }
+  }
+
+  if (action.type === 'NEW_POST_FULFILLED') {
+    return {
+      ...state,
+      loading: false,
+      errorMessage: ''
+    }
+  }
+
   return state
 }

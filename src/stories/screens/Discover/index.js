@@ -59,41 +59,19 @@ export default class Discover extends Component {
   }
 
   onAddNewPost = async (title, text, image, subtitle) => {
-    const enoughBalance = await checkBalanceForTx()
-    if (enoughBalance) {
-      let crypto = require('crypto')
-      const content = {
-        title: title,
-        text: text,
-        image: image,
-        subtitle: subtitle
-      }
-
-      await this.props.addContentToIPFS(content)
-
-      const { ipfsPath } = this.props
-      let postHash = '0x' + crypto.randomBytes(32).toString('hex')
-      const boardId = this.props.boardHash
-      const noParent = '0x0000000000000000000000000000000000000000000000000000000000000000'
-      const postType = getPostTypeHash('POST')
-      await this.props.addPostToForum(boardId, noParent, postHash, ipfsPath, postType)
-      Toast.show({
-        type: 'success',
-        text: 'Comment Sent Successfully!',
-        buttonText: 'Okay',
-        position: 'bottom',
-        duration: 10000
-      })
-      this.setState({ text: null })
-    } else {
-      Toast.show({
-        type: 'danger',
-        text: 'Insufficient fund!',
-        buttonText: 'Okay',
-        position: 'bottom',
-        duration: 10000
-      })
+    const content = {
+      title: title,
+      text: text,
+      image: image,
+      subtitle: subtitle
     }
+
+    const boardId = this.props.boardHash
+    const noParent = '0x0000000000000000000000000000000000000000000000000000000000000000'
+    const postType = getPostTypeHash('POST')
+    await this.props.newPost(content, boardId, noParent, postType)
+
+    this.setState({ text: null })
   }
 
   inBoardSearch = (val) => {
