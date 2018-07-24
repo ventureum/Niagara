@@ -6,6 +6,7 @@ import (
   "feed/dynamodb_config/client_config"
   "feed/dynamodb_config/evaluation_config"
   "math/big"
+  "feed/dynamodb_config/post_config"
   "github.com/aws/aws-lambda-go/lambda"
 )
 
@@ -40,6 +41,9 @@ func Handler(request Request) (Response, error) {
   evaluationExecutor := evaluation_config.EvaluationExecutor{DynamodbFeedClient: *dynamodbFeedClient}
   evaluationItem := request.RequestToEvaluationItem()
   evaluationExecutor.AddEvaluationItem(evaluationItem)
+
+  postExecutor := post_config.PostExecutor{DynamodbFeedClient: *dynamodbFeedClient}
+  postExecutor.AddVoter(feed_attributes.Voter(evaluationItem.EvaluatorAddress), evaluationItem.ObjectId)
   response.Ok = true
   return response, nil
 }

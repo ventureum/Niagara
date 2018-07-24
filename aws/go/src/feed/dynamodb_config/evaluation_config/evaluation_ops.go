@@ -11,7 +11,6 @@ type EvaluationExecutor struct {
   client_config.DynamodbFeedClient
 }
 
-
 func (evaluationExecutor *EvaluationExecutor) CreateEvaluationTable( ) {
   evaluationExecutor.CreateTable(
     AttributeDefinitionsForEvaluation,

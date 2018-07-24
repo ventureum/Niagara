@@ -140,7 +140,7 @@ func processEvent(
        postEvent := (*event).(PostEvent)
        activity := ConvertPostEventToActivity(&postEvent)
        getStreamClient.AddFeedActivityToGetStream(activity)
-       postExecutor.AddPostItem(feed_item.CreatePostItem(activity))
+       postExecutor.UpsertPostItem(feed_item.CreatePostItem(activity))
     case reflect.TypeOf(UpvoteEvent{}):
        upvoteEvent := (*event).(UpvoteEvent)
        rewards := feed_attributes.CreateRewardFromBigInt(upvoteEvent.Value)

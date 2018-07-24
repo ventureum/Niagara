@@ -110,6 +110,45 @@ func (dynamodbClient *DynamodbFeedClient) DeleteItem(
   log.Printf("Successfully deleted Item %+v from Table %s\n", item, *tableName)
 }
 
+func (dynamodbClient *DynamodbFeedClient) UpdateAttributes(
+    expressionAttributeNames map[string]*string,
+    expressionAttributeValues map[string]*dynamodb.AttributeValue,
+    key map[string]*dynamodb.AttributeValue,
+    tableName *string,
+    updateExpression *string,
+    feedItemType feed_item.FeedItemType) *feed_item.FeedItem {
+
+  var input *dynamodb.UpdateItemInput
+  if expressionAttributeValues == nil {
+    input = &dynamodb.UpdateItemInput{
+      ExpressionAttributeValues: expressionAttributeValues,
+      Key: key,
+      TableName:        tableName,
+      ReturnValues:     aws.String("ALL_NEW"),
+      UpdateExpression: updateExpression,
+    }
+  } else {
+    input = &dynamodb.UpdateItemInput{
+      ExpressionAttributeNames: expressionAttributeNames,
+      ExpressionAttributeValues: expressionAttributeValues,
+      Key: key,
+      TableName:        tableName,
+      ReturnValues:     aws.String("ALL_NEW"),
+      UpdateExpression: updateExpression,
+    }
+  }
+
+  updatedValue, err := dynamodbClient.C.UpdateItem(input)
+
+  if err != nil {
+    log.Printf("Failed to update atrributes %+v with key %+v in Table %s by updateExpression %s\n",
+      expressionAttributeValues, key, *tableName, *updateExpression)
+    log.Fatal(err.Error())
+  }
+
+  return UnmarshalToFeedItem(updatedValue.Attributes, feedItemType)
+}
+
 func (dynamodbClient *DynamodbFeedClient) ReadItem(
   key map[string]*dynamodb.AttributeValue, tableName *string, feedItemType feed_item.FeedItemType) *feed_item.FeedItem {
   input := &dynamodb.GetItemInput{
