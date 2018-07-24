@@ -109,18 +109,18 @@ func main () {
   */
   item := feed_item.CreatePostItem(postActivity1)
 
-  postExecutor.AddPostItem(item)
-  expectedRewards :=  postExecutor.ReadRewards(object1)
+  postExecutor.UpsertPostItem(item)
+  expectedRewards :=  postExecutor.ReadRewards(object1.ObjId)
   log.Printf("expected rewards: %s\n", expectedRewards)
 
-  postExecutor.UpdateRewards(object1, rewards2)
-  expectedRewards =  postExecutor.ReadRewards(object1)
+  postExecutor.UpdateRewards(object1.ObjId, rewards2)
+  expectedRewards =  postExecutor.ReadRewards(object1.ObjId)
   log.Printf("expected rewards: %s\n", expectedRewards)
 
-  readItem := postExecutor.ReadPostItem(object1)
+  readItem := postExecutor.ReadPostItem(object1.ObjId)
   log.Printf("expected postItem: %+v\n", readItem)
 
-  postExecutor.DeletePostItem(object1)
-  readItem = postExecutor.ReadPostItem(object1)
+  postExecutor.DeletePostItem(object1.ObjId)
+  readItem = postExecutor.ReadPostItem(object1.ObjId)
   log.Printf("expected postItem: %+v\n", readItem)
 }

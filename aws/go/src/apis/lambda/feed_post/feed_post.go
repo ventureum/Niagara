@@ -70,7 +70,7 @@ func Handler(request Request) (Response, error) {
 
   dynamodbFeedClient := client_config.CreateDynamodbFeedClient()
   postExecutor := post_config.PostExecutor{DynamodbFeedClient: *dynamodbFeedClient}
-  postExecutor.AddPostItem(postItem)
+  postExecutor.UpsertPostItem(postItem)
 
   response.Ok = true
   return response, nil
