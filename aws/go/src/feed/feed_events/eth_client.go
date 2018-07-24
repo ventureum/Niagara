@@ -122,7 +122,7 @@ func matchEvent(topics []common.Hash, data []byte) (*Event, error) {
       if err != nil {
         return nil, err
       }
-      upvoteEventResult.Poster = common.BytesToAddress(topics[1].Bytes())
+      upvoteEventResult.Upvoter = common.BytesToAddress(topics[1].Bytes())
       upvoteEventResult.BoardId = topics[2]
       upvoteEventResult.PostHash = topics[3]
       event = *upvoteEventResult.ToUpvoteEvent()
@@ -138,22 +138,17 @@ func processEvent(
   switch reflect.TypeOf(*event) {
     case reflect.TypeOf(PostEvent{}):
        postEvent := (*event).(PostEvent)
-       activity := convertPostEventToActivity(&postEvent)
+       activity := ConvertPostEventToActivity(&postEvent)
        getStreamClient.AddFeedActivityToGetStream(activity)
        postExecutor.AddPostItem(feed_item.CreatePostItem(activity))
     case reflect.TypeOf(UpvoteEvent{}):
        upvoteEvent := (*event).(UpvoteEvent)
        rewards := feed_attributes.CreateRewardFromBigInt(upvoteEvent.Value)
-       // TODO(david.shao): add support for reply
-       obj := feed_attributes.Object{
-         ObjType: feed_attributes.PostObjectType,
-         ObjId: upvoteEvent.PostHash,
-       }
-       postExecutor.UpdateRewards(obj, rewards)
+       postExecutor.UpdateRewards(upvoteEvent.PostHash, rewards)
   }
 }
 
-func convertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity {
+func ConvertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity {
   var verb feed_attributes.Verb
   var extraParam map[string]interface{}
   var to []feed_attributes.FeedId
@@ -195,8 +190,8 @@ func convertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity 
   }
 
   actor := feed_attributes.Actor(postEvent.Poster)
-  timeStamp := feed_attributes.BlockTimestamp(postEvent.Timestamp.String())
-  typeHash := feed_attributes.CreateFromHashStr(postEvent.TypeHash)
+  timeStamp := postEvent.Timestamp
+  typeHash := postEvent.TypeHash
   rewards := feed_attributes.Reward("0")
   return feed_attributes.CreateNewActivity(actor, verb, obj, timeStamp, typeHash, rewards, to, extraParam)
 }

@@ -3,6 +3,7 @@ package feed_events
 import (
   "github.com/ethereum/go-ethereum/common"
   "math/big"
+  "feed/feed_attributes"
 )
 
 type Event interface{}
@@ -26,8 +27,8 @@ type PostEvent struct {
   ParentHash string
   PostHash string   // indexed
   IpfsPath string
-  TypeHash string
-  Timestamp *big.Int
+  TypeHash feed_attributes.TypeHash
+  Timestamp feed_attributes.BlockTimestamp
 }
 
 type UpdatePostEventResult struct {
@@ -45,18 +46,18 @@ type UpdatePostEvent struct {
 }
 
 type UpvoteEventResult struct {
-  Poster common.Address // indexed
-  BoardId common.Hash   // indexed
-  PostHash common.Hash  // indexed
-  Value *big.Int
+  Upvoter   common.Address // indexed
+  BoardId   common.Hash    // indexed
+  PostHash  common.Hash    // indexed
+  Value     *big.Int
   Timestamp *big.Int
 }
 
 type UpvoteEvent struct {
-  Poster string    // indexed
-  BoardId string   // indexed
-  PostHash string  // indexed
-  Value *big.Int
+  Upvoter   string // indexed
+  BoardId   string // indexed
+  PostHash  string // indexed
+  Value     *big.Int
   Timestamp *big.Int
 }
 
@@ -67,8 +68,8 @@ func (postEventResult *PostEventResult) ToPostEvent() *PostEvent {
     ParentHash: postEventResult.ParentHash.String(),
     PostHash: postEventResult.PostHash.String(),
     IpfsPath: postEventResult.IpfsPath.String(),
-    TypeHash: common.Bytes2Hex(postEventResult.TypeHash[:]),
-    Timestamp: postEventResult.Timestamp,
+    TypeHash: feed_attributes.CreateFromHashStr(common.Bytes2Hex(postEventResult.TypeHash[:])),
+    Timestamp: feed_attributes.CreateBlockTimestampFromBigInt(postEventResult.Timestamp),
   }
 }
 
@@ -83,10 +84,10 @@ func (updatePostEventResult *UpdatePostEventResult) ToUpdatePostEvent() *UpdateP
 
 func (upvoteEventResult *UpvoteEventResult) ToUpvoteEvent() *UpvoteEvent{
   return &UpvoteEvent {
-    Poster: upvoteEventResult.Poster.String(),
-    BoardId: upvoteEventResult.BoardId.String(),
-    PostHash: upvoteEventResult.PostHash.String(),
-    Value: upvoteEventResult.Value,
+    Upvoter:   upvoteEventResult.Upvoter.String(),
+    BoardId:   upvoteEventResult.BoardId.String(),
+    PostHash:  upvoteEventResult.PostHash.String(),
+    Value:     upvoteEventResult.Value,
     Timestamp: upvoteEventResult.Timestamp,
   }
 }

@@ -8,7 +8,7 @@ import (
 )
 
 type GetStreamClient struct {
-  c *stream.Client
+  C *stream.Client
 }
 
 func ConnectGetStreamClient() (*GetStreamClient) {
@@ -18,15 +18,15 @@ func ConnectGetStreamClient() (*GetStreamClient) {
     log.Fatal(err)
   }
   log.Println("Connected to GetStream Client")
-  return &GetStreamClient{c:  client}
+  return &GetStreamClient{C:  client}
 }
 
 func (getStreamClient *GetStreamClient) CreateFlatFeed(feedSlug string, userId string) *stream.FlatFeed {
-  return getStreamClient.c.FlatFeed(feedSlug, userId)
+  return getStreamClient.C.FlatFeed(feedSlug, userId)
 }
 
 func (getStreamClient *GetStreamClient) CreateFlatFeedFromFeedId(feedId feed_attributes.FeedId) *stream.FlatFeed {
-  return getStreamClient.c.FlatFeed(string(feedId.FeedSlug), string(feedId.UserId))
+  return getStreamClient.C.FlatFeed(string(feedId.FeedSlug), string(feedId.UserId))
 }
 
 func (getStreamClient *GetStreamClient) AddFeedActivityToGetStream(activity *feed_attributes.Activity) {
@@ -46,7 +46,7 @@ func (getStreamClient *GetStreamClient) AddFeedActivityToGetStream(activity *fee
     Verb: verb,
     Object: obj,
     Time: stream.Time{
-      Time: time.Unix(timestamp.ToInt64(), 0),
+      Time: time.Unix(timestamp.ToInt64(), 0).UTC(),
     },
     ForeignID: obj,
     To: feed_attributes.ConvertToStringArray(activity.To),
@@ -60,7 +60,7 @@ func (getStreamClient *GetStreamClient) AddFeedActivityToGetStream(activity *fee
 }
 
 func (getStreamClient *GetStreamClient) GetAllFeedActivitiesByFeedId(feedId feed_attributes.FeedId) {
-  flatFeed := getStreamClient.c.FlatFeed(string(feedId.FeedSlug), string(feedId.UserId))
+  flatFeed := getStreamClient.C.FlatFeed(string(feedId.FeedSlug), string(feedId.UserId))
   flatFeedResponse, err := flatFeed.GetActivities(stream.WithActivitiesLimit(10))
   if err != nil {
     log.Printf("Failed to get activities for feedId: %s\n", feedId.Value())

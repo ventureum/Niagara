@@ -8,10 +8,6 @@ import (
 
 var AttributeDefinitionsForPost = []*dynamodb.AttributeDefinition{
   {
-    AttributeName: aws.String("objectType"),
-    AttributeType: aws.String("S"),
-  },
-  {
     AttributeName: aws.String("objectId"),
     AttributeType: aws.String("S"),
   },
@@ -19,12 +15,8 @@ var AttributeDefinitionsForPost = []*dynamodb.AttributeDefinition{
 
 var KeySchemaForPost = []*dynamodb.KeySchemaElement{
   {
-    AttributeName: aws.String("objectType"),
-    KeyType:       aws.String("HASH"),
-  },
-  {
     AttributeName: aws.String("objectId"),
-    KeyType:       aws.String("RANGE"),
+    KeyType:       aws.String("HASH"),
   },
 }
 

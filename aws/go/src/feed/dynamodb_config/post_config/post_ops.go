@@ -30,28 +30,22 @@ func (postExecutor *PostExecutor) DeletePostTable() {
 
 func (postExecutor *PostExecutor) AddPostItem(postItem *feed_item.PostItem) {
   var feedItem feed_item.FeedItem = *postItem
-  postExecutor.AddItem(&feedItem, TableNameForPost)
+  postExecutor.AddItem(&feedItem, TableNameForPost, "")
 }
 
-func (postExecutor *PostExecutor) DeletePostItem(object feed_attributes.Object) {
+func (postExecutor *PostExecutor) DeletePostItem(objectId string) {
   key := map[string]*dynamodb.AttributeValue{
-    "objectType": {
-      S: aws.String(string(object.ObjType)),
-    },
     "objectId": {
-      S: aws.String(object.ObjId),
+      S: aws.String(objectId),
     },
   }
   postExecutor.DeleteItem(key, TableNameForPost, feed_item.PostItemType)
 }
 
-func (postExecutor *PostExecutor) ReadPostItem(object feed_attributes.Object) *feed_item.PostItem {
+func (postExecutor *PostExecutor) ReadPostItem(objectId string) *feed_item.PostItem {
   key := map[string]*dynamodb.AttributeValue{
-    "objectType": {
-      S: aws.String(string(object.ObjType)),
-    },
     "objectId": {
-      S: aws.String(object.ObjId),
+      S: aws.String(objectId),
     },
   }
   item := postExecutor.ReadItem(key, TableNameForPost, feed_item.PostItemType)
@@ -59,14 +53,11 @@ func (postExecutor *PostExecutor) ReadPostItem(object feed_attributes.Object) *f
   return &postItem
 }
 
-func (postExecutor *PostExecutor) ReadRewards(object feed_attributes.Object) feed_attributes.Reward {
+func (postExecutor *PostExecutor) ReadRewards(objectId string) feed_attributes.Reward {
   input := &dynamodb.GetItemInput{
     Key: map[string]*dynamodb.AttributeValue{
-      "objectType": {
-        S: aws.String(string(object.ObjType)),
-      },
       "objectId": {
-        S: aws.String(object.ObjId),
+        S: aws.String(objectId),
       },
     },
     ProjectionExpression: aws.String("activity.rewards" ),
@@ -76,7 +67,7 @@ func (postExecutor *PostExecutor) ReadRewards(object feed_attributes.Object) fee
   result, err := postExecutor.C.GetItem(input);
 
   if err != nil {
-    log.Printf("Failed to read PostItem with object: %s\n", object.Value())
+    log.Printf("Failed to read PostItem with objectId: %s\n", objectId)
     log.Fatal(err.Error())
   }
 
@@ -85,9 +76,9 @@ func (postExecutor *PostExecutor) ReadRewards(object feed_attributes.Object) fee
 }
 
 func (postExecutor *PostExecutor) UpdateRewards (
-    object feed_attributes.Object, rewards feed_attributes.Reward) feed_attributes.Reward {
+    objectId string, rewards feed_attributes.Reward) feed_attributes.Reward {
 
-  oldRewards := postExecutor.ReadRewards(object)
+  oldRewards := postExecutor.ReadRewards(objectId)
   newRewards := oldRewards.AddToReward(rewards)
 
   input := &dynamodb.UpdateItemInput{
@@ -97,11 +88,8 @@ func (postExecutor *PostExecutor) UpdateRewards (
       },
     },
     Key: map[string]*dynamodb.AttributeValue{
-      "objectType": {
-        S: aws.String(string(object.ObjType)),
-      },
       "objectId": {
-        S: aws.String(object.ObjId),
+        S: aws.String(objectId),
       },
     },
     TableName:        TableNameForPost,
@@ -111,7 +99,7 @@ func (postExecutor *PostExecutor) UpdateRewards (
   updatedValue, err := postExecutor.C.UpdateItem(input)
 
   if err != nil {
-    log.Printf("Failed to add rewards %+v to PostItem with object: %s\n", rewards, object.Value())
+    log.Printf("Failed to add rewards %+v to PostItem with objectId: %s\n", rewards, objectId)
     log.Fatal(err.Error())
   }
 
