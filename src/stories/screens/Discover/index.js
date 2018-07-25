@@ -46,8 +46,8 @@ export default class Discover extends Component {
   onRenderItem = ({ item }) => {
     item = {
       ...item,
-      author: WalletUtils.getAddrAbbre(item.author),
-      avatar: WalletUtils.getAvatar(item.author)
+      actor: WalletUtils.getAddrAbbre(item.actor),
+      avatar: WalletUtils.getAvatar(item.actor)
     }
     return (
       <FeedCardBasic post={item}
@@ -64,7 +64,7 @@ export default class Discover extends Component {
     })
   }
 
-  onAddNewPost = async (title, text, image, subtitle) => {
+  onAddNewPost = async (title, text, image, subtitle, destination) => {
     const content = {
       title: title,
       text: text,
@@ -76,7 +76,7 @@ export default class Discover extends Component {
     const web3 = WalletUtils.getWeb3Instance()
     const noParent = web3.utils.padRight('0x0', 64)
     const postType = getPostTypeHash('POST')
-    await this.props.newPost(content, boardId, noParent, postType)
+    await this.props.newPost(content, boardId, noParent, postType, destination)
 
     this.setState({ text: null })
   }
@@ -89,9 +89,9 @@ export default class Discover extends Component {
     this.setState({ addNewPost: visible })
   }
 
-  backFromNewPost = async (title, text, image, subtitle) => {
+  backFromNewPost = async (title, text, image, subtitle, destination) => {
     if (title !== null && text !== null) {
-      await this.onAddNewPost(title, text, image, subtitle)
+      await this.onAddNewPost(title, text, image, subtitle, destination)
     }
     this.setState({ addNewPost: false })
   }

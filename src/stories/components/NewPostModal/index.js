@@ -63,6 +63,12 @@ export default class NewPostModal extends Component {
   }
 
   render () {
+    let destination
+    if (this.state.toMainnet) {
+      destination = 'ONCHAIN'
+    } else {
+      destination = 'OFFCHAIN'
+    }
     return (
       <KeyboardAvoidingView behavior='padding' enabled style={styles.modalContainer}>
         <View style={styles.modalHeader}>
@@ -94,9 +100,9 @@ export default class NewPostModal extends Component {
                     const image = this.findFirstImageURL(tree)
                     const subtitle = this.getSubtitle(tree)
                     if (image === false) {
-                      this.props.goBack(this.state.title, this.state.text, undefined, subtitle)
+                      this.props.goBack(this.state.title, this.state.text, undefined, subtitle, destination)
                     } else {
-                      this.props.goBack(this.state.title, this.state.text, image, subtitle)
+                      this.props.goBack(this.state.title, this.state.text, image, subtitle, destination)
                     }
                   }
                 }}

@@ -36,7 +36,7 @@ export default class FeedCard extends React.Component {
                 fontSize: 14
               }}
             >
-              {'@' + post.author}
+              {'@' + post.actor}
             </Text>
             <Text style={{ paddingLeft: 10, paddingBottom: 5, fontSize: 13, color: '#aaa' }}>
               {moment.utc(post.time).fromNow()}
@@ -59,7 +59,7 @@ export default class FeedCard extends React.Component {
               dark
             >
               <Icon name='ios-heart-outline' />
-              <Text style={styles.badgeCount}>{post.rewards} {post.token.symbol}</Text>
+              <Text style={styles.badgeCount}>{post.rewards}</Text>
             </Button>
           </View>
           <View style={styles.footerIcons}>

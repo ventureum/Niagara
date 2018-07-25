@@ -21,8 +21,8 @@ export default class Reply extends Component {
     }
     item = {
       ...item,
-      author: WalletUtils.getAddrAbbre(item.author),
-      avatar: WalletUtils.getAvatar(item.author)
+      actor: WalletUtils.getAddrAbbre(item.actor),
+      avatar: WalletUtils.getAvatar(item.actor)
     }
     return (
       <CommentCard post={item} />
@@ -40,7 +40,7 @@ export default class Reply extends Component {
       const boardId = post.token.address
       const parentHash = post.hash
       const postType = getPostTypeHash('COMMENT')
-      await this.props.newPost(content, boardId, parentHash, postType)
+      await this.props.newPost(content, boardId, parentHash, postType, post.source)
       this.setState({text: null})
     }
   }

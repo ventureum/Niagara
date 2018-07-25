@@ -49,22 +49,39 @@ function switchBoard (boardName, boardHash) {
   }
 }
 
-function _newPost (content, boardId, parentHash, postType, newContentToIPFS, newTransaction) {
+function _newOnChainPost (content, boardId, parentHash, postType, newContentToIPFS, newTransaction) {
   return {
     type: 'NEW_POST',
-    payload: forum.newPost(content, boardId, parentHash, postType, newContentToIPFS, newTransaction)
+    payload: forum.newOnChainPost(content, boardId, parentHash, postType, newContentToIPFS, newTransaction)
   }
 }
-
-function newPost (content, boardId, parentHash, postType) {
-  return (dispatch) => {
-    dispatch(_newPost(
+function _newOffChainPost (content, boardId, parentHash, postType, poster) {
+  return {
+    type: 'NEW_POST',
+    payload: forum.newOffChainPost(content, boardId, parentHash, postType, poster)
+  }
+}
+function newPost (content, boardId, parentHash, postType, destination) {
+  if (destination === 'ONCHAIN') {
+    return (dispatch) => {
+      dispatch(_newOnChainPost(
+        content,
+        boardId,
+        parentHash,
+        postType,
+        () => {},
+        (txHash) => { dispatch(newTransaction(txHash)) }
+      ))
+    }
+  }
+  return (dispatch, getState) => {
+    const poster = getState().walletReducer.walletAddress
+    dispatch(_newOffChainPost(
       content,
       boardId,
       parentHash,
       postType,
-      () => {},
-      (txHash) => { dispatch(newTransaction(txHash)) }
+      poster
     ))
   }
 }

@@ -38,7 +38,7 @@ export default class FeedCard extends React.Component {
                 fontSize: 14
               }}
             >
-              {'@' + post.author}
+              {'@' + post.actor}
             </Text>
             <Text style={{ paddingLeft: 10, paddingBottom: 5, fontSize: 13, color: '#aaa' }}>
               {moment.utc(post.time).fromNow()}
@@ -57,7 +57,7 @@ export default class FeedCard extends React.Component {
             >
               {post.content.title}
             </Text>
-            {(post.content.image === undefined)
+            {(post.content.image === undefined || post.content.image === '')
               ? <Markdown >{post.content.subtitle}</Markdown>
               : <Markdown >{`![user image](${post.content.image})\n\n${post.content.subtitle}`}</Markdown>
             }
@@ -70,7 +70,7 @@ export default class FeedCard extends React.Component {
               onPress={this.props.upvote.bind(this, post)}
             >
               <Icon name='ios-heart-outline' />
-              <Text style={styles.badgeCount}>{post.rewards} {post.token.symbol}</Text>
+              <Text style={styles.badgeCount}>{post.rewards}</Text>
             </Button>
           </View>
           <View style={styles.footerIcons}>

@@ -84,40 +84,42 @@ async function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
     feedData = await targetFeed.get({ limit: size, id_lt: id_lt })
   }
 
-  // build the array of post hash from feed data
-  let postsHash = []
+  // build the arrays of post hash from feed data
+  let postMap = new Map()
+  let onChainPosts = []
+  let offChainPosts = []
   for (let i = 0; i < feedData.results.length; i++) {
-    const hash = feedData.results[i].object.split(':')[1]
-    postsHash.push(hash)
+    if (feedData.results[i].source === undefined) {
+      // On-chain posts
+      postMap.set(i, onChainPosts.length)
+      onChainPosts.push(feedData.results[i].object.split(':')[1])
+    } else if (feedData.results[i].source === 'database') {
+      // Off-chain posts
+      postMap.set(i, offChainPosts.length)
+      offChainPosts.push(feedData.results[i].object.split(':')[1])
+    }
   }
-
   // get the flatten array of ipfs path, token address, author, rewards, # of replies from forum contract
   const forum = await WalletUtils.getContractInstance('Forum')
-  const postDataFromForumContract = await forum.methods.getBatchPosts(postsHash).call()
-  let posts = []
+  const onChainPostData = await forum.methods.getBatchPosts(onChainPosts).call()
+  let onChainPostMeta = []
 
   // Transform the flatten array from forum contract into an array of post objects
   const web3 = WalletUtils.getWeb3Instance()
   let BN = web3.utils.BN
   let precision = 2
-  for (let i = 0; i < postDataFromForumContract.length; i += 7) {
-    let hex = web3.utils.toBN(postDataFromForumContract[i])
+  for (let i = 0; i < onChainPostData.length; i += 7) {
+    let hex = web3.utils.toBN(onChainPostData[i])
     let base = new BN(10).pow(new BN(18 - precision))
 
     if (!hex.isZero()) {
-      posts.push({
-        hash: postDataFromForumContract[i],
-        token: {
-          address: '0x' + postDataFromForumContract[i + 1].slice(26, 66),
-          symbol: 'VTX'
-        },
-        ipfsPath: getMultihashFromBytes32(postDataFromForumContract[i + 2]),
-        author: '0x' + postDataFromForumContract[i + 3].substr(26, 40),
-        rewards: (web3.utils.toBN(postDataFromForumContract[i + 4]).div(base).toNumber()) / (10 ** 2),
-        repliesLength: web3.utils.toDecimal(postDataFromForumContract[i + 5]),
-        postType: postDataFromForumContract[i + 6],
-        id: feedData.results[i / 7].id,
-        time: feedData.results[i / 7].time
+      onChainPostMeta.push({
+        postHash: onChainPostData[i],
+        ipfsPath: getMultihashFromBytes32(onChainPostData[i + 2]),
+        actor: '0x' + onChainPostData[i + 3].substr(26, 40),
+        rewards: (web3.utils.toBN(onChainPostData[i + 4]).div(base).toNumber()) / (10 ** 2),
+        repliesLength: web3.utils.toDecimal(onChainPostData[i + 5]),
+        postType: onChainPostData[i + 6]
       })
     } else {
       break
@@ -125,13 +127,53 @@ async function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
   }
 
   // get the content of each post
-  let postContents = []
-  for (let i = 0; i < posts.length; i++) {
-    let singleContent = await _getSingleContent(posts[i])
-    postContents.push(singleContent)
+  let onChainPostDetails = []
+  for (let i = 0; i < onChainPostMeta.length; i++) {
+    let singleContent = await _getSingleContent(onChainPostMeta[i])
+    onChainPostDetails.push(singleContent)
+  }
+  let offChainPostDetails = []
+  for (let i = 0; i < offChainPosts.length; i++) {
+    const result = await axios.post(
+      Config.GET_FEED_POST_API,
+      {
+        'PostHash': offChainPosts[i],
+        'getStreamApiKey': Config.STREAM_API_KEY,
+        'getStreamApiSecret': Config.STREAM_API_SECRET
+      }
+    )
+    let precision = 2
+    let base = new BN(10).pow(new BN(18 - precision))
+    const {post} = result.data
+    offChainPostDetails.push({
+      postHash: post.postHash,
+      actor: post.poster,
+      rewards: (web3.utils.toBN(0).div(base).toNumber()) / (10 ** 2),
+      repliesLength: web3.utils.toDecimal(0),
+      postType: post.type,
+      content: post.content
+    })
   }
 
-  return postContents
+  let postDetails = []
+  for (let i = 0; i < feedData.results.length; i++) {
+    if (feedData.results[i].source === undefined) {
+      postDetails.push({
+        ...onChainPostDetails[postMap.get(i)],
+        id: feedData.results[i].id,
+        time: feedData.results[i].time,
+        source: feedData.results[i].source
+      })
+    } else {
+      postDetails.push({
+        ...offChainPostDetails[postMap.get(i)],
+        id: feedData.results[i].id,
+        time: feedData.results[i].time,
+        source: feedData.results[i].source
+      })
+    }
+  }
+  return postDetails
 }
 
 /*
@@ -171,8 +213,7 @@ function getPostTypeHash (type) {
   @param newTransaction A callback function to be used when
     a new transaction is sent but before receipt. It takes a transaction hash as parameter.
 */
-
-function newPost (content, boardId, parentHash, postType, newContentToIPFS, newTransaction) {
+function newOnChainPost (content, boardId, parentHash, postType, newContentToIPFS, newTransaction) {
   return new Promise(async (resolve, reject) => {
     const enoughBalance = await checkBalanceForTx()
     if (!enoughBalance) {
@@ -218,4 +259,28 @@ function newPost (content, boardId, parentHash, postType, newContentToIPFS, newT
   )
 }
 
-export { batchReadFeedsByBoardId, checkBalanceForTx, getPostTypeHash, newPost }
+function newOffChainPost (content, boardId, parentHash, postType, poster) {
+  return new Promise(async (resolve, reject) => {
+    let crypto = require('crypto')
+    let postHash = '0x' + crypto.randomBytes(32).toString('hex')
+    const toDataBase =
+    {
+      'Poster': poster,
+      'BoardId': boardId,
+      'ParentHash': parentHash,
+      'PostHash': postHash,
+      'Type': postType,
+      'Content': content,
+      'getStreamApiKey': Config.STREAM_API_KEY,
+      'getStreamApiSecret': Config.STREAM_API_SECRET
+
+    }
+    const result = await axios.post(
+      Config.FEED_POST_API,
+      toDataBase
+    )
+    resolve(result)
+  })
+}
+
+export { batchReadFeedsByBoardId, checkBalanceForTx, getPostTypeHash, newOnChainPost, newOffChainPost }
