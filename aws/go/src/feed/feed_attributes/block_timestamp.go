@@ -3,6 +3,7 @@ package feed_attributes
 import (
   "math/big"
   "time"
+  "strconv"
 )
 
 type BlockTimestamp string
@@ -23,5 +24,5 @@ func (blockTimestamp BlockTimestamp) ToInt64() int64 {
 }
 
 func CreateBlockTimestampFromNow() BlockTimestamp {
-  return BlockTimestamp(time.Now().UTC().String())
+  return BlockTimestamp(strconv.FormatInt(time.Now().Unix(), 10))
 }
