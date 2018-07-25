@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { FlatList, RefreshControl, View } from 'react-native'
-import { Container, Body, Header, Left, Right, Button, Icon, Title, Text, Content, Fab, Toast } from 'native-base'
+import { Container, Body, Header, Left, Right, Button, Icon, Title, Text, Content, Fab } from 'native-base'
 import FeedCardBasic from '../../components/FeedCardBasic'
 import WalletUtils from '../../../utils/wallet'
 import BoardSearch from '../../components/BoardSearch'
 import NewPostModal from '../../components/NewPostModal'
-import { checkBalanceForTx, getPostTypeHash } from '../../../services/forum'
+import SpecialPostCard from '../../components/SpecialPostCard'
+import { getPostTypeHash } from '../../../services/forum'
 import { BOARD_ALL_HASH } from '../../../utils/constants.js'
 
 console.ignoredYellowBox = ['Setting a timer']
@@ -58,41 +59,20 @@ export default class Discover extends Component {
   }
 
   onAddNewPost = async (title, text, image, subtitle) => {
-    const enoughBalance = await checkBalanceForTx()
-    if (enoughBalance) {
-      let crypto = require('crypto')
-      const content = {
-        title: title,
-        text: text,
-        image: image,
-        subtitle: subtitle
-      }
-
-      await this.props.addContentToIPFS(content)
-
-      const { ipfsPath } = this.props
-      let postHash = '0x' + crypto.randomBytes(32).toString('hex')
-      const boardId = this.props.boardHash
-      const noParent = '0x0000000000000000000000000000000000000000000000000000000000000000'
-      const postType = getPostTypeHash('POST')
-      await this.props.addPostToForum(boardId, noParent, postHash, ipfsPath, postType)
-      Toast.show({
-        type: 'success',
-        text: 'Comment Sent Successfully!',
-        buttonText: 'Okay',
-        position: 'bottom',
-        duration: 10000
-      })
-      this.setState({ text: null })
-    } else {
-      Toast.show({
-        type: 'danger',
-        text: 'Insufficient fund!',
-        buttonText: 'Okay',
-        position: 'bottom',
-        duration: 10000
-      })
+    const content = {
+      title: title,
+      text: text,
+      image: image,
+      subtitle: subtitle
     }
+
+    const boardId = this.props.boardHash
+    const web3 = WalletUtils.getWeb3Instance()
+    const noParent = web3.utils.padRight('0x0', 64)
+    const postType = getPostTypeHash('POST')
+    await this.props.newPost(content, boardId, noParent, postType)
+
+    this.setState({ text: null })
   }
 
   inBoardSearch = (val) => {
@@ -161,6 +141,8 @@ export default class Discover extends Component {
               </Button>
             </Right>
           </Header>
+          <SpecialPostCard type='Audits' />
+          <SpecialPostCard type='Airdrops' />
           {
             this.props.posts.length === 0
               ? <Content contentContainerStyle={{ flex: 1, justifyContent: 'center', flexDirection: 'row', alignItems: 'center' }}

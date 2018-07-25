@@ -23,7 +23,7 @@ export default class FeedCard extends React.Component {
     return (
       <View style={styles.card}>
         <View style={styles.header}>
-          <Thumbnail source={{ uri: post.avatar }} />
+          <Thumbnail small source={{ uri: post.avatar }} />
           <View
             style={{
               flexDirection: 'column',
@@ -51,7 +51,8 @@ export default class FeedCard extends React.Component {
               style={{
                 fontWeight: 'bold',
                 fontSize: 16,
-                color: 'black'
+                color: 'black',
+                paddingLeft: 10
               }}
             >
               {post.content.title}

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {Container, Header, Footer, FooterTab, Body, Button, Left, Title, Icon, Text, Content, ListItem, List} from 'native-base'
+import { Container, Header, Footer, FooterTab, Body, Button, Left, Title, Icon, Text, Content, ListItem, List } from 'native-base'
 import { Grid, Row } from 'react-native-easy-grid'
 import styles from './styles.js'
 import { BigNumber } from 'bignumber.js'

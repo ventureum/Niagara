@@ -39,33 +39,6 @@ function getReplies (postHash) {
   }
 }
 
-function addContentToIPFS (content) {
-  return {
-    type: 'ADD_CONTENT_TO_IPFS',
-    payload: forum.addContentToIPFS(content)
-  }
-}
-
-function _addPostToForum (boardId, parentHash, postHash, ipfsPath, postType, newTransaction) {
-  return {
-    type: 'ADD_POST_TO_FORUM',
-    payload: forum.addPostToForum(boardId, parentHash, postHash, ipfsPath, postType, newTransaction)
-  }
-}
-
-function addPostToForum (boardId, parentHash, postHash, ipfsPath, postType) {
-  return (dispatch) => {
-    dispatch(_addPostToForum(
-      boardId,
-      parentHash,
-      postHash,
-      ipfsPath,
-      postType,
-      (txHash) => { dispatch(newTransaction(txHash)) }
-    ))
-  }
-}
-
 function switchBoard (boardName, boardHash) {
   return {
     type: 'SWITCH_BOARD',
@@ -76,4 +49,24 @@ function switchBoard (boardName, boardHash) {
   }
 }
 
-export { refreshPosts, setTokens, getMorePosts, getReplies, addContentToIPFS, addPostToForum, switchBoard }
+function _newPost (content, boardId, parentHash, postType, newContentToIPFS, newTransaction) {
+  return {
+    type: 'NEW_POST',
+    payload: forum.newPost(content, boardId, parentHash, postType, newContentToIPFS, newTransaction)
+  }
+}
+
+function newPost (content, boardId, parentHash, postType) {
+  return (dispatch) => {
+    dispatch(_newPost(
+      content,
+      boardId,
+      parentHash,
+      postType,
+      () => {},
+      (txHash) => { dispatch(newTransaction(txHash)) }
+    ))
+  }
+}
+
+export { refreshPosts, setTokens, getMorePosts, getReplies, switchBoard, newPost }
