@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { FlatList } from 'react-native'
-import Search from '../../../utils/search.js'
 import {
   Item,
   Input,
@@ -16,48 +15,47 @@ import {
   Left,
   Button
 } from 'native-base'
-import WalletUtils from '../../../utils/wallet'
 
-class BoardSearch extends React.Component {
+class SearchPage extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      boards: null
+      searchResults: null
     }
   }
 
   renderItem = ({item}) => {
-    console.log('render: ', item)
+    const onItemSelected = this.props.navigation.getParam('onItemSelected', (k, v) => {})
     return (
       <ListItem
         onPress={() => {
-          this.props.switchBoard(item.key, item.value)
-          this.props.goBack()
+          onItemSelected(item.key, item.value)
+          this.props.navigation.goBack()
         }} >
         <Body>
-          <Text> b/{item.key} </Text>
+          <Text> {item.key} </Text>
           <Text note> {item.value} </Text>
         </Body>
       </ListItem>)
   }
 
   handleTextChange = (text) => {
-    let rv = Search.searchBoards(text)
-
+    const search = this.props.navigation.getParam('search', (k) => {})
+    let rv = search(text)
     if (rv) {
       this.setState({
-        boards: rv
+        searchResults: rv
       })
     }
   }
 
   render () {
-    let { boards } = this.state
+    let { searchResults } = this.state
 
     return (<Container>
       <Header searchBar rounded>
         <Left>
-          <Button transparent onPress={() => this.props.goBack()}>
+          <Button transparent onPress={() => this.props.navigation.goBack()}>
             <Icon name='arrow-back' />
           </Button>
         </Left>
@@ -70,17 +68,17 @@ class BoardSearch extends React.Component {
         </Item>
       </Header>
       <Content>
-        {boards && boards.length > 0
+        { searchResults && searchResults.length > 0
           ? <FlatList
-            data={boards}
+            data={searchResults}
             renderItem={this.renderItem}
-            keyExtractor={(item, index) => item.key}
+            keyExtractor={(item, index) => item.value}
           />
           : <Card>
             <CardItem>
               <Body>
                 <Text>
-                 No results
+                  No results
                 </Text>
               </Body>
             </CardItem>
@@ -90,4 +88,4 @@ class BoardSearch extends React.Component {
   }
 }
 
-export default BoardSearch
+export default SearchPage
