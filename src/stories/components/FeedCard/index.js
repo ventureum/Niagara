@@ -12,36 +12,47 @@ import {
 } from 'native-base'
 import styles from './styles'
 import Markdown from 'react-native-markdown-renderer'
-
+import SourceBadge from '../SourceBadge'
 let moment = require('moment')
 
 export default class FeedCard extends React.Component {
   render () {
     let { post } = this.props
+    let source
+    if (post.source === 'database') {
+      source = 'Off-Chain'
+    } else {
+      source = 'On-Chain'
+    }
     return (
       <View style={styles.card}>
         <View style={styles.header}>
-          <Thumbnail source={{ uri: post.avatar }} />
-          <View
-            style={{
-              flexDirection: 'column',
-              justifyContent: 'space-between'
-            }}
-          >
-
-            <Text
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'flex-start'
+          }}>
+            <Thumbnail small source={{ uri: post.avatar }} />
+            <View
               style={{
-                paddingLeft: 10,
-                color: '#aaa',
-                fontSize: 14
+                flexDirection: 'column',
+                justifyContent: 'space-between'
               }}
             >
-              {'@' + post.actor}
-            </Text>
-            <Text style={{ paddingLeft: 10, paddingBottom: 5, fontSize: 13, color: '#aaa' }}>
-              {moment.utc(post.time).fromNow()}
-            </Text>
+              <Text
+                style={{
+                  paddingLeft: 10,
+                  color: '#aaa',
+                  fontSize: 14
+                }}
+              >
+                {'@' + post.actor}
+              </Text>
+              <Text style={{ paddingLeft: 10, paddingBottom: 5, fontSize: 13, color: '#aaa' }}>
+                {moment.utc(post.time).fromNow()}
+              </Text>
+            </View>
           </View>
+          <SourceBadge source={source} />
         </View>
         <Text
           style={{

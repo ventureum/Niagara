@@ -173,6 +173,7 @@ async function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
       })
     }
   }
+
   return postDetails
 }
 

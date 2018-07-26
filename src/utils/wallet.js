@@ -246,7 +246,7 @@ export default class WalletUtils {
     // Modify the following token info for testing
     this.tokens.push({
       'symbol': 'VTX',
-      'address': '0xce11c2df65aaa6a1b15596da6f9d26c6e78fff50',
+      'address': '0xdd998c0a031d4a46ec520ecfcbf4ee5ca9ae2cd0',
       'decimals': 18,
       'name': 'VetX Token'
     })
