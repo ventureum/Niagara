@@ -7,8 +7,9 @@ import { addToken, removeToken } from './actions.js'
 class TokenToggleContainer extends React.Component {
   render () {
     return (
-      <TokenToggle navigation={this.props.navigation}
-        tokens={this.props.tokens}
+      <TokenToggle
+        navigation={this.props.navigation}
+        tokens={this.props.tokens.slice(1)} // ignore ETH
         addToken={this.props.addToken}
         removeToken={this.props.removeToken}
       />
