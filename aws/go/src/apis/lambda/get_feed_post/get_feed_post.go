@@ -7,7 +7,9 @@ import (
   "feed/dynamodb_config/client_config"
   "feed/dynamodb_config/post_config"
   "github.com/mitchellh/mapstructure"
+  "fmt"
   "github.com/aws/aws-lambda-go/lambda"
+  "math/big"
 )
 
 
@@ -16,39 +18,46 @@ type Request struct {
 }
 
 type ResponseContent struct {
-  Poster string `json:"poster,required"`
-  BoardId string `json:"boardId,required"`
-  ParentHash string `json:"parentHash,required"`
-  PostHash string `json:"postHash,required"`
-  Type string `json:"type,required"`
-  Content feed_attributes.Content `json:"content,required"`
+  Actor string `json:"actor,omitempty"`
+  BoardId string `json:"boardId,omitempty"`
+  ParentHash string `json:"parentHash,omitempty"`
+  PostHash string `json:"postHash,omitempty"`
+  Type string `json:"type,omitempty"`
+  Content feed_attributes.Content `json:"content,omitempty"`
+  Rewards *big.Int `json:"rewards,omitempty"`
+  RepliesLength *big.Int `json:"repliesLength,omitempty"`
 }
 
 type Response struct {
-  Post ResponseContent `json:"post"`
+  Post ResponseContent `json:"post,omitempty"`
   Ok bool `json:"ok"`
+  Message string `json:"message,omitempty"`
 }
 
 func PostItemToResponse(postItem *feed_item.PostItem) (*ResponseContent) {
   activity := postItem.Activity
-  poster := string(activity.Actor)
-  boardId := string(activity.To[1].UserId)
+  actor := string(activity.Actor)
+
   postHash := postItem.ObjectId
-  typeHash := string(activity.TypeHash)
   var content feed_attributes.Content
+  var boardId string
   mapstructure.Decode(activity.Extra["content"], &content)
   var parentHash string
   if activity.Verb == feed_attributes.ReplyVerb {
-    parentHash = activity.Extra["post"].(feed_attributes.Object).ObjId
+    var object feed_attributes.Object
+    mapstructure.Decode(activity.Extra["post"], &object)
+    parentHash = object.ObjId
+    boardId = string(activity.To[0].UserId)
   } else {
     parentHash = feed_events.NullHashString
+    boardId = string(activity.To[1].UserId)
   }
   return &ResponseContent{
-    Poster: poster,
+    Actor: actor,
     BoardId: boardId,
     ParentHash: parentHash,
     PostHash: postHash,
-    Type: typeHash,
+    Type: string(activity.FeedType),
     Content: content,
   }
 }
@@ -62,6 +71,11 @@ func Handler(request Request) (Response, error) {
   postExecutor := post_config.PostExecutor{DynamodbFeedClient: *dynamodbFeedClient}
   objectId := request.PostHash
   postItem := postExecutor.ReadPostItem(objectId)
+
+  if postItem.ObjectId == "" {
+    response.Message = fmt.Sprintf("No Post exists for postHash: %s", request.PostHash)
+    return response, nil
+  }
 
   response.Post = *PostItemToResponse(postItem)
   response.Ok = true

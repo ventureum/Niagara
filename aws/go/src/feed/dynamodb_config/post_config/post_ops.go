@@ -4,10 +4,10 @@ import (
   "github.com/aws/aws-sdk-go/service/dynamodb"
   "github.com/aws/aws-sdk-go/aws"
   "log"
-  "feed/feed_attributes"
   "feed/dynamodb_config/client_config"
   "feed/dynamodb_config/feed_item"
   "github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+  "feed/feed_attributes"
 )
 
 
@@ -27,16 +27,6 @@ func (postExecutor *PostExecutor) CreatePostTable( ) {
 
 func (postExecutor *PostExecutor) DeletePostTable() {
   postExecutor.DeleteTable(TableNameForPost)
-}
-
-func (postExecutor *PostExecutor) UpsertPostItem(postItem *feed_item.PostItem) {
-  readItem := postExecutor.ReadPostItem(postItem.ObjectId)
-  if readItem.ObjectId == "" {
-    postExecutor.AddNewPostItem(postItem)
-  } else {
-    // avoid to overwrite voters
-    postExecutor.UpdateActivity(&postItem.Activity, postItem.ObjectId)
-  }
 }
 
 func (postExecutor *PostExecutor) DeletePostItem(objectId string) {
@@ -64,46 +54,29 @@ func (postExecutor *PostExecutor) ReadPostItem(objectId string) *feed_item.PostI
   return &postItem
 }
 
-func (postExecutor *PostExecutor) ReadRewards(objectId string) feed_attributes.Reward {
-  input := &dynamodb.GetItemInput{
-    Key: map[string]*dynamodb.AttributeValue{
-      "objectId": {
-        S: aws.String(objectId),
-      },
-    },
-    ProjectionExpression: aws.String("activity.rewards" ),
-    TableName: TableNameForPost,
-  }
-
-  result, err := postExecutor.C.GetItem(input);
-
+func (postExecutor *PostExecutor) UpsertPostItem(postItem *feed_item.PostItem) *feed_item.PostItem {
+  mapInfo, err := dynamodbattribute.MarshalMap(postItem.Activity)
   if err != nil {
-    log.Printf("Failed to read PostItem with objectId: %s\n", objectId)
-    log.Fatal(err.Error())
-  }
-
-  item := client_config.UnmarshalToFeedItem(result.Item, feed_item.PostItemType)
-  return (*item).(feed_item.PostItem).Activity.Rewards
-}
-
-func (postExecutor *PostExecutor) UpdateActivity(
-    activity *feed_attributes.Activity, objectId string) *feed_attributes.Activity {
-  mapInfo, err := dynamodbattribute.MarshalMap(*activity)
-  if err != nil {
-    log.Printf("Failed to MarshalMap activity: %+v\n", *activity)
+    log.Printf("Failed to MarshalMap activity: %+v\n", postItem.Activity)
     log.Fatal(err.Error())
   }
   expressionAttributeValues :=  map[string]*dynamodb.AttributeValue {
     ":activity": {
       M: mapInfo,
     },
+    ":incr": {
+      N: aws.String("1"),
+    },
+    ":zero": {
+      N: aws.String("0"),
+    },
   }
   key := map[string]*dynamodb.AttributeValue {
     "objectId": {
-      S: aws.String(objectId),
+      S: aws.String(postItem.ObjectId),
     },
   }
-  updateExpression := aws.String("set activity = :activity")
+  updateExpression := aws.String("set activity = :activity, updateCount = if_not_exists(updateCount, :zero) + :incr")
 
   item := postExecutor.UpdateAttributes(
     nil,
@@ -113,78 +86,50 @@ func (postExecutor *PostExecutor) UpdateActivity(
       updateExpression,
       feed_item.PostItemType)
 
-  postItem := (*item).(feed_item.PostItem)
-  updatedActivity :=  postItem.Activity
-  log.Printf("Successfully updated activity to be %+v for object: %s\n",
-    updatedActivity, postItem.GetObject())
-  return &updatedActivity
+  updatedPostItem := (*item).(feed_item.PostItem)
+  log.Printf("Successfully updated postItem for objectId %s: %+v\n",
+     postItem.ObjectId, updatedPostItem)
+  return &updatedPostItem
 }
 
-func (postExecutor *PostExecutor) AddVoter(voter feed_attributes.Voter, objectId string) {
-  expressionAttributeValues := map[string]*dynamodb.AttributeValue{
-    ":voter": {
-      L: []*dynamodb.AttributeValue{
-       {
-          S: aws.String(string(voter)),
-       },
+func (postExecutor *PostExecutor) ReadUpdateCount(objectId string) int64 {
+  input := &dynamodb.GetItemInput{
+    Key: map[string]*dynamodb.AttributeValue{
+      "objectId": {
+        S: aws.String(objectId),
       },
     },
-  }
-  key := map[string]*dynamodb.AttributeValue {
-    "objectId": {
-      S: aws.String(objectId),
-    },
+    ProjectionExpression: aws.String("updateCount" ),
+    TableName: TableNameForPost,
   }
 
-  expressionAttributeNames := map[string]*string {
-         "#ri": aws.String("voters"),
+  result, err := postExecutor.C.GetItem(input);
+
+  if err != nil {
+    log.Printf("Failed to read UpdateCount with objectId: %s\n", objectId)
+    log.Fatal(err.Error())
   }
-
-  updateExpression := aws.String("set #ri = list_append(:voter, #ri)")
-
-  item := postExecutor.UpdateAttributes(
-    expressionAttributeNames,
-    expressionAttributeValues,
-    key,
-    TableNameForPost,
-    updateExpression,
-    feed_item.PostItemType)
-
-  postItem := (*item).(feed_item.PostItem)
-  updatedVoters :=  postItem.Voters
-  log.Printf("Successfully added voter %s to voters with object: %s\n, resulting in total %d voters",
-    voter, postItem.GetObject(), len(updatedVoters))
+  item := client_config.UnmarshalToFeedItem(result.Item, feed_item.PostItemType)
+  return (*item).(feed_item.PostItem).UpdateCount
 }
 
-func (postExecutor *PostExecutor) UpdateRewards (
-    objectId string, rewards feed_attributes.Reward) feed_attributes.Reward {
-
-  oldRewards := postExecutor.ReadRewards(objectId)
-  newRewards := oldRewards.AddToReward(rewards)
-
-  expressionAttributeValues := map[string]*dynamodb.AttributeValue{
-    ":rewards": {
-      S: aws.String(string(newRewards)),
+func (postExecutor *PostExecutor) GetFeedType(objectId string) feed_attributes.FeedType {
+  input := &dynamodb.GetItemInput{
+    Key: map[string]*dynamodb.AttributeValue{
+      "objectId": {
+        S: aws.String(objectId),
+      },
     },
+    ProjectionExpression: aws.String("activity.feedType" ),
+    TableName: TableNameForPost,
   }
-  key := map[string]*dynamodb.AttributeValue {
-    "objectId": {
-      S: aws.String(objectId),
-    },
+
+  result, err := postExecutor.C.GetItem(input);
+
+  if err != nil {
+    log.Printf("Failed to get FeedType for objectId: %s\n", objectId)
+    log.Fatal(err.Error())
   }
-  updateExpression := aws.String("set activity.rewards = :rewards")
-
-  item := postExecutor.UpdateAttributes(
-    nil,
-    expressionAttributeValues,
-    key,
-    TableNameForPost,
-    updateExpression,
-    feed_item.PostItemType)
-
-  postItem := (*item).(feed_item.PostItem)
-  updatedRewards :=  postItem.Activity.Rewards
-  log.Printf("Successfully added rewards %s to PostItem with object: %s\n, resulting in total rewards: %s",
-    rewards, postItem.GetObject(), updatedRewards)
-  return updatedRewards
+  item := client_config.UnmarshalToFeedItem(result.Item, feed_item.PostItemType)
+  return (*item).(feed_item.PostItem).Activity.FeedType
 }

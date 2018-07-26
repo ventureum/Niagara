@@ -1,27 +1,23 @@
 package feed_attributes
 
-import "math/big"
+import "log"
 
-type Vote string
+type Vote int64
 
-func (vote Vote) ToBigInt() *big.Int {
-  num := new(big.Int)
-  num.SetString(string(vote), 10)
-  return num
+const UP_VOTE Vote = 1
+const DOWN_VOTE Vote = -1
+
+func ValidateAndCreateVote(voteValue int64) Vote {
+  if !ValidateVote(voteValue) {
+    log.Fatalf("Invalid Vote value: %d", voteValue)
+  }
+  return Vote(voteValue)
 }
 
-func CreateVoteFromBigInt(bigInt *big.Int) Vote {
-  return Vote(bigInt.String())
-}
-
-func (vote Vote) AddToBigInt(bigInt *big.Int) Vote {
-  num := new(big.Int)
-  num.Add(vote.ToBigInt(), bigInt)
-  return Vote(num.String())
-}
-
-func (vote Vote) AddToVote(voteToAdd Vote) Vote {
-  num := new(big.Int)
-  num.Add(vote.ToBigInt(), voteToAdd.ToBigInt())
-  return Vote(num.String())
+func ValidateVote(voteValue int64) bool {
+  vote := Vote(voteValue)
+  if vote != UP_VOTE && vote != DOWN_VOTE {
+    return false
+  }
+  return true
 }

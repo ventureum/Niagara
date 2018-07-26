@@ -14,8 +14,8 @@ type Object struct{
 
 
 const (
-  CommentObjectType ObjectType = "reply"
-  PostObjectType ObjectType = "post"
+  ReplyObjectType ObjectType = "reply"
+  PostObjectType  ObjectType = "post"
 )
 
 

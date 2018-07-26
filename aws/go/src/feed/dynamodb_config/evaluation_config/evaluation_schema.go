@@ -8,22 +8,22 @@ import (
 
 var AttributeDefinitionsForEvaluation = []*dynamodb.AttributeDefinition{
   {
-    AttributeName: aws.String("objectId"),
+    AttributeName: aws.String("uuid"),
     AttributeType: aws.String("S"),
   },
   {
-    AttributeName: aws.String("evaluatorAddress"),
-    AttributeType: aws.String("S"),
+    AttributeName: aws.String("timestamp"),
+    AttributeType: aws.String("N"),
   },
 }
 
 var KeySchemaForEvaluation = []*dynamodb.KeySchemaElement{
   {
-    AttributeName: aws.String("objectId"),
+    AttributeName: aws.String("uuid"),
     KeyType:       aws.String("HASH"),
   },
   {
-    AttributeName: aws.String("evaluatorAddress"),
+    AttributeName: aws.String("timestamp"),
     KeyType:       aws.String("RANGE"),
   },
 }
@@ -34,5 +34,3 @@ var ProvisionedThroughputForEvaluation = &dynamodb.ProvisionedThroughput{
 }
 
 var TableNameForEvaluation = aws.String("Evaluation")
-
-var ConditionExpressionWithoutOverwriting = "attribute_not_exists(objectId) and attribute_not_exists(evaluatorAddress)"

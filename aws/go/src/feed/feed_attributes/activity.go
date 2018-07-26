@@ -2,15 +2,14 @@ package feed_attributes
 
 
 type Activity struct {
-  Actor Actor `json:"actor"`
-  Verb Verb `json:"verb"`
-  Object Object  `json:"object"`
-  ForeignId Object `json:"foreignId"`
-  Time BlockTimestamp `json:"time"`
-  TypeHash TypeHash `json:"typeHash"`
-  Rewards Reward `json:"rewards"`
-  To []FeedId `json:"to"`
-  Extra map[string]interface{} `json:"extra"`
+  Actor       Actor                  `json:"actor"`
+  Verb        Verb                   `json:"verb"`
+  Object      Object                 `json:"object"`
+  ForeignId   Object                 `json:"foreignId"`
+  Time        BlockTimestamp         `json:"time"`
+  FeedType    FeedType               `json:"feedType"`
+  To          []FeedId               `json:"to"`
+  Extra       map[string]interface{} `json:"extra"`
 }
 
 func CreateNewActivity(
@@ -18,20 +17,18 @@ func CreateNewActivity(
     verb Verb,
     obj Object,
     time BlockTimestamp,
-    typeHash TypeHash,
-    rewards Reward,
+    feedType FeedType,
     to []FeedId,
     extraParam map[string]interface{}) *Activity {
 
   return &Activity{
-          Actor: actor,
-          Verb: verb,
-          Object: obj,
-          ForeignId: obj,
-          Time: time,
-          TypeHash: typeHash,
-          Rewards: rewards,
-          To: to,
-          Extra: extraParam,
+          Actor:       actor,
+          Verb:        verb,
+          Object:      obj,
+          ForeignId:   obj,
+          Time:        time,
+          FeedType:    feedType,
+          To:          to,
+          Extra:       extraParam,
   }
 }

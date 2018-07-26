@@ -6,6 +6,8 @@ import (
   "feed/dynamodb_config/profile_config"
   "feed/dynamodb_config/evaluation_config"
   "feed/dynamodb_config/exchange_request_config"
+  "feed/dynamodb_config/reputation_record_config"
+  "feed/dynamodb_config/upvote_count_config"
 )
 
 func main () {
@@ -26,4 +28,12 @@ func main () {
   exchangeRequestExecutor := exchange_request_config.ExchangeRequestExecutor{DynamodbFeedClient: *dynamodbFeedClient}
   exchangeRequestExecutor.DeleteExchangeRequestTable()
   exchangeRequestExecutor.CreateExchangeRequestTable()
+
+  reputationRecordExecutor := reputation_record_config.ReputationRecordExecutor{DynamodbFeedClient: *dynamodbFeedClient}
+  reputationRecordExecutor.DeleteReputationRecordTable()
+  reputationRecordExecutor.CreateReputationRecordTable()
+
+  upvoteCountExecutor := upvote_count_config.UpvoteCountExecutor{DynamodbFeedClient: *dynamodbFeedClient}
+  upvoteCountExecutor.DeleteUpvoteCountTable()
+  upvoteCountExecutor.CreateUpvoteCountTable()
 }

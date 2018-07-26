@@ -5,7 +5,7 @@ const PostEventABI string = `[{
   "inputs": [
     {
       "indexed": true,
-      "name": "poster",
+      "name": "actor",
       "type": "address"
     },
     { 
@@ -43,40 +43,12 @@ const PostEventABI string = `[{
   "type": "event"
 }]`
 
-const UpdatePostEventABI  = `[{
-  "anonymous": false,
-  "inputs": [
-    {
-      "indexed": true,
-      "name": "poster",
-      "type": "address"
-    },
-    {
-      "indexed": true,
-      "name": "postHash",
-      "type": "bytes32"
-    },
-    {
-      "indexed": false,
-      "name": "ipfsPath",
-      "type": "bytes32"
-    },
-    {
-      "indexed": false,
-      "name": "timestamp",
-      "type": "uint256"
-    }
-  ],
-  "name": "UpdatePost",
-  "type": "event"
-}]`
-
 const UpvoteEventABI = `[{
   "anonymous": false,
   "inputs": [
     {
       "indexed": true,
-      "name": "upvoter",
+      "name": "actor",
       "type": "address"
     },
     {

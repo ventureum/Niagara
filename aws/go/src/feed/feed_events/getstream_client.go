@@ -35,8 +35,7 @@ func (getStreamClient *GetStreamClient) AddFeedActivityToGetStream(activity *fee
   obj := activity.Object.Value()
   timestamp := activity.Time
   extra := map[string]interface{} {
-    "rewards": string(activity.Rewards),
-    "typeHash": activity.TypeHash.Value(),
+    "type": activity.FeedType.Value(),
   }
   for k, v := range activity.Extra {
     extra[k] = v
@@ -46,7 +45,7 @@ func (getStreamClient *GetStreamClient) AddFeedActivityToGetStream(activity *fee
     Verb: verb,
     Object: obj,
     Time: stream.Time{
-      Time: time.Unix(timestamp.ToInt64(), 0).UTC(),
+      Time: time.Unix(int64(timestamp), 0).UTC(),
     },
     ForeignID: obj,
     To: feed_attributes.ConvertToStringArray(activity.To),
