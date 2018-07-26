@@ -25,7 +25,6 @@ export default class Search {
   // returns an array of KVPs
   static searchTokens = (target) => {
     let rv = WalletUtils.getToken(target.toUpperCase(), null)
-    console.log(rv)
     if (rv) {
       rv = rv.map(token => {
         return {

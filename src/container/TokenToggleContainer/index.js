@@ -5,10 +5,6 @@ import TokenToggle from '../../stories/screens/TokenToggle'
 import { addToken, removeToken } from './actions.js'
 
 class TokenToggleContainer extends React.Component {
-  componentWillReceiveProps (next) {
-    console.log('fuck fuck')
-  }
-
   render () {
     return (
       <TokenToggle navigation={this.props.navigation}
