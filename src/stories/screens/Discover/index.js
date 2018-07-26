@@ -3,7 +3,7 @@ import { FlatList, RefreshControl, View } from 'react-native'
 import { Container, Body, Header, Left, Right, Button, Icon, Title, Text, Content, Fab, Toast } from 'native-base'
 import FeedCardBasic from '../../components/FeedCardBasic'
 import WalletUtils from '../../../utils/wallet'
-import BoardSearch from '../../components/BoardSearch'
+import Search from '../../../utils/search.js'
 import NewPostModal from '../../components/NewPostModal'
 import { checkBalanceForTx, getPostTypeHash } from '../../../services/forum'
 import { BOARD_ALL_HASH } from '../../../utils/constants.js'
@@ -14,7 +14,6 @@ export default class Discover extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      boardSearch: false,
       fabActive: false,
       addNewPost: false
     }
@@ -57,6 +56,13 @@ export default class Discover extends Component {
     )
   }
 
+  toSearchPage = () => {
+    this.props.navigation.navigate('SearchPage', {
+      search: Search.searchBoards,
+      onItemSelected: this.props.switchBoard
+    })
+  }
+
   onAddNewPost = async (title, text, image, subtitle) => {
     const enoughBalance = await checkBalanceForTx()
     if (enoughBalance) {
@@ -95,10 +101,6 @@ export default class Discover extends Component {
     }
   }
 
-  inBoardSearch = (val) => {
-    this.setState({ boardSearch: val })
-  }
-
   getMorePosts = () => {
     this.props.getMorePosts(this.props.boardHash)
   }
@@ -115,16 +117,7 @@ export default class Discover extends Component {
   }
 
   render () {
-    if (this.state.boardSearch) {
-      return (
-        <BoardSearch
-          goBack={() => {
-            this.inBoardSearch(false)
-          }}
-          switchBoard={this.props.switchBoard}
-        />
-      )
-    } else if (this.state.addNewPost) {
+    if (this.state.addNewPost) {
       return (
         <NewPostModal
           goBack={this.backFromNewPost}
@@ -153,7 +146,7 @@ export default class Discover extends Component {
                 </Button>
                 : <View />
               }
-              <Button onPress={() => this.inBoardSearch(true)} >
+              <Button onPress={this.toSearchPage} >
                 <Icon name='search' />
               </Button>
               <Button onPress={this.onRefresh} >
