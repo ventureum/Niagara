@@ -11,7 +11,9 @@ import {
   Right,
   List,
   ListItem,
-  Thumbnail
+  Thumbnail,
+  Button,
+  Icon
 } from 'native-base'
 import { Row, Grid } from 'react-native-easy-grid'
 import styles from './styles'
@@ -47,6 +49,10 @@ class Assets extends React.Component {
     this.props.refreshTokens()
   }
 
+  addTokenOnPress = () => {
+    this.props.navigation.navigate('TokenToggle')
+  }
+
   render () {
     let { tokens, totalVal, walletAddress } = this.props
 
@@ -77,7 +83,7 @@ class Assets extends React.Component {
         <Header span>
           <Grid>
             <Row size={1} />
-            <Row size={2}>
+            <Row size={3}>
               <Body style={{flexDirection: 'row', justifyContent: 'center'}}>
                 <Thumbnail small source={{ uri: identiconBase64 }} />
               </Body>
@@ -87,10 +93,15 @@ class Assets extends React.Component {
                 <Text style={styles.textContent}> {walletAddressAbbre} </Text>
               </Body>
             </Row>
-            <Row size={2}>
+            <Row size={3}>
               <Left>
                 <Title> ≈ { totalVal }  </Title>
               </Left>
+              <Right>
+                <Button onPress={this.addTokenOnPress}>
+                  <Icon type='MaterialIcons' name='add-circle-outline' style={{fontSize: 37, color: 'white'}} />
+                </Button>
+              </Right>
             </Row>
           </Grid>
         </Header>

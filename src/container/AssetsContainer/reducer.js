@@ -1,5 +1,6 @@
 import { BigNumber } from 'bignumber.js'
 import update from 'immutability-helper'
+import WalletUtils from '../../utils/wallet.js'
 
 const NUMBER_OF_TX_TO_FETCH = 20
 const initialState = {
@@ -88,5 +89,36 @@ export default function (state: any = initialState, action: Function) {
       loading: false
     }
   }
+  if (action.type === 'ADD_TOKEN') {
+    let tokens = state.tokens
+    let token = WalletUtils.getToken(action.payload.symbol, action.payload.address)
+    for (let i = 0; i < tokens.length; i++) {
+      if (tokens[i].symbol === action.payload.symbol &&
+          tokens[i].address === action.payload.address) {
+        // token already exist, ignore the operation
+        return state
+      }
+    }
+    if (token) {
+      return update(
+        state,
+        {tokens: tokens => update(tokens || [], {$push: [{...token, balance: 0, value: 0}]})}
+      )
+    }
+  }
+  if (action.type === 'REMOVE_TOKEN') {
+    let tokens = state.tokens
+    let tokensAfterRemoval = []
+    for (let i = 0; i < tokens.length; i++) {
+      if (tokens[i].address !== action.payload.address) {
+        tokensAfterRemoval.push(tokens[i])
+      }
+    }
+    return {
+      ...state,
+      tokens: tokensAfterRemoval
+    }
+  }
+
   return state
 }
