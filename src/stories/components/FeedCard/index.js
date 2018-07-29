@@ -19,7 +19,7 @@ export default class FeedCard extends React.Component {
   render () {
     let { post } = this.props
     let source
-    if (post.source === 'database') {
+    if (post.source === 'OFF-CHAIN') {
       source = 'Off-Chain'
     } else {
       source = 'On-Chain'

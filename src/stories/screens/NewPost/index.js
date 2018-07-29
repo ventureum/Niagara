@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import { KeyboardAvoidingView, View, TextInput, Switch } from 'react-native'
-import { Icon, Text, Button, Thumbnail, Spinner } from 'native-base'
+import { KeyboardAvoidingView, View, TextInput, Switch, ScrollView } from 'react-native'
+import { Icon, Text, Button, Thumbnail, Spinner, Toast } from 'native-base'
 import styles from './styles'
 import WalletUtils from '../../../utils/wallet'
 import { getPostTypeHash } from '../../../services/forum'
-import {findFirstImageURL, getSubtitle} from '../../../utils/content'
+import { processContent } from '../../../utils/content'
 
 export default class NewPost extends Component {
   constructor (props) {
@@ -18,24 +18,23 @@ export default class NewPost extends Component {
 
   onTweet = (title, text) => {
     if (this.state.title !== null && this.state.text !== null) {
-      let image = findFirstImageURL(text)
-      if (image === false) {
-        image = ''
-      }
-      const subtitle = getSubtitle(text)
-      const content = {
-        title: title,
-        text: text,
-        image: image,
-        subtitle: subtitle
+      const content = processContent(title, text)
+      if (content === false) {
+        Toast.show({
+          text: 'Invalid text detected',
+          position: 'center',
+          buttonText: 'Okay',
+          type: 'danger',
+          duration: 10000
+        })
+        return
       }
       let destination
       if (this.state.toMainnet) {
-        destination = 'ONCHAIN'
+        destination = 'ON-CHAIN'
       } else {
-        destination = 'OFFCHAIN'
+        destination = 'OFF-CHAIN'
       }
-
       const boardId = this.props.boardHash
       const web3 = WalletUtils.getWeb3Instance()
       const noParent = web3.utils.padRight('0x0', 64)
@@ -47,7 +46,7 @@ export default class NewPost extends Component {
 
   render () {
     return (
-      <KeyboardAvoidingView behavior='padding' enabled style={styles.modalContainer}>
+      <KeyboardAvoidingView enabled style={styles.modalContainer}>
         <View style={styles.modalHeader}>
           <Icon
             active
@@ -84,23 +83,25 @@ export default class NewPost extends Component {
           <View style={styles.avatarContainer}>
             <Thumbnail small source={{ uri: this.props.avatar }} />
           </View>
-          <View style={styles.textInputContainer}>
-            <TextInput
-              placeholder='Title'
-              onChangeText={(title) => {
-                this.setState({ title })
-              }}
-              value={this.state.title}
-            />
-            <TextInput
-              placeholder='Share your ideas!'
-              multiline
-              underlineColorAndroid='transparent'
-              onChangeText={(text) => {
-                this.setState({ text })
-              }}
-              value={this.state.text}
-            />
+          <View style={styles.textInputContainer} >
+            <ScrollView>
+              <TextInput
+                placeholder='Title'
+                onChangeText={(title) => {
+                  this.setState({ title })
+                }}
+                value={this.state.title}
+              />
+              <TextInput
+                placeholder='Share your ideas!'
+                multiline
+                underlineColorAndroid='transparent'
+                onChangeText={(text) => {
+                  this.setState({ text })
+                }}
+                value={this.state.text}
+              />
+            </ScrollView>
           </View>
         </View>
       </KeyboardAvoidingView >
