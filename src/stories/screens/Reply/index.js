@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
 import { Text, Icon, Toast } from 'native-base'
-import { TextInput, View, KeyboardAvoidingView, TouchableOpacity, ScrollView } from 'react-native'
+import { TextInput, View, KeyboardAvoidingView, TouchableOpacity, ScrollView, Switch } from 'react-native'
 import styles from './styles'
-import { getPostTypeHash } from '../../../services/forum'
 import { processContent } from '../../../utils/content'
 export default class Reply extends Component {
   constructor (props) {
     super(props)
     this.state = ({
-      text: null
+      text: null,
+      onChain: false
     })
   }
 
@@ -26,14 +26,14 @@ export default class Reply extends Component {
         return
       }
       let destination
-      if (parentPost.source !== 'database') {
-        destination = 'ONCHAIN'
+      if (this.state.onChain) {
+        destination = 'ON-CHAIN'
       } else {
-        destination = 'OFFCHAIN'
+        destination = 'OFF-CHAIN'
       }
       const boardId = this.props.boardHash
       const parentHash = parentPost.postHash
-      const postType = getPostTypeHash('COMMENT')
+      const postType = 'COMMENT'
       this.props.newPost(content, boardId, parentHash, postType, destination)
       this.props.navigation.goBack()
     }
@@ -60,6 +60,13 @@ export default class Reply extends Component {
             onPress={() => {
               this.onSendComment(post, this.state.text)
             }}>
+            <Switch
+              value={this.state.onChain}
+              onValueChange={(value) => {
+                this.setState({ onChain: value })
+              }}
+              style={{ marginRight: 4 }}
+            />
             <Text>POST</Text>
           </TouchableOpacity>
         </View>

@@ -62,7 +62,7 @@ function _newOffChainPost (content, boardId, parentHash, postType, poster) {
   }
 }
 function newPost (content, boardId, parentHash, postType, destination) {
-  if (destination === 'ONCHAIN') {
+  if (destination === 'ON-CHAIN') {
     return (dispatch) => {
       dispatch(_newOnChainPost(
         content,

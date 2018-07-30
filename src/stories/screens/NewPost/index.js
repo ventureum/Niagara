@@ -3,7 +3,6 @@ import { KeyboardAvoidingView, View, TextInput, Switch, ScrollView } from 'react
 import { Icon, Text, Button, Thumbnail, Spinner, Toast } from 'native-base'
 import styles from './styles'
 import WalletUtils from '../../../utils/wallet'
-import { getPostTypeHash } from '../../../services/forum'
 import { processContent } from '../../../utils/content'
 
 export default class NewPost extends Component {
@@ -38,7 +37,7 @@ export default class NewPost extends Component {
       const boardId = this.props.boardHash
       const web3 = WalletUtils.getWeb3Instance()
       const noParent = web3.utils.padRight('0x0', 64)
-      const postType = getPostTypeHash('POST')
+      const postType = 'POST'
       this.props.newPost(content, boardId, noParent, postType, destination)
       this.props.navigation.goBack()
     }

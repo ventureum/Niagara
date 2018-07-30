@@ -93,7 +93,6 @@ export default class WalletUtils {
           `https://kovan.infura.io/${Config.INFURA_API_KEY}`
         )
       case 'rinkeby': {
-        console.log('making a rinkeby web3')
         return new Web3.providers.HttpProvider(
           `https://rinkeby.infura.io/${Config.INFURA_API_KEY}`
         )
@@ -248,7 +247,7 @@ export default class WalletUtils {
     // Modify the following token info for testing
     this.tokens.push({
       'symbol': 'VTX',
-      'address': '0x8bc934561eb4175b05f7001e91a03072cec7c028',
+      'address': '0xdd998c0a031d4a46ec520ecfcbf4ee5ca9ae2cd0',
       'decimals': 18,
       'name': 'VetX Token'
     })

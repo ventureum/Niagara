@@ -26,12 +26,6 @@ export default class FeedCard extends React.Component {
 
   render () {
     let { post } = this.props
-    let source
-    if (post.source === 'OFF-CHAIN') {
-      source = 'Off-Chain'
-    } else {
-      source = 'On-Chain'
-    }
     return (
       <View style={styles.card}>
         <View style={styles.header}>
@@ -60,7 +54,7 @@ export default class FeedCard extends React.Component {
               </Text>
             </View>
           </View>
-          <SourceBadge source={source} />
+          <SourceBadge source={post.source} />
         </View>
         <TouchableWithoutFeedback onPress={() => {
           this.toDetail(post)
@@ -77,8 +71,8 @@ export default class FeedCard extends React.Component {
               >
                 {post.content.title}
               </Text>
-              {(post.content.image === '')
-                ? <Markdown >{post.content.subtitle}</Markdown>
+              {(post.content.image === undefined)
+                ? <Markdown >subtitle</Markdown>
                 : <Markdown >{`![user image](${post.content.image})\n\n${post.content.subtitle}`}</Markdown>
               }
             </View>

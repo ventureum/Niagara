@@ -87,8 +87,13 @@ export default class Discover extends Component {
             </Button>
           </Right>
         </Header>
-        <SpecialPostCard type='Audits' />
-        <SpecialPostCard type='Airdrops' />
+        {this.props.boardHash !== BOARD_ALL_HASH
+          ? (
+            <View>
+              <SpecialPostCard type='Audits' />
+              <SpecialPostCard type='Airdrops' />
+            </View>)
+          : (<View />)}
         {
           this.props.posts.length === 0
             ? <Content contentContainerStyle={{ flex: 1, justifyContent: 'center', flexDirection: 'row', alignItems: 'center' }}

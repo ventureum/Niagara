@@ -6,7 +6,7 @@ import FeedCard from '../../components/FeedCard'
 import styles from './styles'
 import WalletUtils from '../../../utils/wallet'
 
-export default class Reply extends Component {
+export default class PostDetail extends Component {
   constructor (props) {
     super(props)
     this.state = ({
