@@ -92,11 +92,10 @@ export default class WalletUtils {
         return new Web3.providers.HttpProvider(
           `https://kovan.infura.io/${Config.INFURA_API_KEY}`
         )
-      case 'rinkeby': {
+      case 'rinkeby':
         return new Web3.providers.HttpProvider(
           `https://rinkeby.infura.io/${Config.INFURA_API_KEY}`
         )
-      }
       case 'mainnet':
         return new Web3.providers.HttpProvider(
           `https://mainnet.infura.io/${Config.INFURA_API_KEY}`

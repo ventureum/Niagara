@@ -3,7 +3,8 @@ let reader = new commonmark.Parser()
 const forbidenTypes = [
   'code',
   'block_quote',
-  'item', 'list',
+  'item',
+  'list',
   'heading',
   'code_block',
   'html_block',
@@ -28,7 +29,7 @@ function processContent (title, text) {
   let subtitle = ''
   let characterLimit = 150
   let skipType = []
-  while (event = walker.next()) {
+  while ((event = walker.next())) {
     node = event.node
     // Detect unallowed types
     if (forbidenTypes.includes(node.type)) {
