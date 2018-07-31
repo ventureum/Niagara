@@ -62,76 +62,126 @@ function getBytes32FromMultiash (multihash) {
     API. size must satisfy: 0 < size <= 10
   @return return a array of post details
 */
-async function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
-  // get feed token from lamda API
-  const feedSlug = feed.split(':')
-  const response = await axios.post(
-    Config.FEED_TOKEN_API,
-    {
-      'feedSlug': feedSlug[0],
-      'userId': feedSlug[1],
-      'getStreamApiKey': Config.STREAM_API_KEY,
-      'getStreamApiSecret': Config.STREAM_API_SECRET
+function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
+  return new Promise(async (resolve, reject) => {
+    // get feed token from lamda API
+    const feedSlug = feed.split(':')
+    const response = await axios.post(
+      Config.FEED_TOKEN_API,
+      {
+        'feedSlug': feedSlug[0],
+        'userId': feedSlug[1],
+        'getStreamApiKey': Config.STREAM_API_KEY,
+        'getStreamApiSecret': Config.STREAM_API_SECRET
+      }
+    )
+    if (!response.data.ok) {
+      reject(response.data.message)
     }
-  )
-
-  // get feed data from Stream API
-  const targetFeed = client.feed(feedSlug[0], feedSlug[1], response.data.feedToken)
-  let feedData
-  if (id_lt === null) {
-    feedData = await targetFeed.get({ limit: size })
-  } else {
-    feedData = await targetFeed.get({ limit: size, id_lt: id_lt })
-  }
-
-  // build the array of post hash from feed data
-  let postsHash = []
-  for (let i = 0; i < feedData.results.length; i++) {
-    const hash = feedData.results[i].object.split(':')[1]
-    postsHash.push(hash)
-  }
-
-  // get the flatten array of ipfs path, token address, author, rewards, # of replies from forum contract
-  const forum = await WalletUtils.getContractInstance('Forum')
-  const postDataFromForumContract = await forum.methods.getBatchPosts(postsHash).call()
-  let posts = []
-
-  // Transform the flatten array from forum contract into an array of post objects
-  const web3 = WalletUtils.getWeb3Instance()
-  let BN = web3.utils.BN
-  let precision = 2
-  for (let i = 0; i < postDataFromForumContract.length; i += 7) {
-    let hex = web3.utils.toBN(postDataFromForumContract[i])
-    let base = new BN(10).pow(new BN(18 - precision))
-
-    if (!hex.isZero()) {
-      posts.push({
-        hash: postDataFromForumContract[i],
-        token: {
-          address: '0x' + postDataFromForumContract[i + 1].slice(26, 66),
-          symbol: 'VTX'
-        },
-        ipfsPath: getMultihashFromBytes32(postDataFromForumContract[i + 2]),
-        author: '0x' + postDataFromForumContract[i + 3].substr(26, 40),
-        rewards: (web3.utils.toBN(postDataFromForumContract[i + 4]).div(base).toNumber()) / (10 ** 2),
-        repliesLength: web3.utils.toDecimal(postDataFromForumContract[i + 5]),
-        postType: postDataFromForumContract[i + 6],
-        id: feedData.results[i / 7].id,
-        time: feedData.results[i / 7].time
-      })
+    // get feed data from Stream API
+    const targetFeed = client.feed(feedSlug[0], feedSlug[1], response.data.feedToken)
+    let feedData
+    if (id_lt === null) {
+      feedData = await targetFeed.get({ limit: size })
     } else {
-      break
+      feedData = await targetFeed.get({ limit: size, id_lt: id_lt })
     }
-  }
 
-  // get the content of each post
-  let postContents = []
-  for (let i = 0; i < posts.length; i++) {
-    let singleContent = await _getSingleContent(posts[i])
-    postContents.push(singleContent)
-  }
+    // build the arrays of post hash from feed data
+    let postMap = new Map()
+    let onChainPosts = []
+    let offChainPosts = []
+    for (let i = 0; i < feedData.results.length; i++) {
+      if (feedData.results[i].source === 'ON-CHAIN') {
+        // On-chain posts
+        postMap.set(i, onChainPosts.length)
+        onChainPosts.push(feedData.results[i].object.split(':')[1])
+      } else if (feedData.results[i].source === 'OFF-CHAIN') {
+        // Off-chain posts
+        postMap.set(i, offChainPosts.length)
+        offChainPosts.push(feedData.results[i].object.split(':')[1])
+      }
+    }
+    // get the flatten array of ipfs path, token address, author, rewards, # of replies from forum contract
+    const forum = await WalletUtils.getContractInstance('Forum')
+    const onChainPostData = await forum.methods.getBatchPosts(onChainPosts).call()
+    let onChainPostMeta = []
 
-  return postContents
+    // Transform the flatten array from forum contract into an array of post objects
+    const web3 = WalletUtils.getWeb3Instance()
+    let BN = web3.utils.BN
+    let precision = 2
+    for (let i = 0; i < onChainPostData.length; i += 7) {
+      let hex = web3.utils.toBN(onChainPostData[i])
+      let base = new BN(10).pow(new BN(18 - precision))
+
+      if (!hex.isZero()) {
+        onChainPostMeta.push({
+          postHash: onChainPostData[i],
+          ipfsPath: getMultihashFromBytes32(onChainPostData[i + 2]),
+          actor: '0x' + onChainPostData[i + 3].substr(26, 40),
+          rewards: (web3.utils.toBN(onChainPostData[i + 4]).div(base).toNumber()) / (10 ** 2),
+          repliesLength: web3.utils.toDecimal(onChainPostData[i + 5]),
+          type: onChainPostData[i + 6]
+        })
+      } else {
+        break
+      }
+    }
+
+    // get the content of each post
+    let onChainPostDetails = []
+    for (let i = 0; i < onChainPostMeta.length; i++) {
+      let singleContent = await _getSingleContent(onChainPostMeta[i])
+      onChainPostDetails.push(singleContent)
+    }
+    let offChainPostDetails = []
+    for (let i = 0; i < offChainPosts.length; i++) {
+      const result = await axios.post(
+        Config.GET_FEED_POST_API,
+        {
+          'postHash': offChainPosts[i],
+          'getStreamApiKey': Config.STREAM_API_KEY,
+          'getStreamApiSecret': Config.STREAM_API_SECRET
+        }
+      )
+
+      if (!result.data.ok) {
+        reject(response.data.message)
+      }
+      let precision = 2
+      let base = new BN(10).pow(new BN(18 - precision))
+      const { post } = result.data
+      offChainPostDetails.push({
+        postHash: post.postHash,
+        actor: post.actor,
+        rewards: (web3.utils.toBN(0).div(base).toNumber()) / (10 ** 2),
+        repliesLength: web3.utils.toDecimal(0),
+        type: post.type,
+        content: post.content
+      })
+    }
+
+    let postDetails = []
+    for (let i = 0; i < feedData.results.length; i++) {
+      if (feedData.results[i].source === 'ON-CHAIN') {
+        postDetails.push({
+          ...onChainPostDetails[postMap.get(i)],
+          id: feedData.results[i].id,
+          time: feedData.results[i].time,
+          source: feedData.results[i].source
+        })
+      } else {
+        postDetails.push({
+          ...offChainPostDetails[postMap.get(i)],
+          id: feedData.results[i].id,
+          time: feedData.results[i].time,
+          source: feedData.results[i].source
+        })
+      }
+    }
+    resolve(postDetails)
+  })
 }
 
 /*
@@ -171,8 +221,7 @@ function getPostTypeHash (type) {
   @param newTransaction A callback function to be used when
     a new transaction is sent but before receipt. It takes a transaction hash as parameter.
 */
-
-function newPost (content, boardId, parentHash, postType, newContentToIPFS, newTransaction) {
+function newOnChainPost (content, boardId, parentHash, postType, newContentToIPFS, newTransaction) {
   return new Promise(async (resolve, reject) => {
     const enoughBalance = await checkBalanceForTx()
     if (!enoughBalance) {
@@ -201,10 +250,10 @@ function newPost (content, boardId, parentHash, postType, newContentToIPFS, newT
     const forum = await WalletUtils.getContractInstance('Forum')
     let crypto = require('crypto')
     let postHash = '0x' + crypto.randomBytes(32).toString('hex')
-
-    forum.methods.post(boardId, parentHash, postHash, ipfsPath, postType).send({ gasPrice: GAS_PRICE })
+    const hashedPostType = getPostTypeHash(postType)
+    forum.methods.post(boardId, parentHash, postHash, ipfsPath, hashedPostType).send({ gasPrice: GAS_PRICE })
       .on('transactionHash', (txHash) => {
-        if (newContentToIPFS !== undefined) {
+        if (newTransaction !== undefined) {
           newTransaction(txHash)
         }
       })
@@ -218,4 +267,32 @@ function newPost (content, boardId, parentHash, postType, newContentToIPFS, newT
   )
 }
 
-export { batchReadFeedsByBoardId, checkBalanceForTx, getPostTypeHash, newPost }
+function newOffChainPost (content, boardId, parentHash, postType, poster) {
+  return new Promise(async (resolve, reject) => {
+    let crypto = require('crypto')
+    let postHash = '0x' + crypto.randomBytes(32).toString('hex')
+    const typeHash = getPostTypeHash(postType)
+    const toDataBase =
+    {
+      'actor': poster,
+      'boardId': boardId,
+      'parentHash': parentHash,
+      'postHash': postHash,
+      'typeHash': typeHash,
+      'content': content,
+      'getStreamApiKey': Config.STREAM_API_KEY,
+      'getStreamApiSecret': Config.STREAM_API_SECRET
+    }
+    const result = await axios.post(
+      Config.FEED_POST_API,
+      toDataBase
+    )
+    if (result.data.ok) {
+      resolve(result)
+    } else {
+      reject(result)
+    }
+  })
+}
+
+export { batchReadFeedsByBoardId, checkBalanceForTx, getPostTypeHash, newOnChainPost, newOffChainPost }

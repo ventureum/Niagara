@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { TouchableOpacity, View, Text } from 'react-native'
-import { Icon, Right, Left, ListItem } from 'native-base'
+import { Icon } from 'native-base'
 import styles from './styles'
 import TransactionDetail from '../TransactionDetail'
 
@@ -20,7 +20,7 @@ export default class TransactionItem extends Component {
       <TouchableOpacity
         style={styles.itemContainer}
         onPress={() => {
-          this.setState({expanded: !this.state.expanded})
+          this.setState({ expanded: !this.state.expanded })
         }}
       >
         <View style={styles.transactionContainer} >
@@ -39,7 +39,7 @@ export default class TransactionItem extends Component {
             {moment(timestamp * 1000).fromNow()}
           </Text>
         </View>
-        { (status === 'Fulfilled' && this.state.expanded)
+        {(status === 'Fulfilled' && this.state.expanded)
           ? <TransactionDetail receipt={this.props.transaction.receipt} />
           : <View />
         }

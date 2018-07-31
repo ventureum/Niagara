@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import Reply from '../../stories/screens/Reply'
-import { newPost } from '../DiscoverContainer/actions'
+import PostDetail from '../../stories/screens/PostDetail'
+import { getReplies } from '../DiscoverContainer/actions'
 
 class ReplyContainer extends Component {
   constructor (props) {
@@ -11,28 +11,30 @@ class ReplyContainer extends Component {
     })
   }
 
+  componentWillMount () {
+    this.props.getReplies(this.state.post.postHash)
+  }
   render () {
     return (
-      <Reply
+      <PostDetail
         navigation={this.props.navigation}
         post={this.state.post}
+        replies={this.props.replies}
         loading={this.props.loading}
-        newPost={this.props.newPost}
         errorMessage={this.props.errorMessage}
-        boardHash={this.props.boardHash}
       />
     )
   }
 }
 
 const mapStateToProps = state => ({
+  replies: state.discoverReducer.replies,
   loading: state.discoverReducer.loading,
-  errorMessage: state.discoverReducer.errorMessage,
-  boardHash: state.discoverReducer.boardHash
+  errorMessage: state.discoverReducer.errorMessage
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  newPost: (content, boardId, parentHash, postType, destination) => dispatch(newPost(content, boardId, parentHash, postType, destination))
+  getReplies: (postHash) => dispatch(getReplies(postHash))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ReplyContainer)

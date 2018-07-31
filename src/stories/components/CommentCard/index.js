@@ -26,7 +26,7 @@ export default class CommentCard extends React.Component {
                 fontSize: 16
               }}
             >
-              {'@' + post.author + ' replied:'}
+              {'@' + post.actor + ' replied:'}
             </Text>
             <Text style={{ fontSize: 12, color: '#aaa' }}>
               {moment.utc(post.time).fromNow()}

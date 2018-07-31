@@ -7,6 +7,7 @@ import assetsReducer from '../container/AssetsContainer/reducer'
 import discoverReducer from '../container/DiscoverContainer/reducer'
 import transactionReducer from '../container/TransactionContainer/reducer'
 import sendPageReducer from '../container/SendPageContainer/reducer'
+import network from '../container/NetworkContainer/reducer'
 
 export default combineReducers({
   form: formReducer,
@@ -15,5 +16,6 @@ export default combineReducers({
   assetsReducer,
   discoverReducer,
   transactionReducer,
-  sendPageReducer
+  sendPageReducer,
+  network
 })

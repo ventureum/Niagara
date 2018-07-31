@@ -28,7 +28,8 @@ const styles = StyleSheet.create({
   header: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'flex-start'
+    justifyContent: 'space-between',
+    paddingRight: 5
   }
 })
 

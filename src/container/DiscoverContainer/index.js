@@ -38,7 +38,7 @@ const mapDispatchToProps = (dispatch) => ({
   refreshPosts: (boardHash) => dispatch(refreshPosts('board', boardHash)),
   getMorePosts: (boardHash) => dispatch(getMorePosts('board', boardHash)),
   switchBoard: (boardHash, boardName) => dispatch(switchBoard(boardHash, boardName)),
-  newPost: (content, boardId, parentHash, postType) => dispatch(newPost(content, boardId, parentHash, postType))
+  newPost: (content, boardId, parentHash, postType, destination) => dispatch(newPost(content, boardId, parentHash, postType, destination))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(DiscoverContainer)

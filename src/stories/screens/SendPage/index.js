@@ -63,7 +63,7 @@ export default class SendPage extends Component {
                 () => this.props.navigation.navigate('QRScaner', { returnData: this.returnData.bind(this) })
               }
             >
-              <Icon name='list' />
+              <Icon name='md-qr-scanner' />
             </Button>
           </Right>
         </Header>

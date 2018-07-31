@@ -1,24 +1,34 @@
 import { StyleSheet } from 'react-native'
 
 const styles = StyleSheet.create({
-  footerView: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'stretch'
-  },
-  KeyboardAvoidingView: {
-    flex: 1,
+  replyContainer: {
     flexDirection: 'column',
     alignItems: 'stretch'
   },
-  contentView: {
-    flex: 11
+  replyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingBottom: 13,
+    paddingTop: 10,
+    borderBottomWidth: 1,
+    borderColor: '#cecece'
   },
-  sendBadgeContainer: {
-    width: '90%'
+  headerLeft: {
+    flexDirection: 'row'
   },
-  TextContainer: {
-    width: '10%'
+  headerRight: {
+    flexDirection: 'row'
+  },
+  postTitle: {
+    flexDirection: 'row',
+    paddingLeft: 15,
+    borderBottomWidth: 1,
+    borderColor: '#8c8c8c',
+    padding: 10,
+    alignItems: 'center'
   }
 })
 

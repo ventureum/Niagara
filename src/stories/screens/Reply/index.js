@@ -1,78 +1,93 @@
 import React, { Component } from 'react'
-import { Text, Button, Spinner } from 'native-base'
-import { FlatList, TextInput, View, KeyboardAvoidingView } from 'react-native'
-import CommentCard from '../../components/CommentCard'
-import FeedCard from '../../components/FeedCard'
+import { Text, Icon, Toast } from 'native-base'
+import { TextInput, View, KeyboardAvoidingView, TouchableOpacity, ScrollView, Switch } from 'react-native'
 import styles from './styles'
-import { getPostTypeHash } from '../../../services/forum'
-import WalletUtils from '../../../utils/wallet'
-
+import { processContent } from '../../../utils/content'
 export default class Reply extends Component {
   constructor (props) {
     super(props)
     this.state = ({
-      text: null
+      text: null,
+      onChain: false
     })
   }
 
-  onRenderItem = ({ item }) => {
-    if (item === this.props.post) {
-      return <FeedCard post={item} />
-    }
-    item = {
-      ...item,
-      author: WalletUtils.getAddrAbbre(item.author),
-      avatar: WalletUtils.getAvatar(item.author)
-    }
-    return (
-      <CommentCard post={item} />
-    )
-  }
-
-  onSendComment = async () => {
+  onSendComment = (parentPost, text) => {
     if (this.state.text !== null) {
-      const { post } = this.props
-      const content = {
-        title: '',
-        text: this.state.text
+      const content = processContent('', text)
+      if (content === false) {
+        Toast.show({
+          text: 'Invalid text detected',
+          position: 'center',
+          buttonText: 'Okay',
+          type: 'danger',
+          duration: 10000
+        })
+        return
       }
-
-      const boardId = post.token.address
-      const parentHash = post.hash
-      const postType = getPostTypeHash('COMMENT')
-      await this.props.newPost(content, boardId, parentHash, postType)
-      this.setState({text: null})
+      let destination
+      if (this.state.onChain) {
+        destination = 'ON-CHAIN'
+      } else {
+        destination = 'OFF-CHAIN'
+      }
+      const boardId = this.props.boardHash
+      const parentHash = parentPost.postHash
+      const postType = 'COMMENT'
+      this.props.newPost(content, boardId, parentHash, postType, destination)
+      this.props.navigation.goBack()
     }
   }
 
   render () {
-    const { post, replies } = this.props
-    let content = [post]
-    content = content.concat(replies)
+    const { post } = this.props
+
     return (
-      <KeyboardAvoidingView enabled style={styles.KeyboardAvoidingView}>
-        <View style={styles.contentView}>
-          <FlatList
-            data={content}
-            renderItem={this.onRenderItem}
-            keyExtractor={item => item.id}
-            onEndReachedThreshold={0.5}
-            onEndReached={this.props.getMorePosts}
-          />
+      <KeyboardAvoidingView style={styles.replyContainer}>
+        <View style={styles.replyHeader} >
+          <View style={styles.headerLeft} >
+            <Icon
+              active
+              name='arrow-back'
+              onPress={() => {
+                this.props.navigation.goBack()
+              }}
+            />
+            <Text style={{ paddingLeft: 20, paddingTop: 3 }}> Reply to Post</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.headerRight}
+            onPress={() => {
+              this.onSendComment(post, this.state.text)
+            }}>
+            <Switch
+              value={this.state.onChain}
+              onValueChange={(value) => {
+                this.setState({ onChain: value })
+              }}
+              style={{ marginRight: 4 }}
+            />
+            <Text>POST</Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.footerView}>
-          <TextInput style={{ width: '80%' }} placeholder='  Your comments'
-            value={this.state.text}
-            onChangeText={(text) => { this.setState({ text: text }) }}
-          />
-          <Button style={{ width: '20%', height: '100%', flex: 1 }} info rounded
-            onPress={this.onSendComment}>
-            {this.props.loading
-              ? <Spinner style={{ alignSelf: 'center' }} color='green' />
-              : <Text style={{ alignSelf: 'center', fontWeight: 'bold', fontSize: 17 }}>send</Text>
-            }
-          </Button>
-        </View>
+        <ScrollView>
+          <View style={styles.postTitle}>
+            <Text style={{ fontWeight: 'bold', color: 'black', fontSize: 16 }}>{post.content.title}</Text>
+          </View>
+          <View>
+            <TextInput
+              autoFocus
+              placeholder='Share your ideas!'
+              multiline
+              underlineColorAndroid='transparent'
+              onChangeText={(text) => {
+                this.setState({ text })
+              }}
+              value={this.state.text}
+              selectionColor='red'
+            />
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     )
   }

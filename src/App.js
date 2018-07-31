@@ -21,6 +21,8 @@ import Profile from './container/ProfileContainer'
 import Transaction from './container/TransactionContainer'
 import SearchPage from './stories/screens/SearchPage'
 import TokenToggle from './container/TokenToggleContainer'
+import NewPost from './container/NewPostContainer'
+import PostDetail from './container/PostDetailContainer'
 
 const Drawer = DrawerNavigator(
   {
@@ -49,9 +51,12 @@ const App = StackNavigator(
     Discover: { screen: Discover },
     Reply: { screen: Reply },
     Profile: { screen: Profile },
-    Transaction: {screen: Transaction},
-    SearchPage: {screen: SearchPage},
-    TokenToggle: {screen: TokenToggle}
+    Transaction: { screen: Transaction },
+    SearchPage: { screen: SearchPage },
+    TokenToggle: { screen: TokenToggle },
+    NewPost: { screen: NewPost },
+    PostDetail: { screen: PostDetail }
+
   },
   {
     initialRouteName: 'Login',
