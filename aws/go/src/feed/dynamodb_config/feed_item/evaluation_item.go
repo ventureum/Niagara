@@ -4,9 +4,14 @@ import "feed/feed_attributes"
 
 
 type EvaluationItem struct {
-  ObjectId string `json:"objectId"`
-  EvaluatorAddress string `json:"evaluatorAddress"`
-  BoardId string `json:"boardId"`
+  UUID      UUID                           `json:"uuid"`
+  PostHash  string                         `json:"postHash"`
+  Evaluator string                         `json:"evaluator"`
+  BoardId   string                         `json:"boardId"`
   Timestamp feed_attributes.BlockTimestamp `json:"timestamp"`
-  Value feed_attributes.Vote `json:"value"`
+  Value     feed_attributes.Vote           `json:"value"`
+}
+
+func CreateUUIDForEvaluationItem (postHash string, evaluator string) UUID {
+  return CreateUUIDFromArray([]string{postHash, evaluator})
 }

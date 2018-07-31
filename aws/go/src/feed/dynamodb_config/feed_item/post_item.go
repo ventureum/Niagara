@@ -8,16 +8,14 @@ import (
 type PostItem struct {
   ObjectId string `json:"objectId"`
   Activity feed_attributes.Activity `json:"activity"`
-  Voters []feed_attributes.Voter `json:"voters"`
+  UpdateCount int64
 }
 
 
 func CreatePostItem(activity *feed_attributes.Activity) *PostItem {
-  var voters []feed_attributes.Voter
   return &PostItem {
     ObjectId: activity.Object.ObjId,
     Activity: *activity,
-    Voters: voters,
   }
 }
 

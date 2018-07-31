@@ -2,8 +2,8 @@ package feed_events
 
 import (
   "github.com/ethereum/go-ethereum/common"
-  "math/big"
   "feed/feed_attributes"
+  "math/big"
 )
 
 type Event interface{}
@@ -22,31 +22,16 @@ type PostEventResult struct {
 }
 
 type PostEvent struct {
-  Poster string     // indexed
+  Actor string     // indexed
   BoardId string    // indexed
   ParentHash string
   PostHash string   // indexed
-  IpfsPath string
-  TypeHash feed_attributes.TypeHash
+  FeedType feed_attributes.FeedType
   Timestamp feed_attributes.BlockTimestamp
 }
 
-type UpdatePostEventResult struct {
-  Poster common.Address  // indexed
-  PostHash common.Hash   // indexed
-  IpfsPath common.Hash
-  Timestamp *big.Int
-}
-
-type UpdatePostEvent struct {
-  Poster string     // indexed
-  PostHash string   // indexed
-  IpfsPath string
-  Timestamp *big.Int
-}
-
 type UpvoteEventResult struct {
-  Upvoter   common.Address // indexed
+  Actor   common.Address // indexed
   BoardId   common.Hash    // indexed
   PostHash  common.Hash    // indexed
   Value     *big.Int
@@ -54,40 +39,30 @@ type UpvoteEventResult struct {
 }
 
 type UpvoteEvent struct {
-  Upvoter   string // indexed
+  Actor   string // indexed
   BoardId   string // indexed
   PostHash  string // indexed
-  Value     *big.Int
-  Timestamp *big.Int
+  Value     feed_attributes.Vote
+  Timestamp feed_attributes.BlockTimestamp
 }
 
 func (postEventResult *PostEventResult) ToPostEvent() *PostEvent {
   return &PostEvent {
-    Poster: postEventResult.Poster.String(),
+    Actor: postEventResult.Poster.String(),
     BoardId: postEventResult.BoardId.String(),
     ParentHash: postEventResult.ParentHash.String(),
     PostHash: postEventResult.PostHash.String(),
-    IpfsPath: postEventResult.IpfsPath.String(),
-    TypeHash: feed_attributes.CreateFromHashStr(common.Bytes2Hex(postEventResult.TypeHash[:])),
+    FeedType: feed_attributes.CreateFeedTypeFromHashStr(common.Bytes2Hex(postEventResult.TypeHash[:])),
     Timestamp: feed_attributes.CreateBlockTimestampFromBigInt(postEventResult.Timestamp),
-  }
-}
-
-func (updatePostEventResult *UpdatePostEventResult) ToUpdatePostEvent() *UpdatePostEvent {
-  return &UpdatePostEvent {
-    Poster: updatePostEventResult.Poster.String(),
-    PostHash: updatePostEventResult.PostHash.String(),
-    IpfsPath: updatePostEventResult.IpfsPath.String(),
-    Timestamp: updatePostEventResult.Timestamp,
   }
 }
 
 func (upvoteEventResult *UpvoteEventResult) ToUpvoteEvent() *UpvoteEvent{
   return &UpvoteEvent {
-    Upvoter:   upvoteEventResult.Upvoter.String(),
+    Actor:   upvoteEventResult.Actor.String(),
     BoardId:   upvoteEventResult.BoardId.String(),
     PostHash:  upvoteEventResult.PostHash.String(),
-    Value:     upvoteEventResult.Value,
-    Timestamp: upvoteEventResult.Timestamp,
+    Value:     feed_attributes.Vote(upvoteEventResult.Value.Int64()),
+    Timestamp: feed_attributes.CreateBlockTimestampFromBigInt(upvoteEventResult.Timestamp),
   }
 }

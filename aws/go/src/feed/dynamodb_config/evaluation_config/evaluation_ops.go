@@ -26,32 +26,14 @@ func (evaluationExecutor *EvaluationExecutor) DeleteEvaluationTable() {
 
 func (evaluationExecutor *EvaluationExecutor) AddEvaluationItem(evaluationItem *feed_item.EvaluationItem) {
   var feedItem feed_item.FeedItem = *evaluationItem
-  evaluationExecutor.AddItem(&feedItem, TableNameForEvaluation, ConditionExpressionWithoutOverwriting)
+  evaluationExecutor.AddItem(&feedItem, TableNameForEvaluation, "")
 }
 
-func (evaluationExecutor *EvaluationExecutor) DeleteEvaluationItem(objectId string, evaluatorAddress string) {
+func (evaluationExecutor *EvaluationExecutor) DeleteEvaluationItem(postHash string, evaluator string) {
   key := map[string]*dynamodb.AttributeValue{
-    "objectId": {
-      S: aws.String(objectId),
-    },
-    "evaluatorAddress": {
-      S: aws.String(evaluatorAddress),
+    "uuid": {
+      S: aws.String(feed_item.CreateUUIDForEvaluationItem(postHash, evaluator).Value()),
     },
   }
   evaluationExecutor.DeleteItem(key, TableNameForEvaluation, feed_item.EvaluationItemType)
-}
-
-func (evaluationExecutor *EvaluationExecutor) ReadEvaluationItem(
-    objectId string, evaluatorAddress string) *feed_item.EvaluationItem {
-  key := map[string]*dynamodb.AttributeValue{
-    "objectId": {
-      S: aws.String(objectId),
-    },
-    "evaluatorAddress": {
-      S: aws.String(evaluatorAddress),
-    },
-  }
-  item := evaluationExecutor.ReadItem(key, TableNameForEvaluation, feed_item.EvaluationItemType)
-  evaluationItem := (*item).(feed_item.EvaluationItem)
-  return &evaluationItem
 }

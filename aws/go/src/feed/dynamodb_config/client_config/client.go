@@ -176,7 +176,32 @@ func UnmarshalToFeedItem(
       var postItem feed_item.PostItem
       err = dynamodbattribute.UnmarshalMap(attributeValues, &postItem)
       item = postItem
-  }
+
+    case feed_item.EvaluationItemType:
+      var evaluationItem feed_item.EvaluationItem
+      err = dynamodbattribute.UnmarshalMap(attributeValues, &evaluationItem)
+      item = evaluationItem
+
+    case feed_item.ExchangeRequestItemType:
+      var exchangeRequestItem feed_item.ExchangeRequestItem
+      err = dynamodbattribute.UnmarshalMap(attributeValues, &exchangeRequestItem)
+      item = exchangeRequestItem
+
+    case feed_item.ReputationRecordItemType:
+      var reputationRecordItem feed_item.ReputationRecordItem
+      err = dynamodbattribute.UnmarshalMap(attributeValues, &reputationRecordItem)
+      item = reputationRecordItem
+
+    case feed_item.UpvoteCountItemType:
+          var upvoteCountItem feed_item.UpvoteCountItem
+          err = dynamodbattribute.UnmarshalMap(attributeValues, &upvoteCountItem)
+          item = upvoteCountItem
+
+    case feed_item.ProfileItemType:
+      var profileItem feed_item.ProfileItem
+      err = dynamodbattribute.UnmarshalMap(attributeValues, &profileItem)
+      item = profileItem
+    }
   if err != nil {
     log.Printf("Failed to unmarshal Item with attributeValues: %+v\n", attributeValues)
     log.Fatal(err.Error())

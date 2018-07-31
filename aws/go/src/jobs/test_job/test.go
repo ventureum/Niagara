@@ -56,7 +56,7 @@ func main () {
   verb1 := feed_attributes.SubmitVerb
   object1 := feed_attributes.CreateObjectFromValue("post:0x01")
   time1 :=  feed_attributes.BlockTimestamp("1000000")
-  rewards1 := feed_attributes.CreateRewardFromBigInt(bigNumber1)
+  rewards1 := feed_attributes.CreateReputationFromBigInt(bigNumber1)
   to1 := []feed_attributes.FeedId {
    feed_attributes.CreateFeedIdFromValue("board:all"),
    feed_attributes.CreateFeedIdFromValue("board:0x01"),
@@ -73,7 +73,7 @@ func main () {
   verb2 := feed_attributes.SubmitVerb
   object2 := feed_attributes.CreateObjectFromValue("post:0x02")
   time2 :=  feed_attributes.BlockTimestamp("2000000")
-  rewards2 := feed_attributes.CreateRewardFromBigInt(bigNumber2)
+  rewards2 := feed_attributes.CreateReputationFromBigInt(bigNumber2)
   to2 := []feed_attributes.FeedId {
    feed_attributes.CreateFeedIdFromValue("board:all"),
    feed_attributes.CreateFeedIdFromValue("board:0x02"),

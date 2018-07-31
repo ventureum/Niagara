@@ -16,6 +16,8 @@ import (
   "feed/dynamodb_config/client_config"
   "feed/dynamodb_config/feed_item"
   "feed/dynamodb_config/post_config"
+  "feed/dynamodb_config/evaluation_config"
+  "feed/dynamodb_config/upvote_count_config"
 )
 
 
@@ -53,7 +55,6 @@ func createFilterQuery(forumAddressHex string) ethereum.FilterQuery {
     Addresses: []common.Address{forumAddress},
     Topics: [][]common.Hash{{
       PostEventTopic,
-      UpdatePostEventTopic,
       UpvoteEventTopic,
     }},
   }
@@ -103,18 +104,6 @@ func matchEvent(topics []common.Hash, data []byte) (*Event, error) {
       event = *postEventResult.ToPostEvent()
       return &event, nil
 
-    case UpdatePostEventTopic:
-      var updatePostEventResult UpdatePostEventResult
-      updatePostEventAbi, _ := abi.JSON(strings.NewReader(UpdatePostEventABI))
-      err := updatePostEventAbi.Unpack(&updatePostEventResult, "UpdatePost", data)
-      if err != nil {
-        return nil, err
-      }
-      updatePostEventResult.Poster = common.BytesToAddress(topics[1].Bytes())
-      updatePostEventResult.PostHash = topics[2]
-      event = *updatePostEventResult.ToUpdatePostEvent()
-      return &event, nil
-
     case UpvoteEventTopic:
       var upvoteEventResult UpvoteEventResult
       upvoteEventAbi, _ := abi.JSON(strings.NewReader(UpvoteEventABI))
@@ -122,7 +111,7 @@ func matchEvent(topics []common.Hash, data []byte) (*Event, error) {
       if err != nil {
         return nil, err
       }
-      upvoteEventResult.Upvoter = common.BytesToAddress(topics[1].Bytes())
+      upvoteEventResult.Actor = common.BytesToAddress(topics[1].Bytes())
       upvoteEventResult.BoardId = topics[2]
       upvoteEventResult.PostHash = topics[3]
       event = *upvoteEventResult.ToUpvoteEvent()
@@ -134,25 +123,30 @@ func matchEvent(topics []common.Hash, data []byte) (*Event, error) {
 
 func processEvent(
   event *Event, getStreamClient *GetStreamClient, dynamodbClient *client_config.DynamodbFeedClient) {
-  postExecutor := post_config.PostExecutor{DynamodbFeedClient: *dynamodbClient}
   switch reflect.TypeOf(*event) {
     case reflect.TypeOf(PostEvent{}):
+       postExecutor := post_config.PostExecutor{DynamodbFeedClient: *dynamodbClient}
        postEvent := (*event).(PostEvent)
-       activity := ConvertPostEventToActivity(&postEvent)
+       activity := ConvertPostEventToActivity(&postEvent, feed_attributes.ON_CHAIN)
        getStreamClient.AddFeedActivityToGetStream(activity)
        postExecutor.UpsertPostItem(feed_item.CreatePostItem(activity))
     case reflect.TypeOf(UpvoteEvent{}):
+       evaluationExecutor := evaluation_config.EvaluationExecutor{DynamodbFeedClient: *dynamodbClient}
        upvoteEvent := (*event).(UpvoteEvent)
-       rewards := feed_attributes.CreateRewardFromBigInt(upvoteEvent.Value)
-       postExecutor.UpdateRewards(upvoteEvent.PostHash, rewards)
+       evaluationExecutor.AddEvaluationItem(ConvertUpvoteEventToEvaluationItem(&upvoteEvent))
+       upvoteCountExecutor :=  upvote_count_config.UpvoteCountExecutor{DynamodbFeedClient: *dynamodbClient}
+       upvoteCountExecutor.UpdateCount(upvoteEvent.PostHash, upvoteEvent.Actor)
   }
 }
 
-func ConvertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity {
+func ConvertPostEventToActivity(postEvent *PostEvent, source feed_attributes.Source) *feed_attributes.Activity {
   var verb feed_attributes.Verb
-  var extraParam map[string]interface{}
   var to []feed_attributes.FeedId
   var obj feed_attributes.Object
+  extraParam := map[string]interface{}{
+    "source": source,
+  }
+
   if postEvent.ParentHash == NullHashString {
     obj = feed_attributes.Object{
       ObjType:feed_attributes.PostObjectType,
@@ -171,15 +165,13 @@ func ConvertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity 
     }
   } else {
     obj = feed_attributes.Object{
-      ObjType:feed_attributes.CommentObjectType,
+      ObjType:feed_attributes.ReplyObjectType,
       ObjId: postEvent.PostHash,
     }
     verb = feed_attributes.ReplyVerb
-    extraParam = map[string]interface{} {
-      "post": feed_attributes.Object{
+    extraParam["post"] = feed_attributes.Object{
         ObjType: feed_attributes.PostObjectType,
         ObjId: postEvent.ParentHash,
-      },
     }
     to = []feed_attributes.FeedId {
       {
@@ -189,9 +181,19 @@ func ConvertPostEventToActivity(postEvent *PostEvent) *feed_attributes.Activity 
     }
   }
 
-  actor := feed_attributes.Actor(postEvent.Poster)
+  actor := feed_attributes.Actor(postEvent.Actor)
   timeStamp := postEvent.Timestamp
-  typeHash := postEvent.TypeHash
-  rewards := feed_attributes.Reward("0")
-  return feed_attributes.CreateNewActivity(actor, verb, obj, timeStamp, typeHash, rewards, to, extraParam)
+  feedType := postEvent.FeedType
+  return feed_attributes.CreateNewActivity(actor, verb, obj, timeStamp, feedType, to, extraParam)
+}
+
+func ConvertUpvoteEventToEvaluationItem(upvoteEvent *UpvoteEvent) *feed_item.EvaluationItem {
+    return &feed_item.EvaluationItem {
+      UUID: feed_item.CreateUUIDForEvaluationItem(upvoteEvent.PostHash, upvoteEvent.Actor),
+      PostHash: upvoteEvent.PostHash,
+      Evaluator: upvoteEvent.Actor,
+      BoardId: upvoteEvent.BoardId,
+      Timestamp: upvoteEvent.Timestamp,
+      Value: upvoteEvent.Value,
+    }
 }
