@@ -36,7 +36,9 @@ function updateTransactionStatus () {
         pendingTransactions.push(transactions[i])
       }
     }
-    dispatch(_updateTransactionStatus(pendingTransactions))
+    if (pendingTransactions.length !== 0) {
+      dispatch(_updateTransactionStatus(pendingTransactions))
+    }
   }
 }
 export { newTransaction, updateTransaction, updateTransactionStatus }

@@ -4,7 +4,7 @@ import { View, Text } from 'react-native'
 export default class SourceBadge extends Component {
   render () {
     let badgeColor
-    this.props.source === 'On-Chain' ? badgeColor = '#9400d3' : badgeColor = '#696969'
+    this.props.source === 'ON-CHAIN' ? badgeColor = '#9400d3' : badgeColor = '#696969'
     return (
       <View style={{
         flexDirection: 'column',

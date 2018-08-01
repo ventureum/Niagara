@@ -16,7 +16,7 @@ export default function reducer (state = initialState, action) {
 
   if (action.type === 'UPDATE_TRANSACTION_FULFILLED') {
     let targetIndex = -1
-    if (action.payload === undefined || action.payload.length === 0) {
+    if (action.payload.length === 0 || action.payload[0] === null) {
       return {
         ...state,
         loading: false
