@@ -2,112 +2,85 @@ package feed_attributes
 
 import (
   "math/big"
+  "strconv"
 )
 
-type Reputation string
 
-const PostReputationCost Reputation = "10"
-const ReplyReputationCost Reputation = "1"
-const AduitReputationCost Reputation = "100"
+type Reputation int64
 
 
-func InitReputationsFromFeedType(feedType FeedType) Reputation {
-  reputations := Reputation("0")
-  switch feedType {
-    case PostFeedType:
-      reputations = reputations.SubReputations(PostReputationCost)
-    case ReplyFeedType:
-      reputations = reputations.SubReputations(ReplyReputationCost)
-    case AuditFeedType:
-      reputations = reputations.SubReputations(AduitReputationCost)
+const REPUTATION_BASE = 100
+
+var PostReputationCost Reputation = 10 * REPUTATION_BASE
+var ReplyReputationCost Reputation = 1 * REPUTATION_BASE
+var AduitReputationCost Reputation = 100 * REPUTATION_BASE
+
+
+func PenaltyForPostType(postType PostType, counter int64) Reputation {
+  var reputations Reputation
+  switch postType {
+    case PostPostType:
+        reputations = PostReputationCost.MulByPower(big.NewInt(2), big.NewInt(counter))
+    case ReplyPostType:
+        reputations = ReplyReputationCost.MulByPower(big.NewInt(2), big.NewInt(counter))
+    case AuditPostType:
+        reputations = AduitReputationCost.MulByPower(big.NewInt(2), big.NewInt(counter))
   }
   return reputations
 }
 
-func PenaltyForFeedType(feedType FeedType, counter int64) Reputation {
-  var reputations Reputation
-  switch feedType {
-    case PostFeedType:
-        reputations = PostReputationCost.MulByPower(big.NewInt(2), big.NewInt(counter))
-    case ReplyFeedType:
-        reputations = ReplyReputationCost.MulByPower(big.NewInt(2), big.NewInt(counter))
-    case AuditFeedType:
-        reputations = AduitReputationCost.MulByPower(big.NewInt(2), big.NewInt(counter))
-  }
-  return reputations
+func CreateReputationFromStr(rep string) Reputation {
+  i, _ := strconv.ParseInt(rep, 10, 64)
+  return Reputation(i)
 }
 
 func PenaltyForUpvote(base Reputation, counter int64) Reputation {
   return base.MulByPower(big.NewInt(2), big.NewInt(counter))
 }
 
-func BigFloatToReputation(f *big.Float) Reputation {
-  return Reputation(f.Text('G', 38))
+func BigIntToReputation(num *big.Int) Reputation {
+  return Reputation(num.Int64())
 }
 
-func (reputation Reputation) Value() string{
-  return string(reputation)
+func (reputation Reputation) Value() int64 {
+  return int64(reputation)
 }
 
 func (reputation Reputation) ToBigInt() *big.Int {
-  num := new(big.Int)
-  num.SetString(string(reputation), 10)
-  return num
-}
-
-func (reputation Reputation) ToBigFloat() *big.Float {
-  f, _ := new(big.Float).SetString(reputation.Value())
-  return f
-}
-
-func CreateReputationFromBigInt(bigInt *big.Int) Reputation {
-  return CreateReputationFromString(bigInt.String())
-}
-
-func CreateReputationFromString(value string) Reputation {
-  f, _ := new(big.Float).SetString(value)
-  return BigFloatToReputation(f)
-}
-
-func (reputation Reputation) AddToBigInt(bigInt *big.Int) Reputation {
-  num := new(big.Float)
-  f, _ := new(big.Float).SetString(bigInt.String())
-  num.Add(reputation.ToBigFloat(), f)
-  return BigFloatToReputation(f)
+  return big.NewInt(reputation.Value())
 }
 
 func (reputation Reputation) AddToReputations(reputationToAdd Reputation) Reputation {
-  num := new(big.Float)
-  num.Add(reputation.ToBigFloat(), reputationToAdd.ToBigFloat())
-  return BigFloatToReputation(num)
+  num := new(big.Int)
+  num.Add(reputation.ToBigInt(), reputationToAdd.ToBigInt())
+  return BigIntToReputation(num)
 }
 
 func (reputation Reputation) SubReputations(reputationToSub Reputation) Reputation {
-  num := new(big.Float)
-  num.Sub(reputation.ToBigFloat(), reputationToSub.ToBigFloat())
-  return BigFloatToReputation(num)
+  num := new(big.Int)
+  num.Sub(reputation.ToBigInt(), reputationToSub.ToBigInt())
+  return BigIntToReputation(num)
 }
 
 func (reputation Reputation) MulByPower(base *big.Int, factor *big.Int) Reputation {
-  num := new(big.Float)
+  num := new(big.Int)
   numInt := new(big.Int).Exp(base, factor, nil )
-  numFloat, _ := new(big.Float).SetString(numInt.String())
-  num.Mul(reputation.ToBigFloat(), numFloat)
+  num.Mul(reputation.ToBigInt(), numInt)
 
-  return BigFloatToReputation(num)
+  return BigIntToReputation(num)
 }
 
 func (reputation Reputation) Sign() int {
-  num := reputation.ToBigFloat()
+  num := reputation.ToBigInt()
   return num.Sign()
 }
 
-func (reputation Reputation) Abs() string {
-  num := new(big.Float)
-  return num.Abs(reputation.ToBigFloat()).String()
+func (reputation Reputation) Abs() int64 {
+  num := new(big.Int)
+  return num.Abs(reputation.ToBigInt()).Int64()
 }
 
 func (reputation Reputation) Neg() Reputation {
-  num := new(big.Float)
-  return BigFloatToReputation(num.Neg(reputation.ToBigFloat()))
+  num := new(big.Int)
+  return BigIntToReputation(num.Neg(reputation.ToBigInt()))
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-  "math/big"
   "feed/dynamodb_config/client_config"
   "feed/dynamodb_config/reputation_record_config"
   "feed/feed_attributes"
@@ -11,7 +10,7 @@ import (
 
 type Request struct {
   UserAddress string `json:"userAddress,required"`
-  Reputations *big.Int `json:"reputations,required"`
+  Reputations int64 `json:"reputations,required"`
 }
 
 type Response struct {
@@ -26,7 +25,7 @@ func Handler(request Request) (Response, error) {
 
   dynamodbFeedClient := client_config.CreateDynamodbFeedClient()
   reputationRecordExecutor := reputation_record_config.ReputationRecordExecutor{DynamodbFeedClient: *dynamodbFeedClient}
-  reputations := feed_attributes.CreateReputationFromBigInt(request.Reputations)
+  reputations := feed_attributes.Reputation(request.Reputations)
   userAddress := request.UserAddress
 
   // Update Reputations

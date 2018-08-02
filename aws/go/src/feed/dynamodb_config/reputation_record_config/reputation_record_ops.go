@@ -71,9 +71,9 @@ func (reputationRecordExecutor *ReputationRecordExecutor) ReadReputations(userAd
   }
 
   if len(result.Item) == 0 {
-    return feed_attributes.Reputation("0")
+    return feed_attributes.Reputation(0)
   } else {
-    return feed_attributes.Reputation(*result.Item["reputations"].N)
+    return feed_attributes.CreateReputationFromStr(*result.Item["reputations"].N)
   }
 }
 
@@ -121,5 +121,5 @@ func (reputationRecordExecutor *ReputationRecordExecutor) UpdateReputations (
       reputations.Abs(), userAddress, updatedReputations)
   }
 
-  return feed_attributes.Reputation(updatedReputations)
+  return feed_attributes.CreateReputationFromStr(updatedReputations)
 }
