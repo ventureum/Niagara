@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { Fab, Icon } from 'native-base'
-import { FlatList, View } from 'react-native'
+import { FlatList, View, KeyboardAvoidingView } from 'react-native'
 import CommentCard from '../../components/CommentCard'
 import FeedCard from '../../components/FeedCard'
 import styles from './styles'
 import WalletUtils from '../../../utils/wallet'
+import MilestoneCard from '../../components/MilestoneCard'
 
 export default class PostDetail extends Component {
   constructor (props) {
@@ -16,7 +17,22 @@ export default class PostDetail extends Component {
 
   onRenderItem = ({ item }) => {
     if (item === this.props.post) {
-      return <FeedCard post={item} />
+      if (item.postType === 'MILESTONE') {
+        return (
+          <View>
+            <FeedCard post={item} />
+            <MilestoneCard
+              milestoneData={this.props.milestoneData}
+              processPutOption={this.props.processPutOption}
+              postHash={item.postHash}
+            />
+          </View >
+        )
+      } else {
+        return (
+          <FeedCard post={item} />
+        )
+      }
     }
     item = {
       ...item,
@@ -38,7 +54,7 @@ export default class PostDetail extends Component {
     content = content.concat(replies)
     return (
       <View style={styles.container}>
-        <View>
+        <KeyboardAvoidingView enabled>
           <FlatList
             data={content}
             renderItem={this.onRenderItem}
@@ -46,7 +62,7 @@ export default class PostDetail extends Component {
             onEndReachedThreshold={0.5}
             onEndReached={this.props.getMorePosts}
           />
-        </View>
+        </KeyboardAvoidingView >
         <Fab
           active
           containerStyle={{}}

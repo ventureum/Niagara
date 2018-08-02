@@ -32,13 +32,6 @@ function setTokens (publicToken, userToken, timelineToken) {
   }
 }
 
-function getReplies (postHash) {
-  return {
-    type: 'GET_REPLIES',
-    payload: forum.batchReadFeedsByBoardId('comment:' + postHash)
-  }
-}
-
 function switchBoard (boardName, boardHash) {
   return {
     type: 'SWITCH_BOARD',
@@ -86,4 +79,4 @@ function newPost (content, boardId, parentHash, postType, destination) {
   }
 }
 
-export { refreshPosts, setTokens, getMorePosts, getReplies, switchBoard, newPost }
+export { refreshPosts, setTokens, getMorePosts, switchBoard, newPost }

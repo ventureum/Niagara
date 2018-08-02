@@ -7,6 +7,13 @@ const stream = require('getstream')
 const client = stream.connect(Config.STREAM_API_KEY)
 const GAS_PRICE = '20000000000'
 const MINIMUM_BALANCE = 10000000000000000
+const GAS_LIMIT = '6500000'
+
+const typeMap = new Map()
+typeMap.set('0x6bf78b95', 'COMMENT')
+typeMap.set('0x2fca5a5e', 'POST')
+typeMap.set('0x04bc4e7a', 'AIRDROP')
+typeMap.set('0xf7003d25', 'MILESTONE')
 
 /*
   fetch the content of a single post from IPFS
@@ -122,7 +129,7 @@ function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
           actor: '0x' + onChainPostData[i + 3].substr(26, 40),
           rewards: (web3.utils.toBN(onChainPostData[i + 4]).div(base).toNumber()) / (10 ** 2),
           repliesLength: web3.utils.toDecimal(onChainPostData[i + 5]),
-          type: onChainPostData[i + 6]
+          postType: typeMap.get(onChainPostData[i + 6].slice(0, 10))
         })
       } else {
         break
@@ -157,7 +164,7 @@ function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
         actor: post.actor,
         rewards: (web3.utils.toBN(0).div(base).toNumber()) / (10 ** 2),
         repliesLength: web3.utils.toDecimal(0),
-        type: post.type,
+        postType: post.postType,
         content: post.content
       })
     }
@@ -295,4 +302,98 @@ function newOffChainPost (content, boardId, parentHash, postType, poster) {
   })
 }
 
-export { batchReadFeedsByBoardId, checkBalanceForTx, getPostTypeHash, newOnChainPost, newOffChainPost }
+function fetchUserMilstoneData (postHash, userAddress) {
+  return new Promise(async (resolve, reject) => {
+    const forum = await WalletUtils.getContractInstance('Forum')
+    let milstoneData = await forum.methods.getMilestoneData(postHash).call()
+    const userOptionBalance = await forum.methods.putOptionNumTokenForInvestor(postHash, userAddress).call()
+    const milestoneTokenAddress = milstoneData[0]
+    const milestoneAvailableToken = milstoneData[1]
+    const milestonePrices = milstoneData[2]
+    const milestoneEndTime = milstoneData[3]
+    const optionsPurchased = milstoneData[4]
+    const putOptionFeeRate = milstoneData[5]
+    const putOptionFeeRateGtOne = milstoneData[6]
+
+    milstoneData = {
+      milestoneTokenAddress,
+      milestoneAvailableToken,
+      milestonePrices,
+      milestoneEndTime,
+      optionsPurchased,
+      putOptionFeeRate,
+      putOptionFeeRateGtOne
+    }
+    const tokenInstance = WalletUtils.getERC20Instance(milestoneTokenAddress)
+    const tokenDecimals = await tokenInstance.methods.decimals().call()
+    const tokenSymbol = await tokenInstance.methods.symbol().call()
+
+    resolve({
+      milestoneAvailableToken,
+      milestonePrices,
+      milestoneEndTime,
+      putOptionFeeRate,
+      putOptionFeeRateGtOne,
+      userOptionBalance,
+      tokenSymbol,
+      tokenDecimals
+    })
+  })
+}
+
+function purchasePutOption (postHash, purchaser, numToken, numVtxFeeToken, newTransation) {
+  return new Promise(async (resolve, reject) => {
+    const vtxInstance = await WalletUtils.getContractInstance('Token')
+    const forum = await WalletUtils.getContractInstance('Forum')
+    await vtxInstance.methods.approve(forum.options.address, numVtxFeeToken).send({
+      gasPrice: GAS_PRICE,
+      gas: GAS_LIMIT
+    })
+    forum.methods.purchasePutOption(postHash, purchaser, numToken).send({
+      gasPrice: GAS_PRICE,
+      gas: GAS_LIMIT
+    })
+      .on('transactionHash', (txHash) => {
+        if (newTransation !== undefined) {
+          newTransation(txHash)
+        }
+      }).on('receipt', (receipt) => {
+        resolve(receipt)
+      }).on('error', (error) => {
+        reject(error)
+      })
+  })
+}
+
+function executePutOption (postHash, numToken, numVtxFeeToken, newTransation) {
+  return new Promise(async (resolve, reject) => {
+    const vtxInstance = await WalletUtils.getContractInstance('Token')
+    const forum = await WalletUtils.getContractInstance('Forum')
+
+    vtxInstance.methods.approve(forum.options.address, numVtxFeeToken).send({
+      gasPrice: GAS_PRICE,
+      gas: GAS_LIMIT
+    })
+    forum.methods.executePutOption(postHash, numToken).send()
+      .on('transactionHash', (txHash) => {
+        if (newTransation !== undefined) {
+          newTransation(txHash)
+        }
+      }).on('receipt', (receipt) => {
+        resolve(receipt)
+      }).on('error', (error) => {
+        reject(error)
+      })
+  })
+}
+
+export {
+  batchReadFeedsByBoardId,
+  checkBalanceForTx,
+  getPostTypeHash,
+  newOnChainPost,
+  newOffChainPost,
+  fetchUserMilstoneData,
+  purchasePutOption,
+  executePutOption
+}
