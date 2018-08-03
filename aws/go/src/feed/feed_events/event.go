@@ -8,7 +8,6 @@ import (
 
 type Event interface{}
 
-
 var NullHashString string = common.HexToHash("0x0").String()
 
 type PostEventResult struct {
@@ -22,12 +21,12 @@ type PostEventResult struct {
 }
 
 type PostEvent struct {
-  Actor string     // indexed
-  BoardId string    // indexed
+  Actor      string     // indexed
+  BoardId    string    // indexed
   ParentHash string
-  PostHash string   // indexed
-  FeedType feed_attributes.FeedType
-  Timestamp feed_attributes.BlockTimestamp
+  PostHash   string   // indexed
+  PostType   feed_attributes.PostType
+  Timestamp  feed_attributes.BlockTimestamp
 }
 
 type UpvoteEventResult struct {
@@ -48,12 +47,12 @@ type UpvoteEvent struct {
 
 func (postEventResult *PostEventResult) ToPostEvent() *PostEvent {
   return &PostEvent {
-    Actor: postEventResult.Poster.String(),
-    BoardId: postEventResult.BoardId.String(),
+    Actor:      postEventResult.Poster.String(),
+    BoardId:    postEventResult.BoardId.String(),
     ParentHash: postEventResult.ParentHash.String(),
-    PostHash: postEventResult.PostHash.String(),
-    FeedType: feed_attributes.CreateFeedTypeFromHashStr(common.Bytes2Hex(postEventResult.TypeHash[:])),
-    Timestamp: feed_attributes.CreateBlockTimestampFromBigInt(postEventResult.Timestamp),
+    PostHash:   postEventResult.PostHash.String(),
+    PostType:   feed_attributes.CreatePostTypeFromHashStr(common.Bytes2Hex(postEventResult.TypeHash[:])),
+    Timestamp:  feed_attributes.CreateBlockTimestampFromBigInt(postEventResult.Timestamp),
   }
 }
 

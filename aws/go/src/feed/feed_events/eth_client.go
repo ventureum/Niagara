@@ -183,8 +183,8 @@ func ConvertPostEventToActivity(postEvent *PostEvent, source feed_attributes.Sou
 
   actor := feed_attributes.Actor(postEvent.Actor)
   timeStamp := postEvent.Timestamp
-  feedType := postEvent.FeedType
-  return feed_attributes.CreateNewActivity(actor, verb, obj, timeStamp, feedType, to, extraParam)
+  postType := postEvent.PostType
+  return feed_attributes.CreateNewActivity(actor, verb, obj, timeStamp, postType, to, extraParam)
 }
 
 func ConvertUpvoteEventToEvaluationItem(upvoteEvent *UpvoteEvent) *feed_item.EvaluationItem {

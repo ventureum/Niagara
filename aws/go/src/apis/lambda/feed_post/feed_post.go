@@ -31,12 +31,12 @@ type Response struct {
 
 func (request *Request) ToPostEvent() (*feed_events.PostEvent) {
   return &feed_events.PostEvent{
-    Actor: request.Actor,
-    BoardId: request.BoardId,
+    Actor:      request.Actor,
+    BoardId:    request.BoardId,
     ParentHash: request.ParentHash,
-    PostHash: request.PostHash,
-    FeedType: feed_attributes.CreateFeedTypeFromHashStr(request.TypeHash),
-    Timestamp: feed_attributes.CreateBlockTimestampFromNow(),
+    PostHash:   request.PostHash,
+    PostType:   feed_attributes.CreatePostTypeFromHashStr(request.TypeHash),
+    Timestamp:  feed_attributes.CreateBlockTimestampFromNow(),
   }
 }
 
@@ -68,8 +68,8 @@ func Handler(request Request) (Response, error) {
   reputationRecordExecutor := reputation_record_config.ReputationRecordExecutor{DynamodbFeedClient: *dynamodbFeedClient}
 
   updateCount :=  postExecutor.ReadUpdateCount(postEvent.PostHash)
-  reputationsPenalty := feed_attributes.PenaltyForFeedType(
-    feed_attributes.FeedType(postEvent.FeedType), updateCount)
+  reputationsPenalty := feed_attributes.PenaltyForPostType(
+    feed_attributes.PostType(postEvent.PostType), updateCount)
 
   // Validate whether there are enough reputations to consume
   currentReputations := reputationRecordExecutor.ReadReputations(request.Actor)

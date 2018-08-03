@@ -22,7 +22,7 @@ type ResponseContent struct {
   BoardId string `json:"boardId,omitempty"`
   ParentHash string `json:"parentHash,omitempty"`
   PostHash string `json:"postHash,omitempty"`
-  Type string `json:"type,omitempty"`
+  PostType string `json:"postType,omitempty"`
   Content feed_attributes.Content `json:"content,omitempty"`
   Rewards *big.Int `json:"rewards,omitempty"`
   RepliesLength *big.Int `json:"repliesLength,omitempty"`
@@ -57,7 +57,7 @@ func PostItemToResponse(postItem *feed_item.PostItem) (*ResponseContent) {
     BoardId: boardId,
     ParentHash: parentHash,
     PostHash: postHash,
-    Type: string(activity.FeedType),
+    PostType: string(activity.PostType),
     Content: content,
   }
 }

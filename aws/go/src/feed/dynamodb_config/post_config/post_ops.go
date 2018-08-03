@@ -113,23 +113,23 @@ func (postExecutor *PostExecutor) ReadUpdateCount(objectId string) int64 {
   return (*item).(feed_item.PostItem).UpdateCount
 }
 
-func (postExecutor *PostExecutor) GetFeedType(objectId string) feed_attributes.FeedType {
+func (postExecutor *PostExecutor) GetPostType(objectId string) feed_attributes.PostType {
   input := &dynamodb.GetItemInput{
     Key: map[string]*dynamodb.AttributeValue{
       "objectId": {
         S: aws.String(objectId),
       },
     },
-    ProjectionExpression: aws.String("activity.feedType" ),
+    ProjectionExpression: aws.String("activity.postType" ),
     TableName: TableNameForPost,
   }
 
   result, err := postExecutor.C.GetItem(input);
 
   if err != nil {
-    log.Printf("Failed to get FeedType for objectId: %s\n", objectId)
+    log.Printf("Failed to get PostType for objectId: %s\n", objectId)
     log.Fatal(err.Error())
   }
   item := client_config.UnmarshalToFeedItem(result.Item, feed_item.PostItemType)
-  return (*item).(feed_item.PostItem).Activity.FeedType
+  return (*item).(feed_item.PostItem).Activity.PostType
 }
