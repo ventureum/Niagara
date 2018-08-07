@@ -58,4 +58,10 @@ function processPutOption (postHash, numToken, numVtxFeeToken, action) {
   }
 }
 
-export { getReplies, fetchUserMilstoneData, processPutOption }
+function clearPostDetail () {
+  return {
+    type: 'CLEAR_POST_DETAIL'
+  }
+}
+
+export { getReplies, fetchUserMilstoneData, processPutOption, clearPostDetail }

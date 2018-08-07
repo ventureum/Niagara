@@ -51,13 +51,6 @@ export default class Discover extends Component {
     this.props.getMorePosts(this.props.boardHash)
   }
 
-  backFromNewPost = async (title, text, image, subtitle, destination) => {
-    if (title !== null && text !== null) {
-      await this.onAddNewPost(title, text, image, subtitle, destination)
-    }
-    this.setState({ addNewPost: false })
-  }
-
   render () {
     return (
       <Container>

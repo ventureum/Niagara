@@ -53,7 +53,7 @@ export default class Reply extends Component {
                 this.props.navigation.goBack()
               }}
             />
-            <Text style={{ paddingLeft: 20, paddingTop: 3 }}> Reply to Post</Text>
+            <Text style={{ paddingLeft: 20 }}> Reply to Post</Text>
           </View>
           <TouchableOpacity
             style={styles.headerRight}

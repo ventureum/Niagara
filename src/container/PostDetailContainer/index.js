@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PostDetail from '../../stories/screens/PostDetail'
-import { getReplies, fetchUserMilstoneData, processPutOption } from './actions'
+import { getReplies, fetchUserMilstoneData, processPutOption, clearPostDetail } from './actions'
 
-class ReplyContainer extends Component {
+class PostDetailContainer extends Component {
   constructor (props) {
     super(props)
     this.state = ({
@@ -12,8 +12,9 @@ class ReplyContainer extends Component {
   }
 
   componentWillMount () {
+    this.props.clearPostDetail()
     this.props.getReplies(this.state.post.postHash)
-    if (this.state.post.postType) {
+    if (this.state.post.postType === 'MILESTONE') {
       this.props.fetchUserMilstoneData(this.state.post.postHash)
     }
   }
@@ -27,6 +28,7 @@ class ReplyContainer extends Component {
         errorMessage={this.props.errorMessage}
         milestoneData={this.props.milestoneData}
         processPutOption={this.props.processPutOption}
+        getReplies={this.props.getReplies}
       />
     )
   }
@@ -42,7 +44,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = (dispatch) => ({
   getReplies: (postHash) => dispatch(getReplies(postHash)),
   fetchUserMilstoneData: (postHash) => dispatch(fetchUserMilstoneData(postHash)),
-  processPutOption: (postHash, numToken, numVtxFeeToken, action) => dispatch(processPutOption(postHash, numToken, numVtxFeeToken, action))
+  processPutOption: (postHash, numToken, numVtxFeeToken, action) => dispatch(processPutOption(postHash, numToken, numVtxFeeToken, action)),
+  clearPostDetail: () => dispatch(clearPostDetail())
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(ReplyContainer)
+export default connect(mapStateToProps, mapDispatchToProps)(PostDetailContainer)

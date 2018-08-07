@@ -71,7 +71,7 @@ export default class FeedCard extends React.Component {
               >
                 {post.content.title}
               </Text>
-              {(post.content.image === undefined || post.content.image === '')
+              {(post.content.image === undefined)
                 ? <Markdown >{post.content.subtitle}</Markdown>
                 : <Markdown >{`![user image](${post.content.image})\n\n${post.content.subtitle}`}</Markdown>
               }

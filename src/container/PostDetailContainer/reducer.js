@@ -2,7 +2,8 @@ const initialState = {
   replies: [],
   loading: false,
   errorMessage: '',
-  milestoneData: {}
+  milestoneData: {},
+  milestoneDataLoading: false
 }
 
 export default function (state = initialState, action) {
@@ -32,7 +33,7 @@ export default function (state = initialState, action) {
   if (action.type === 'FETCH_USER_MILESTONE_DATA_FULFILLED') {
     return {
       ...state,
-      loading: false,
+      milestoneDataLoading: false,
       errorMessage: '',
       milestoneData: action.payload
     }
@@ -40,16 +41,19 @@ export default function (state = initialState, action) {
   if (action.type === 'FETCH_USER_MILESTONE_DATA_PENDING') {
     return {
       ...state,
-      loading: true,
+      milestoneDataLoading: true,
       errorMessage: ''
     }
   }
   if (action.type === 'FETCH_USER_MILESTONE_DATA_REJECTED') {
     return {
       ...state,
-      loading: false,
+      milestoneDataLoading: false,
       errorMessage: action.payload
     }
+  }
+  if (action.type === 'CLEAR_POST_DETAIL') {
+    return initialState
   }
 
   return state
