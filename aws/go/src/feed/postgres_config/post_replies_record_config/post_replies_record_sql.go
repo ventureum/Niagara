@@ -12,6 +12,8 @@ VALUES
   :post_hash, 
   :reply_hash
 )
+ON CONFLICT (post_hash, reply_hash) 
+DO NOTHING;
 `
 
 const DELETE_POST_REPLIES_RECORD_COMMAND = `

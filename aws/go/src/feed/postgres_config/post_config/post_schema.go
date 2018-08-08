@@ -14,6 +14,7 @@ CREATE TABLE posts (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (post_hash)
 );
+CREATE INDEX posts_index ON posts (post_hash, update_count);
 `
 
 const TABLE_NAME_FOR_POST = "posts"

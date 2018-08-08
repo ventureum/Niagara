@@ -37,6 +37,9 @@ func main() {
   postReply2 := postRepliesRecordExecutor.GetPostReplies(postRepliesRecord3.PostHash)
   log.Printf("postReply2: %+v\n", postReply2)
 
+  postReply3 := postRepliesRecordExecutor.GetPostReplies("0xpReplyHash004")
+  log.Printf("postReply2: %+v\n", postReply3)
+
   postReplyCount1 := postRepliesRecordExecutor.GetPostRepliesRecordCount(postRepliesRecord1.PostHash)
   log.Printf("Reply Count 1: %+v\n",  postReplyCount1)
 

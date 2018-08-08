@@ -10,6 +10,7 @@ import (
 
 type PostgresFeedClient struct {
   C *sqlx.DB
+  Tx *sqlx.Tx
 }
 
 func ConnectPostgresClient() *PostgresFeedClient {
@@ -27,11 +28,27 @@ func ConnectPostgresClient() *PostgresFeedClient {
   return &PostgresFeedClient{C: db}
 }
 
+func (postgresFeedClient *PostgresFeedClient) Begin() {
+  tx, err := postgresFeedClient.C.Beginx()
+  if err != nil {
+    log.Fatalf("Failed to Begin TX")
+
+  }
+  postgresFeedClient.Tx = tx
+}
+
+func (postgresFeedClient *PostgresFeedClient) Commit() {
+  err := postgresFeedClient.Tx.Commit()
+  if err != nil {
+    log.Fatalf("Failed to Commit")
+  }
+}
+
 func (postgresFeedClient *PostgresFeedClient) CreateTable(schema string, tableName string) {
   tx := postgresFeedClient.C.MustBegin()
   _ , err := tx.Exec(schema)
   if err != nil {
-    log.Fatalf("Failed to execute deleting Table %s:\n error: %s", tableName, err.Error())
+    log.Fatalf("Failed to execute creating Table %s:\n error: %s", tableName, err.Error())
   }
   tx.Commit()
   log.Printf("Table %s has been created\n", tableName)
@@ -61,5 +78,19 @@ func (postgresFeedClient *PostgresFeedClient) RegisterTimestampTrigger(tableName
   _, err := postgresFeedClient.C.Exec(command)
   if err != nil {
     log.Fatalf("Failed to register timestamp trigger for Table %s\n", tableName)
+  }
+}
+
+func (postgresFeedClient *PostgresFeedClient) LoadUuidExtension() {
+  _, err := postgresFeedClient.C.Exec(LOAD_UUID_EXTENSION)
+  if err != nil {
+    log.Fatalf("Failed to load uuid extension")
+  }
+}
+
+func (postgresFeedClient *PostgresFeedClient) LoadVoteTypeEnum() {
+  _, err := postgresFeedClient.C.Exec(LOAD_VOTE_TYPE_ENUM)
+  if err != nil {
+    log.Fatalf("Failed to load vote type enum")
   }
 }

@@ -8,6 +8,7 @@ CREATE TABLE post_replies_records (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (post_hash, reply_hash)
 );
+CREATE INDEX post_replies_records_index ON post_replies_records (post_hash, reply_hash);
 `
 
 const TABLE_NAME_FOR_POST_REPLIES_RECORD = "post_replies_records"

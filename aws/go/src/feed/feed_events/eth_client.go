@@ -18,6 +18,12 @@ import (
   "feed/dynamodb_config/post_config"
   "feed/dynamodb_config/evaluation_config"
   "feed/dynamodb_config/upvote_count_config"
+  client_config2 "feed/postgres_config/client_config"
+  post_config2 "feed/postgres_config/post_config"
+  "feed/postgres_config/actor_reputations_record_config"
+  "feed/postgres_config/post_replies_record_config"
+  "feed/postgres_config/post_votes_record_config"
+  "feed/postgres_config/post_reputations_record_config"
 )
 
 
@@ -85,6 +91,31 @@ func (client *EthClient) SubscribeFilterLogs(
   }
 }
 
+func (client *EthClient) SubscribeFilterLogsV2(
+    forumAddressHex string, getStreamClient *GetStreamClient, postgresFeedClient *client_config2.PostgresFeedClient) {
+  logs := make(chan types.Log)
+  filterQuery := createFilterQuery(forumAddressHex)
+  sub, err := client.c.SubscribeFilterLogs(context.Background(), filterQuery, logs)
+  if err != nil {
+    log.Fatal(err)
+  }
+  log.Println("Subscribed to FilterLogs")
+  for {
+    select {
+    case err := <-sub.Err():
+      log.Fatal(err)
+    case vLog := <-logs:
+      event, err := matchEvent(vLog.Topics, vLog.Data)
+      if err != nil {
+        log.Println(err)
+      }
+      log.Printf("Processing Event: %+v\n", *event)
+      processEventV2(event, getStreamClient, postgresFeedClient)
+    }
+  }
+}
+
+
 func matchEvent(topics []common.Hash, data []byte) (*Event, error) {
   if len(topics) == 0 {
     return nil, nil
@@ -136,6 +167,71 @@ func processEvent(
        evaluationExecutor.AddEvaluationItem(ConvertUpvoteEventToEvaluationItem(&upvoteEvent))
        upvoteCountExecutor :=  upvote_count_config.UpvoteCountExecutor{DynamodbFeedClient: *dynamodbClient}
        upvoteCountExecutor.UpdateCount(upvoteEvent.PostHash, upvoteEvent.Actor)
+  }
+}
+
+func processEventV2(
+    event *Event, getStreamClient *GetStreamClient, postgresFeedClient *client_config2.PostgresFeedClient) {
+  switch reflect.TypeOf(*event) {
+    case reflect.TypeOf(PostEvent{}):
+      postEvent := (*event).(PostEvent)
+      activity := ConvertPostEventToActivity(&postEvent, feed_attributes.ON_CHAIN)
+      postRecord := ConvertPostEventToPostRecord(&postEvent)
+      postgresFeedClient.Begin()
+      postExecutor := post_config2.PostExecutor{*postgresFeedClient}
+      postRepliesRecordExecutor := post_replies_record_config.PostRepliesRecordExecutor{*postgresFeedClient}
+
+      // Insert Post Record
+      updatedTimestamp := postExecutor.UpsertPostRecordTx(postRecord)
+
+      // Insert Activity to GetStream
+      activity.Time = feed_attributes.CreateBlockTimestampFromTime(updatedTimestamp)
+      getStreamClient.AddFeedActivityToGetStream(activity)
+
+      // Update Post Replies Record
+      if activity.Verb == feed_attributes.ReplyVerb {
+        postRepliesRecord := post_replies_record_config.PostRepliesRecord {
+          PostHash: postRecord.ParentHash,
+          ReplyHash: postRecord.PostHash,
+        }
+        postRepliesRecordExecutor.UpsertPostRepliesRecordTx(&postRepliesRecord)
+      }
+
+      postgresFeedClient.Commit()
+    case reflect.TypeOf(UpvoteEvent{}):
+      upvoteEvent := (*event).(UpvoteEvent)
+      actor := upvoteEvent.Actor
+      postHash := upvoteEvent.PostHash
+      var voteType feed_attributes.VoteType
+      if upvoteEvent.Value < 0 {
+        voteType = feed_attributes.DOWN_VOTE_TYPE
+      } else {
+        voteType = feed_attributes.UP_VOTE_TYPE
+      }
+
+      postgresFeedClient.Begin()
+      actorReputationsRecordExecutor := actor_reputations_record_config.ActorReputationsRecordExecutor{
+        *postgresFeedClient}
+      postReputationsRecordExecutor := post_reputations_record_config.PostReputationsRecordExecutor{*postgresFeedClient}
+      postVotesRecordExecutor := post_votes_record_config.PostVotesRecordExecutor{*postgresFeedClient}
+
+      // Record current vote
+      postVotesRecord :=  post_votes_record_config.PostVotesRecord {
+        Actor: actor,
+        PostHash: postHash,
+        VoteType: voteType,
+      }
+      postVotesRecordExecutor.UpsertPostVotesRecordTx(&postVotesRecord)
+
+      // Update Actor Reputation For the postHash
+      postReputationsRecord := post_reputations_record_config.PostReputationsRecord{
+        Actor: actor,
+        PostHash: postHash,
+        Reputations: actorReputationsRecordExecutor.GetActorReputationsTx(actor),
+        LatestVoteType: voteType,
+      }
+      postReputationsRecordExecutor.UpsertPostReputationsRecordTx(&postReputationsRecord)
+      postgresFeedClient.Commit()
   }
 }
 
@@ -196,4 +292,14 @@ func ConvertUpvoteEventToEvaluationItem(upvoteEvent *UpvoteEvent) *feed_item.Eva
       Timestamp: upvoteEvent.Timestamp,
       Value: upvoteEvent.Value,
     }
+}
+
+func ConvertPostEventToPostRecord(postEvent *PostEvent) (*post_config2.PostRecord) {
+  return &post_config2.PostRecord{
+    Actor:      postEvent.Actor,
+    BoardId:    postEvent.BoardId,
+    ParentHash: postEvent.ParentHash,
+    PostHash:   postEvent.PostHash,
+    PostType:   postEvent.PostType.Value(),
+  }
 }

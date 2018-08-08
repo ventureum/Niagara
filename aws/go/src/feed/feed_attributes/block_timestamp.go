@@ -15,3 +15,7 @@ func CreateBlockTimestampFromBigInt(bigInt *big.Int) BlockTimestamp {
 func CreateBlockTimestampFromNow() BlockTimestamp {
   return BlockTimestamp(time.Now().Unix())
 }
+
+func CreateBlockTimestampFromTime(timestamp time.Time) BlockTimestamp {
+  return BlockTimestamp(timestamp.Unix())
+}
