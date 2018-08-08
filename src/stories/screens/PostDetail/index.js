@@ -1,10 +1,18 @@
 import React, { Component } from 'react'
 import { Fab, Icon } from 'native-base'
-import { FlatList, View } from 'react-native'
+import {
+  FlatList,
+  View,
+  KeyboardAvoidingView,
+  Text,
+  ScrollView,
+  RefreshControl
+} from 'react-native'
 import CommentCard from '../../components/CommentCard'
 import FeedCard from '../../components/FeedCard'
 import styles from './styles'
 import WalletUtils from '../../../utils/wallet'
+import MilestoneCard from '../../components/MilestoneCard'
 
 export default class PostDetail extends Component {
   constructor (props) {
@@ -15,9 +23,6 @@ export default class PostDetail extends Component {
   }
 
   onRenderItem = ({ item }) => {
-    if (item === this.props.post) {
-      return <FeedCard post={item} />
-    }
     item = {
       ...item,
       actor: WalletUtils.getAddrAbbre(item.actor),
@@ -34,19 +39,55 @@ export default class PostDetail extends Component {
 
   render () {
     const { post, replies } = this.props
-    let content = [post]
-    content = content.concat(replies)
     return (
       <View style={styles.container}>
-        <View>
-          <FlatList
-            data={content}
-            renderItem={this.onRenderItem}
-            keyExtractor={item => item.id}
-            onEndReachedThreshold={0.5}
-            onEndReached={this.props.getMorePosts}
-          />
-        </View>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={this.props.loading}
+              onRefresh={() => {
+                this.props.getReplies(post.postHash)
+              }}
+            />}
+        >
+          <View style={styles.header} >
+            <View style={styles.headerLeft} >
+              <Icon
+                active
+                name='arrow-back'
+                onPress={() => {
+                  this.props.navigation.goBack()
+                }}
+              />
+              <Text style={{
+                fontWeight: '500',
+                fontSize: 18,
+                color: '#0f0f0f',
+                paddingLeft: 16
+              }}> Post </Text>
+            </View>
+          </View>
+          {post.postType === 'MILESTONE'
+            ? <View>
+              <FeedCard post={post} />
+              <MilestoneCard
+                milestoneData={this.props.milestoneData}
+                processPutOption={this.props.processPutOption}
+                postHash={post.postHash}
+              />
+            </View >
+            : <FeedCard post={post} />
+          }
+          <KeyboardAvoidingView enabled>
+            <FlatList
+              data={replies}
+              renderItem={this.onRenderItem}
+              keyExtractor={item => item.id}
+              onEndReachedThreshold={0.5}
+              onEndReached={this.props.getMorePosts}
+            />
+          </KeyboardAvoidingView >
+        </ScrollView>
         <Fab
           active
           containerStyle={{}}
@@ -55,6 +96,7 @@ export default class PostDetail extends Component {
           onPress={() => { this.toReply(post) }}>
           <Icon name='ios-list-box-outline' />
         </Fab>
+
       </View >
     )
   }

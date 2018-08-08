@@ -19,7 +19,7 @@ const persistConfig = {
   key: 'vthwallet',
   version: 1,
   storage,
-  blacklist: ['discoverReducer']
+  blacklist: ['discoverReducer', 'sendPageReducer', 'postDetailReducer']
 }
 
 var store = null

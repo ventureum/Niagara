@@ -17,10 +17,12 @@ const styles = StyleSheet.create({
     borderColor: '#cecece'
   },
   headerLeft: {
-    flexDirection: 'row'
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   headerRight: {
-    flexDirection: 'row'
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   postTitle: {
     flexDirection: 'row',

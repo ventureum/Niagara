@@ -23,7 +23,6 @@ function processContent (title, text) {
   let returnObject = {
     title,
     text,
-    image: '',
     subtitle: ''
   }
   let subtitle = ''

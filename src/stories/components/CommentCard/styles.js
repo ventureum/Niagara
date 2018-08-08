@@ -23,12 +23,16 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     paddingLeft: 15
   },
-  authorContainer: {
+  headerLeft: {
     flex: 1,
     flexDirection: 'column',
     alignItems: 'stretch',
     justifyContent: 'flex-start',
     flexWrap: 'wrap'
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   },
   commentContainer: {
     flex: 1,

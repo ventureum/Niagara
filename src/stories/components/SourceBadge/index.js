@@ -12,11 +12,11 @@ export default class SourceBadge extends Component {
         justifyContent: 'center',
         backgroundColor: badgeColor,
         borderRadius: 5,
-        height: '65%',
+        height: '60%',
         paddingLeft: 5,
         paddingRight: 5
       }}>
-        <Text style={{ color: 'white', fontSize: 13 }}>{this.props.source}</Text>
+        <Text style={{ color: 'white', fontSize: 12 }}>{this.props.source}</Text>
       </View>
     )
   }

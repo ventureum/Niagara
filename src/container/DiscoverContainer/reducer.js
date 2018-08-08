@@ -70,29 +70,6 @@ export default function (state: any = initialState, action: Function) {
     )
   }
 
-  if (action.type === 'GET_REPLIES_PENDING') {
-    return {
-      ...state,
-      loading: true,
-      errorMessage: ''
-    }
-  }
-  if (action.type === 'GET_REPLIES_FULFILLED') {
-    return {
-      ...state,
-      loading: false,
-      replies: action.payload,
-      errorMessage: ''
-    }
-  }
-  if (action.type === 'GET_REPLIES_REJECTED') {
-    return {
-      ...state,
-      loading: false,
-      errorMessage: action.payload
-    }
-  }
-
   if (action.type === 'SWITCH_BOARD') {
     return {
       ...state,
