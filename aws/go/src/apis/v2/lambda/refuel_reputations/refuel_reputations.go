@@ -19,10 +19,12 @@ type Response struct {
   Message string `json:"message,omitempty"`
 }
 
-func Handler(request Request) (Response, error) {
-  response := Response {
-    Ok: false,
-  }
+func ProcessRequest(request Request, response *Response) {
+  defer func() {
+    if errStr := recover(); errStr != nil { //catch
+      response.Message = errStr.(string)
+    }
+  }()
 
   reputations := feed_attributes.Reputation(request.Reputations)
   actor := request.UserAddress
@@ -33,6 +35,8 @@ func Handler(request Request) (Response, error) {
   }
 
   postgresFeedClient := client_config.ConnectPostgresClient()
+  defer postgresFeedClient.Close()
+
   postgresFeedClient.Begin()
   reputationsRefuelRecordExecutor := reputations_refuel_record_config.ReputationsRefuelRecordExecutor{
     *postgresFeedClient}
@@ -50,11 +54,16 @@ func Handler(request Request) (Response, error) {
   log.Printf("Refueled %d to actor %s", reputations, actor)
 
   response.Ok = true
+}
+
+func Handler(request Request) (response Response, err error) {
+  response.Ok = false
+  ProcessRequest(request, &response)
   return response, nil
 }
 
 func main() {
-  // TODO(david.shao): remove example when deployed to production
+  //TODO(david.shao): remove example when deployed to production
   //request := Request{
   // UserAddress: "0x003",
   // Reputations: 400000,

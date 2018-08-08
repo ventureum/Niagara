@@ -25,7 +25,7 @@ func (postRewardsRecordExecutor *PostRewardsRecordExecutor) DeletePostRewardsRec
 func (postRewardsRecordExecutor *PostRewardsRecordExecutor) UpsertPostRewardsRecord(postRewardsRecord *PostRewardsRecord) {
   _, err := postRewardsRecordExecutor.C.NamedExec(UPSERT_POST_REWARDS_RECORD_COMMAND, postRewardsRecord)
   if err != nil {
-    log.Fatalf("Failed to upsert post rewards record: %+v with error:\n %+v", postRewardsRecord, err.Error())
+    log.Panicf("Failed to upsert post rewards record: %+v with error:\n %+v", postRewardsRecord, err.Error())
   }
   log.Printf("Sucessfully upserted post rewards record for postHash %s\n", postRewardsRecord.PostHash)
 }
@@ -33,7 +33,7 @@ func (postRewardsRecordExecutor *PostRewardsRecordExecutor) UpsertPostRewardsRec
 func (postRewardsRecordExecutor *PostRewardsRecordExecutor) DeletePostRewardsRecords(postHash string) {
   _, err := postRewardsRecordExecutor.C.Exec(DELETE_POST_REWARDS_RECORD_COMMAND, postHash)
   if err != nil {
-    log.Fatalf("Failed to delete post rewards records for postHash %s with error:\n %+v", postHash, err.Error())
+    log.Panicf("Failed to delete post rewards records for postHash %s with error:\n %+v", postHash, err.Error())
   }
   log.Printf("Sucessfully deleted post rewards records for postHash %s\n", postHash)
 }
@@ -42,7 +42,7 @@ func (postRewardsRecordExecutor *PostRewardsRecordExecutor) GetPostRewards(postH
   var postRewards sql.NullInt64
   err := postRewardsRecordExecutor.C.Get(&postRewards , QUERY_POST_REWARDS_COMMAND, postHash)
   if err != nil {
-    log.Fatalf("Failed to get post rewards for postHash %s with error:\n %+v", postHash, err.Error())
+    log.Panicf("Failed to get post rewards for postHash %s with error:\n %+v", postHash, err.Error())
   }
   return feed_attributes.Reputation(postRewards.Int64)
 }
@@ -52,7 +52,7 @@ func (postRewardsRecordExecutor *PostRewardsRecordExecutor) AddPostRewards(
   _, err := postRewardsRecordExecutor.C.Exec(ADD_POST_REWARDS_COMMAND, postHash, reputationToAdd)
 
   if err != nil {
-    log.Fatalf("Failed to add post rewards for postHash %s with error:\n %+v", postHash, err.Error())
+    log.Panicf("Failed to add post rewards for postHash %s with error:\n %+v", postHash, err.Error())
   }
 
   log.Printf("Successfully added post rewards %d for postHash %s", reputationToAdd, postHash)
@@ -64,7 +64,7 @@ func (postRewardsRecordExecutor *PostRewardsRecordExecutor) SubPostRewards(
   _, err := postRewardsRecordExecutor.C.Exec(SUB_POST_REWARDS_COMMAND, postHash, reputationToSub)
 
   if err != nil {
-    log.Fatalf("Failed to add post rewards for postHash %s with error:\n %+v", postHash, err.Error())
+    log.Panicf("Failed to add post rewards for postHash %s with error:\n %+v", postHash, err.Error())
   }
 
   log.Printf("Successfully substracted post rewards %d from postHash %s", reputationToSub, postHash)
@@ -76,7 +76,7 @@ func (postRewardsRecordExecutor *PostRewardsRecordExecutor) SubPostRewards(
 func (postRewardsRecordExecutor *PostRewardsRecordExecutor) UpsertPostRewardsRecordTx(postRewardsRecord *PostRewardsRecord) {
   _, err := postRewardsRecordExecutor.Tx.NamedExec(UPSERT_POST_REWARDS_RECORD_COMMAND, postRewardsRecord)
   if err != nil {
-    log.Fatalf("Failed to upsert post rewards record: %+v with error:\n %+v", postRewardsRecord, err.Error())
+    log.Panicf("Failed to upsert post rewards record: %+v with error:\n %+v", postRewardsRecord, err.Error())
   }
   log.Printf("Sucessfully upserted post rewards record for postHash %s\n", postRewardsRecord.PostHash)
 }
@@ -84,7 +84,7 @@ func (postRewardsRecordExecutor *PostRewardsRecordExecutor) UpsertPostRewardsRec
 func (postRewardsRecordExecutor *PostRewardsRecordExecutor) DeletePostRewardsRecordsTx(postHash string) {
   _, err := postRewardsRecordExecutor.Tx.Exec(DELETE_POST_REWARDS_RECORD_COMMAND, postHash)
   if err != nil {
-    log.Fatalf("Failed to delete post rewards records for postHash %s with error:\n %+v", postHash, err.Error())
+    log.Panicf("Failed to delete post rewards records for postHash %s with error:\n %+v", postHash, err.Error())
   }
   log.Printf("Sucessfully deleted post rewards records for postHash %s\n", postHash)
 }
@@ -93,7 +93,7 @@ func (postRewardsRecordExecutor *PostRewardsRecordExecutor) GetPostRewardsTx(pos
   var postRewards sql.NullInt64
   err := postRewardsRecordExecutor.Tx.Get(&postRewards , QUERY_POST_REWARDS_COMMAND, postHash)
   if err != nil && err != sql.ErrNoRows {
-    log.Fatalf("Failed to get post rewards for postHash %s with error:\n %+v", postHash, err.Error())
+    log.Panicf("Failed to get post rewards for postHash %s with error:\n %+v", postHash, err.Error())
   }
   return feed_attributes.Reputation(postRewards.Int64)
 }
@@ -103,7 +103,7 @@ func (postRewardsRecordExecutor *PostRewardsRecordExecutor) AddPostRewardsTx(
   _, err := postRewardsRecordExecutor.Tx.Exec(ADD_POST_REWARDS_COMMAND, postHash, reputationToAdd)
 
   if err != nil {
-    log.Fatalf("Failed to add post rewards for postHash %s with error:\n %+v", postHash, err.Error())
+    log.Panicf("Failed to add post rewards for postHash %s with error:\n %+v", postHash, err.Error())
   }
 
   log.Printf("Successfully added post rewards %d for postHash %s", reputationToAdd, postHash)
@@ -115,7 +115,7 @@ func (postRewardsRecordExecutor *PostRewardsRecordExecutor) SubPostRewardsTx(
   _, err := postRewardsRecordExecutor.Tx.Exec(SUB_POST_REWARDS_COMMAND, postHash, reputationToSub)
 
   if err != nil {
-    log.Fatalf("Failed to add post rewards for postHash %s with error:\n %+v", postHash, err.Error())
+    log.Panicf("Failed to add post rewards for postHash %s with error:\n %+v", postHash, err.Error())
   }
 
   log.Printf("Successfully substracted post rewards %d from postHash %s", reputationToSub, postHash)

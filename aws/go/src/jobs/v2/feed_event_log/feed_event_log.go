@@ -26,5 +26,5 @@ func main() {
   postgresClient := client_config.ConnectPostgresClient()
 
   log.Printf("Subscribing to logs at Forum Address: %s\n", forumAddress)
-  ethClient.SubscribeFilterLogsV2(forumAddress, getStreamClient, postgresClient)
+  ethClient.SubscribeFilterLogs(forumAddress, getStreamClient, postgresClient)
 }

@@ -28,7 +28,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) UpsertPostRe
    _, err := postReputationsRecordExecutor.C.NamedExec(UPSERT_POST_REPUTATIONS_RECORD_COMMAND, postReputationsRecord)
 
   if err != nil {
-    log.Fatalf("Failed to upsert post reputations record: %+v with error:\n %+v", postReputationsRecord, err.Error())
+    log.Panicf("Failed to upsert post reputations record: %+v with error:\n %+v", postReputationsRecord, err.Error())
   }
   log.Printf("Sucessfully upserted post reputations record for post_hash %s and actor %s with reputaions %d\n",
     postReputationsRecord.PostHash, postReputationsRecord.Actor, postReputationsRecord.Reputations)
@@ -37,7 +37,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) UpsertPostRe
 func (postReputationsRecordExecutor *PostReputationsRecordExecutor) DeletePostReputationsRecordsByPostHash(postHash string) {
   _, err := postReputationsRecordExecutor.C.Exec(DELETE_POST_REPUTATIONS_RECORDS_BY_POST_HASH_COMMAND, postHash)
   if err != nil {
-    log.Fatalf("Failed to delete post reputations records for postHash %s with error:\n %+v", postHash, err.Error())
+    log.Panicf("Failed to delete post reputations records for postHash %s with error:\n %+v", postHash, err.Error())
   }
   log.Printf("Sucessfully deleted post reputations records for postHash %s\n", postHash)
 }
@@ -45,7 +45,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) DeletePostRe
 func (postReputationsRecordExecutor *PostReputationsRecordExecutor) DeletePostReputationsRecordsByActor(actor string) {
   _, err := postReputationsRecordExecutor.C.Exec(DELETE_POST_REPUTATIONS_RECORDS_BY_ACTOR_COMMAND, actor)
   if err != nil {
-    log.Fatalf("Failed to delete post reputations records for actor %s with error:\n %+v", actor, err.Error())
+    log.Panicf("Failed to delete post reputations records for actor %s with error:\n %+v", actor, err.Error())
   }
   log.Printf("Sucessfully deleted post reputations records for actor %s\n", actor)
 }
@@ -55,7 +55,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) DeletePostRe
   _, err := postReputationsRecordExecutor.C.Exec(DELETE_POST_REPUTATIONS_RECORDS_BY_POST_HASH_AND_ACTOR_COMMAND,
     postHash, actor)
   if err != nil {
-    log.Fatalf("Failed to delete post reputations records for postHash %s and actor %s with error:\n %+v",
+    log.Panicf("Failed to delete post reputations records for postHash %s and actor %s with error:\n %+v",
       postHash, actor, err.Error())
   }
   log.Printf("Sucessfully deleted post reputations records for postHash %s and actor %s\n", postHash, actor)
@@ -66,7 +66,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) GetTotalRepu
   var totalReputations sql.NullInt64
   err := postReputationsRecordExecutor.C.Get(&totalReputations, QUERY_TOTAL_REPUTATIONS_BY_POST_HASH_COMMAND, postHash)
   if err != nil && err != sql.ErrNoRows {
-    log.Fatalf(
+    log.Panicf(
       "Failed to get total reputations for postHash %s with error:\n %+v", postHash, err.Error())
   }
   return feed_attributes.Reputation(totalReputations.Int64)
@@ -78,7 +78,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) GetReputatio
   err := postReputationsRecordExecutor.C.Get(&reputations, QUERY_REPUTATIONS_BY_POST_HASH_AND_ACTOR_COMMAND,
     postHash, actor)
   if err != nil && err != sql.ErrNoRows {
-    log.Fatalf(
+    log.Panicf(
       "Failed to get reputations for postHash %s and actor %s with error:\n %+v",
       postHash, actor, err.Error())
   }
@@ -91,7 +91,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) GetReputatio
   err := postReputationsRecordExecutor.C.Get(&reputations, QUERY_REPUTATIONS_BY_POST_HASH_AND_VOTE_TYPE_COMMAND,
     postHash, voteType)
   if err != nil && err != sql.ErrNoRows {
-    log.Fatalf(
+    log.Panicf(
       "Failed to get total reputations for postHash %s and voteType %s with error:\n %+v",
       postHash, voteType, err.Error())
   }
@@ -104,7 +104,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) GetReputatio
   err := postReputationsRecordExecutor.Tx.Get(&reputations, QUERY_REPUTATIONS_BY_POST_HASH_AND_ACTOR_WITH_LATEST_VOTE_TYPE_AND_TIME_CUTOFF_COMMAND,
     postHash, actor, voteType, time)
   if err != nil && err != sql.ErrNoRows {
-    log.Fatalf(
+    log.Panicf(
       "Failed to get reputations for postHash %s, actor %s, lastestVoteType %s and cutOffTime %s with error:\n %+v",
       postHash, actor, voteType, time, err.Error())
   }
@@ -116,7 +116,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) GetTotalVote
   var postVotes sql.NullInt64
   err := postReputationsRecordExecutor.C.Get(&postVotes, QUERY_TOTAL_VOTES_COUNT_BY_POST_HASH_AND_ACTOR_COMMAND, postHash, actor)
   if err != nil && err != sql.ErrNoRows {
-    log.Fatalf(
+    log.Panicf(
       "Failed to get total votes count for postHash %s and actor %s with error:\n %+v",
       postHash, actor, err)
   }
@@ -128,7 +128,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) GetActorList
   var actorList []string
   err := postReputationsRecordExecutor.C.Select(&actorList, QUERY_ACTOR_LIST_BY_POST_HASH_AND_VOTE_TYPE_COMMAND, postHash, voteType)
   if err != nil && err != sql.ErrNoRows {
-    log.Fatalf(
+    log.Panicf(
       "Failed to get actor list for postHash %s and voteType %s with error:\n %+v", postHash,  voteType, err)
   }
   return &actorList
@@ -143,7 +143,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) UpsertPostRe
   _, err := postReputationsRecordExecutor.Tx.NamedExec(UPSERT_POST_REPUTATIONS_RECORD_COMMAND, postReputationsRecord)
 
   if err != nil {
-    log.Fatalf("Failed to upsert post reputations record: %+v with error:\n %+v", postReputationsRecord, err.Error())
+    log.Panicf("Failed to upsert post reputations record: %+v with error:\n %+v", postReputationsRecord, err.Error())
   }
   log.Printf("Sucessfully upserted post reputations record for post_hash %s and actor %s with reputaions %d\n",
     postReputationsRecord.PostHash, postReputationsRecord.Actor, postReputationsRecord.Reputations)
@@ -152,7 +152,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) UpsertPostRe
 func (postReputationsRecordExecutor *PostReputationsRecordExecutor) DeletePostReputationsRecordsByPostHashTx(postHash string) {
   _, err := postReputationsRecordExecutor.Tx.Exec(DELETE_POST_REPUTATIONS_RECORDS_BY_POST_HASH_COMMAND, postHash)
   if err != nil {
-    log.Fatalf("Failed to delete post reputations records for postHash %s with error:\n %+v", postHash, err.Error())
+    log.Panicf("Failed to delete post reputations records for postHash %s with error:\n %+v", postHash, err.Error())
   }
   log.Printf("Sucessfully deleted post reputations records for postHash %s\n", postHash)
 }
@@ -160,7 +160,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) DeletePostRe
 func (postReputationsRecordExecutor *PostReputationsRecordExecutor) DeletePostReputationsRecordsByActorTx(actor string) {
   _, err := postReputationsRecordExecutor.Tx.Exec(DELETE_POST_REPUTATIONS_RECORDS_BY_ACTOR_COMMAND, actor)
   if err != nil {
-    log.Fatalf("Failed to delete post reputations records for actor %s with error:\n %+v", actor, err.Error())
+    log.Panicf("Failed to delete post reputations records for actor %s with error:\n %+v", actor, err.Error())
   }
   log.Printf("Sucessfully deleted post reputations records for actor %s\n", actor)
 }
@@ -170,7 +170,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) DeletePostRe
   _, err := postReputationsRecordExecutor.Tx.Exec(DELETE_POST_REPUTATIONS_RECORDS_BY_POST_HASH_AND_ACTOR_COMMAND,
     postHash, actor)
   if err != nil {
-    log.Fatalf("Failed to delete post reputations records for postHash %s and actor %s with error:\n %+v",
+    log.Panicf("Failed to delete post reputations records for postHash %s and actor %s with error:\n %+v",
       postHash, actor, err.Error())
   }
   log.Printf("Sucessfully deleted post reputations records for postHash %s and actor %s\n", postHash, actor)
@@ -181,7 +181,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) GetTotalRepu
   var totalReputations sql.NullInt64
   err := postReputationsRecordExecutor.Tx.Get(&totalReputations, QUERY_TOTAL_REPUTATIONS_BY_POST_HASH_COMMAND, postHash)
   if err != nil && err != sql.ErrNoRows {
-    log.Fatalf(
+    log.Panicf(
       "Failed to get total reputations for postHash %s with error:\n %+v", postHash, err.Error())
   }
   return feed_attributes.Reputation(totalReputations.Int64)
@@ -193,7 +193,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) GetReputatio
   err := postReputationsRecordExecutor.Tx.Get(&reputations, QUERY_REPUTATIONS_BY_POST_HASH_AND_ACTOR_COMMAND,
     postHash, actor)
   if err != nil && err != sql.ErrNoRows {
-    log.Fatalf(
+    log.Panicf(
       "Failed to get reputations for postHash %s and actor %s with error:\n %+v",
       postHash, actor, err.Error())
   }
@@ -206,7 +206,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) GetReputatio
   err := postReputationsRecordExecutor.Tx.Get(&reputations, QUERY_REPUTATIONS_BY_POST_HASH_AND_VOTE_TYPE_COMMAND,
     postHash, voteType)
   if err != nil && err != sql.ErrNoRows {
-    log.Fatalf(
+    log.Panicf(
       "Failed to get total reputations for postHash %s and voteType %s with error:\n %+v",
       postHash, voteType, err.Error())
   }
@@ -219,7 +219,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) GetReputatio
   err := postReputationsRecordExecutor.Tx.Get(&reputations, QUERY_REPUTATIONS_BY_POST_HASH_AND_ACTOR_WITH_LATEST_VOTE_TYPE_AND_TIME_CUTOFF_COMMAND,
     postHash, actor, voteType, time)
   if err != nil && err != sql.ErrNoRows {
-    log.Fatalf(
+    log.Panicf(
       "Failed to get reputations for postHash %s, actor %s, lastestVoteType %s and cutOffTime %s with error:\n %+v",
       postHash, actor, voteType, time, err.Error())
   }
@@ -231,7 +231,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) GetTotalVote
   var postVotes sql.NullInt64
   err := postReputationsRecordExecutor.Tx.Get(&postVotes, QUERY_TOTAL_VOTES_COUNT_BY_POST_HASH_AND_ACTOR_COMMAND, postHash, actor)
   if err != nil && err != sql.ErrNoRows {
-    log.Fatalf(
+    log.Panicf(
       "Failed to get total votes count for postHash %s and actor %s with error:\n %+v",
        postHash, actor, err)
   }
@@ -243,7 +243,7 @@ func (postReputationsRecordExecutor *PostReputationsRecordExecutor) GetActorList
   var actorList []string
   err := postReputationsRecordExecutor.Tx.Select(&actorList, QUERY_ACTOR_LIST_BY_POST_HASH_AND_VOTE_TYPE_COMMAND, postHash, voteType)
   if err != nil && err != sql.ErrNoRows {
-    log.Fatalf(
+    log.Panicf(
       "Failed to get actor list for postHash %s and voteType %s with error:\n %+v", postHash,  voteType, err)
   }
   return &actorList

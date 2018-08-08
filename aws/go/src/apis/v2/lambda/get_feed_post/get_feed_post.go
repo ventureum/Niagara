@@ -2,11 +2,11 @@ package main
 
 import (
   "feed/feed_attributes"
-  "feed/postgres_config/client_config"
   "feed/postgres_config/post_config"
-  "feed/postgres_config/post_replies_record_config"
-  "feed/postgres_config/post_rewards_record_config"
   "github.com/aws/aws-lambda-go/lambda"
+  "feed/postgres_config/client_config"
+  "feed/postgres_config/post_rewards_record_config"
+  "feed/postgres_config/post_replies_record_config"
 )
 
 
@@ -15,14 +15,14 @@ type Request struct {
 }
 
 type ResponseContent struct {
-  Actor string `json:"actor,omitempty"`
-  BoardId string `json:"boardId,omitempty"`
-  ParentHash string `json:"parentHash,omitempty"`
-  PostHash string `json:"postHash,omitempty"`
-  PostType string `json:"postType,omitempty"`
-  Content feed_attributes.Content `json:"content,omitempty"`
-  Rewards int64 `json:"rewards,omitempty"`
-  RepliesLength int64 `json:"repliesLength,omitempty"`
+  Actor string `json:"actor"`
+  BoardId string `json:"boardId"`
+  ParentHash string `json:"parentHash"`
+  PostHash string `json:"postHash"`
+  PostType string `json:"postType"`
+  Content feed_attributes.Content `json:"content"`
+  Rewards int64 `json:"rewards"`
+  RepliesLength int64 `json:"repliesLength"`
 }
 
 type Response struct {
@@ -34,20 +34,24 @@ type Response struct {
 func PostRecordResultToResponseContent(result *post_config.PostRecordResult) *ResponseContent {
   return &ResponseContent{
     Actor: result.Actor,
-    BoardId: result.Actor,
+    BoardId: result.BoardId,
     ParentHash: result.ParentHash,
+    PostHash: result.PostHash,
     PostType: result.PostType,
     Content: *result.Content,
   }
 }
 
-func Handler(request Request) (Response, error) {
-  response := Response {
-    Ok: false,
-  }
+func ProcessRequest(request Request, response *Response) {
+  defer func() {
+    if errStr := recover(); errStr != nil { //catch
+      response.Message = errStr.(string)
+    }
+  }()
 
   postHash := request.PostHash
   postgresFeedClient := client_config.ConnectPostgresClient()
+  defer postgresFeedClient.Close()
   postgresFeedClient.Begin()
 
   postExecutor := post_config.PostExecutor{*postgresFeedClient}
@@ -61,15 +65,20 @@ func Handler(request Request) (Response, error) {
   response.Post.Rewards = postRewardsRecordExecutor.GetPostRewardsTx(postHash).Value()
 
   postgresFeedClient.Commit()
-
   response.Ok = true
+}
+
+func Handler(request Request) (response Response, err error) {
+  response.Ok = false
+  ProcessRequest(request, &response)
   return response, nil
 }
+
 
 func main() {
   // TODO(david.shao): remove example when deployed to production
   //request := Request{
-  //  PostHash: "0x007",
+  // PostHash: "0x009",
   //}
   //response, _ := Handler(request)
   //fmt.Printf("%+v", response)

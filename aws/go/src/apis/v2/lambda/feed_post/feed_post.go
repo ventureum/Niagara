@@ -1,13 +1,12 @@
 package main
 
 import (
-  "gopkg.in/GetStream/stream-go2.v1"
   "feed/feed_attributes"
   "feed/feed_events"
-  "feed/postgres_config/client_config"
   "feed/postgres_config/post_config"
-  "feed/postgres_config/actor_reputations_record_config"
-  "feed/postgres_config/post_replies_record_config"
+  "log"
+  "gopkg.in/GetStream/stream-go2.v1"
+  "feed/postgres_config/client_config"
   "github.com/aws/aws-lambda-go/lambda"
 )
 
@@ -39,90 +38,59 @@ func (request *Request) ToPostRecord() (*post_config.PostRecord) {
   }
 }
 
-func (request *Request) ToPostEvent() (*feed_events.PostEvent) {
-  return &feed_events.PostEvent{
-    Actor:      request.Actor,
-    BoardId:    request.BoardId,
-    ParentHash: request.ParentHash,
-    PostHash:   request.PostHash,
-    PostType:   feed_attributes.CreatePostTypeFromHashStr(request.TypeHash),
-  }
-}
+func ProcessRequest(request Request, response *Response) {
+  defer func() {
+    if errStr := recover(); errStr != nil { //catch
+      response.Message = errStr.(string)
+    }
+  }()
 
-func Handler(request Request) (Response, error) {
   var err error
-  var client *stream.Client
+  var getStreamIOClient *stream.Client
   if request.GetStreamApiKey != "" && request.GetStreamApiSecret != "" {
-    client, err = stream.NewClient(request.GetStreamApiKey, request.GetStreamApiSecret)
+    getStreamIOClient, err = stream.NewClient(request.GetStreamApiKey, request.GetStreamApiSecret)
   } else {
-    client, err = stream.NewClientFromEnv()
+    getStreamIOClient, err = stream.NewClientFromEnv()
   }
 
-  response := Response {
-    Ok: false,
-  }
   if err != nil {
-    return response, err
+    log.Panic(err.Error())
   }
-
-  postRecord := request.ToPostRecord()
-  postEvent := request.ToPostEvent();
-  activity := feed_events.ConvertPostEventToActivity(postEvent, feed_attributes.OFF_CHAIN)
 
   postgresFeedClient := client_config.ConnectPostgresClient()
-  postgresFeedClient.Begin()
-
-  postExecutor := post_config.PostExecutor{*postgresFeedClient}
-  actorReputationsRecordExecutor := actor_reputations_record_config.ActorReputationsRecordExecutor{
-    *postgresFeedClient}
-  postRepliesRecordExecutor := post_replies_record_config.PostRepliesRecordExecutor{*postgresFeedClient}
-
-  updateCount :=  postExecutor.GetPostUpdateCountTx(postEvent.PostHash)
-  reputationsPenalty := feed_attributes.PenaltyForPostType(
-    feed_attributes.PostType(postEvent.PostType), updateCount)
-
-  // Update Actor Reputation
-  actorReputationsRecordExecutor.SubActorReputationsTx(request.Actor, reputationsPenalty)
-
-  // Insert Post Record
-  updatedTimestamp := postExecutor.UpsertPostRecordTx(postRecord)
-
-  // Insert Activity to GetStream
-  activity.Time = feed_attributes.CreateBlockTimestampFromTime(updatedTimestamp)
-  getStreamClient := feed_events.GetStreamClient{C: client}
-  getStreamClient.AddFeedActivityToGetStream(activity)
-
-  // Update Post Replies Record
-  if activity.Verb == feed_attributes.ReplyVerb {
-    postRepliesRecord := post_replies_record_config.PostRepliesRecord {
-      PostHash: postRecord.ParentHash,
-      ReplyHash: postRecord.PostHash,
-    }
-    postRepliesRecordExecutor.UpsertPostRepliesRecordTx(&postRepliesRecord)
-  }
-
-
-  postgresFeedClient.Commit()
-
+  getStreamClient := &feed_events.GetStreamClient{C: getStreamIOClient}
+  defer postgresFeedClient.Close()
+  postRecord := request.ToPostRecord()
+  feed_events.ProcessPostRecord(
+    postRecord,
+    getStreamClient,
+    postgresFeedClient,
+    feed_attributes.OFF_CHAIN)
   response.Ok = true
+}
+
+func Handler(request Request) (response Response, err error) {
+  response.Ok = false
+  ProcessRequest(request, &response)
   return response, nil
 }
 
 func main() {
   // TODO(david.shao): remove example when deployed to production
   //content := feed_attributes.Content{
-  // Title: "titleSample1",
-  // Text: "hello, world",
+  //  Title: "titleSample1",
+  //  Text: "hello, world",
   //}
   //request := Request{
-  // Actor:  "0x003",
-  // BoardId: "0x02",
-  // ParentHash: "0x007",
-  // PostHash: "0x009",
-  // TypeHash:  feed_attributes.ReplyPostType.Hash(),
-  // Content: content,
+  //  Actor:  "0x00999",
+  //  BoardId: "0x02",
+  //  ParentHash: "0x007",
+  //  PostHash: "0x009",
+  //  TypeHash:  feed_attributes.ReplyPostType.Hash(),
+  //  Content: content,
   //}
-  //Handler(request)
+  //reposnse, _ := Handler(request)
+  //log.Printf("%+v", reposnse)
 
   lambda.Start(Handler)
 }

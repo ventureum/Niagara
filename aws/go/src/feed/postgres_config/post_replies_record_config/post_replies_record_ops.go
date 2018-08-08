@@ -24,7 +24,7 @@ func (postRepliesRecordExecutor *PostRepliesRecordExecutor) DeletePostRepliesRec
 func (postRepliesRecordExecutor *PostRepliesRecordExecutor) UpsertPostRepliesRecord(postRepliesRecord *PostRepliesRecord) {
   _, err := postRepliesRecordExecutor.C.NamedExec(UPSERT_POST_REPLIES_RECORD_COMMAND, postRepliesRecord)
   if err != nil {
-    log.Fatalf("Failed to upsert post replies record: %+v with error:\n %+v", postRepliesRecord, err.Error())
+    log.Panicf("Failed to upsert post replies record: %+v with error:\n %+v", postRepliesRecord, err.Error())
   }
   log.Printf("Sucessfully upserted post replies record for postHash %s\n", postRepliesRecord.PostHash)
 }
@@ -32,7 +32,7 @@ func (postRepliesRecordExecutor *PostRepliesRecordExecutor) UpsertPostRepliesRec
 func (postRepliesRecordExecutor *PostRepliesRecordExecutor) DeletePostRepliesRecords(postHash string) {
   _, err := postRepliesRecordExecutor.C.Exec(DELETE_POST_REPLIES_RECORD_COMMAND, postHash)
   if err != nil {
-    log.Fatalf("Failed to delete post replies records for postHash %s with error:\n %+v", postHash, err.Error())
+    log.Panicf("Failed to delete post replies records for postHash %s with error:\n %+v", postHash, err.Error())
   }
   log.Printf("Sucessfully deleted post replies records for postHash %s\n", postHash)
 }
@@ -41,7 +41,7 @@ func (postRepliesRecordExecutor *PostRepliesRecordExecutor) GetPostReplies(postH
   var postReplies []string
   err := postRepliesRecordExecutor.C.Select(&postReplies, QUERY_POST_REPLIES_COMMAND, postHash)
   if err != nil {
-    log.Fatalf("Failed to get post repliers for postHash %s with error:\n %+v", postHash, err.Error())
+    log.Panicf("Failed to get post repliers for postHash %s with error:\n %+v", postHash, err.Error())
   }
   return &postReplies
 }
@@ -50,7 +50,7 @@ func (postRepliesRecordExecutor *PostRepliesRecordExecutor) GetPostRepliesRecord
   var updateCount sql.NullInt64
   err := postRepliesRecordExecutor.C.Get(&updateCount, QUERY_POST_REPLIES_COUNT_COMMAND, postHash)
   if err != nil && err != sql.ErrNoRows {
-    log.Fatalf("Failed to read post repliers count for postHash %s with error:\n %+v", postHash, err.Error())
+    log.Panicf("Failed to read post repliers count for postHash %s with error:\n %+v", postHash, err.Error())
   }
   return updateCount.Int64
 }
@@ -61,7 +61,7 @@ func (postRepliesRecordExecutor *PostRepliesRecordExecutor) GetPostRepliesRecord
 func (postRepliesRecordExecutor *PostRepliesRecordExecutor) UpsertPostRepliesRecordTx(postRepliesRecord *PostRepliesRecord) {
   _, err := postRepliesRecordExecutor.Tx.NamedExec(UPSERT_POST_REPLIES_RECORD_COMMAND, postRepliesRecord)
   if err != nil {
-    log.Fatalf("Failed to upsert post replies record: %+v with error:\n %+v", postRepliesRecord, err.Error())
+    log.Panicf("Failed to upsert post replies record: %+v with error:\n %+v", postRepliesRecord, err.Error())
   }
   log.Printf("Sucessfully upserted post replies record for postHash %s\n", postRepliesRecord.PostHash)
 }
@@ -69,7 +69,7 @@ func (postRepliesRecordExecutor *PostRepliesRecordExecutor) UpsertPostRepliesRec
 func (postRepliesRecordExecutor *PostRepliesRecordExecutor) DeletePostRepliesRecordsTx(postHash string) {
   _, err := postRepliesRecordExecutor.Tx.Exec(DELETE_POST_REPLIES_RECORD_COMMAND, postHash)
   if err != nil {
-    log.Fatalf("Failed to delete post replies records for postHash %s with error:\n %+v", postHash, err.Error())
+    log.Panicf("Failed to delete post replies records for postHash %s with error:\n %+v", postHash, err.Error())
   }
   log.Printf("Sucessfully deleted post replies records for postHash %s\n", postHash)
 }
@@ -78,7 +78,7 @@ func (postRepliesRecordExecutor *PostRepliesRecordExecutor) GetPostRepliesTx(pos
   var postReplies []string
   err := postRepliesRecordExecutor.Tx.Select(&postReplies, QUERY_POST_REPLIES_COMMAND, postHash)
   if err != nil {
-    log.Fatalf("Failed to get post repliers for postHash %s with error:\n %+v", postHash, err.Error())
+    log.Panicf("Failed to get post repliers for postHash %s with error:\n %+v", postHash, err.Error())
   }
   return &postReplies
 }
@@ -87,7 +87,7 @@ func (postRepliesRecordExecutor *PostRepliesRecordExecutor) GetPostRepliesRecord
   var updateCount sql.NullInt64
   err := postRepliesRecordExecutor.Tx.Get(&updateCount, QUERY_POST_REPLIES_COUNT_COMMAND, postHash)
   if err != nil && err != sql.ErrNoRows {
-    log.Fatalf("Failed to read post repliers count for postHash %s with error:\n %+v", postHash, err.Error())
+    log.Panicf("Failed to read post repliers count for postHash %s with error:\n %+v", postHash, err.Error())
   }
   return updateCount.Int64
 }

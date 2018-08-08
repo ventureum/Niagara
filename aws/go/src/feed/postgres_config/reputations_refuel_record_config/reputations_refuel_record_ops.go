@@ -25,7 +25,7 @@ func (reputationsRefuelRecordExecutor *ReputationsRefuelRecordExecutor) UpsertRe
   _, err := reputationsRefuelRecordExecutor.C.NamedExec(
     UPSERT_REPUTATION_REFUEL_RECORD_COMMAND, reputationsRefuelRecord)
   if err != nil {
-    log.Fatalf("Failed to upsert Reputations Refuel Record %+v with error:\n %+v", reputationsRefuelRecord, err.Error())
+    log.Panicf("Failed to upsert Reputations Refuel Record %+v with error:\n %+v", reputationsRefuelRecord, err.Error())
   }
   log.Printf("Sucessfully upserted Reputations Refuel Record for actor %s\n", reputationsRefuelRecord.Actor)
 }
@@ -33,7 +33,7 @@ func (reputationsRefuelRecordExecutor *ReputationsRefuelRecordExecutor) UpsertRe
 func (reputationsRefuelRecordExecutor *ReputationsRefuelRecordExecutor) DeleteReputationsRefuelRecord(actor string) {
   _, err := reputationsRefuelRecordExecutor.C.Exec(DELETE_REPUTATION_REFUEL_RECORDS_COMMAND, actor)
   if err != nil {
-    log.Fatalf("Failed to delete Reputations Refuel Records  for actor %s with error:\n %+v", actor, err.Error())
+    log.Panicf("Failed to delete Reputations Refuel Records  for actor %s with error:\n %+v", actor, err.Error())
   }
   log.Printf("Sucessfully deleted Reputations Refuel Records for actor %s\n", actor)
 }
@@ -43,7 +43,7 @@ func (reputationsRefuelRecordExecutor *ReputationsRefuelRecordExecutor) GetReput
   var reputationsRefuelRecords []ReputationsRefuelRecord
   err := reputationsRefuelRecordExecutor.C.Select(& reputationsRefuelRecords, QUERY_REPUTATION_REFUEL_RECORDS_COMMAND, actor)
   if err != nil {
-    log.Fatalf("Failed to get Reputations Refuel Records for actor %s with error:\n %+v", actor, err.Error())
+    log.Panicf("Failed to get Reputations Refuel Records for actor %s with error:\n %+v", actor, err.Error())
   }
   return &reputationsRefuelRecords
 }
@@ -56,7 +56,7 @@ func (reputationsRefuelRecordExecutor *ReputationsRefuelRecordExecutor) UpsertRe
   _, err := reputationsRefuelRecordExecutor.Tx.NamedExec(
     UPSERT_REPUTATION_REFUEL_RECORD_COMMAND, reputationsRefuelRecord)
   if err != nil {
-    log.Fatalf("Failed to upsert Reputations Refuel Record %+v with error:\n %+v", reputationsRefuelRecord, err.Error())
+    log.Panicf("Failed to upsert Reputations Refuel Record %+v with error:\n %+v", reputationsRefuelRecord, err.Error())
   }
   log.Printf("Sucessfully upserted Reputations Refuel Record for actor %s\n", reputationsRefuelRecord.Actor)
 }
@@ -64,7 +64,7 @@ func (reputationsRefuelRecordExecutor *ReputationsRefuelRecordExecutor) UpsertRe
 func (reputationsRefuelRecordExecutor *ReputationsRefuelRecordExecutor) DeleteReputationsRefuelRecordTx(actor string) {
   _, err := reputationsRefuelRecordExecutor.Tx.Exec(DELETE_REPUTATION_REFUEL_RECORDS_COMMAND, actor)
   if err != nil {
-    log.Fatalf("Failed to delete Reputations Refuel Records  for actor %s with error:\n %+v", actor, err.Error())
+    log.Panicf("Failed to delete Reputations Refuel Records  for actor %s with error:\n %+v", actor, err.Error())
   }
   log.Printf("Sucessfully deleted Reputations Refuel Records for actor %s\n", actor)
 }
@@ -74,7 +74,7 @@ func (reputationsRefuelRecordExecutor *ReputationsRefuelRecordExecutor) GetReput
   var reputationsRefuelRecords []ReputationsRefuelRecord
   err := reputationsRefuelRecordExecutor.Tx.Select(& reputationsRefuelRecords, QUERY_REPUTATION_REFUEL_RECORDS_COMMAND, actor)
   if err != nil {
-    log.Fatalf("Failed to get Reputations Refuel Records for actor %s with error:\n %+v", actor, err.Error())
+    log.Panicf("Failed to get Reputations Refuel Records for actor %s with error:\n %+v", actor, err.Error())
   }
   return &reputationsRefuelRecords
 }
