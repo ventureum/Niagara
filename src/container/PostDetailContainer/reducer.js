@@ -56,5 +56,25 @@ export default function (state = initialState, action) {
     return initialState
   }
 
+  if (action.type === 'PROCESS_PUT_OPTION_FULFILLED') {
+    return {
+      ...state,
+      milestoneDataLoading: false
+    }
+  }
+  if (action.type === 'PROCESS_PUT_OPTION_PENDING') {
+    return {
+      ...state,
+      milestoneDataLoading: true
+    }
+  }
+  if (action.type === 'PROCESS_PUT_OPTION_REJECTED') {
+    return {
+      ...state,
+      milestoneDataLoading: false,
+      errorMessage: action.payload
+    }
+  }
+
   return state
 }

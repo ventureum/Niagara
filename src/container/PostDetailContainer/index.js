@@ -29,6 +29,8 @@ class PostDetailContainer extends Component {
         milestoneData={this.props.milestoneData}
         processPutOption={this.props.processPutOption}
         getReplies={this.props.getReplies}
+        milestoneDataLoading={this.props.milestoneDataLoading}
+        fetchUserMilstoneData={this.props.fetchUserMilstoneData}
       />
     )
   }
@@ -38,13 +40,15 @@ const mapStateToProps = state => ({
   replies: state.postDetailReducer.replies,
   loading: state.postDetailReducer.loading,
   errorMessage: state.postDetailReducer.errorMessage,
-  milestoneData: state.postDetailReducer.milestoneData
+  milestoneData: state.postDetailReducer.milestoneData,
+  milestoneDataLoading: state.postDetailReducer.milestoneDataLoading
 })
 
 const mapDispatchToProps = (dispatch) => ({
   getReplies: (postHash) => dispatch(getReplies(postHash)),
   fetchUserMilstoneData: (postHash) => dispatch(fetchUserMilstoneData(postHash)),
-  processPutOption: (postHash, numToken, numVtxFeeToken, action) => dispatch(processPutOption(postHash, numToken, numVtxFeeToken, action)),
+  processPutOption: (postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action, refreshCallback) =>
+    dispatch(processPutOption(postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action, refreshCallback)),
   clearPostDetail: () => dispatch(clearPostDetail())
 })
 
