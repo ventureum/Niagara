@@ -83,16 +83,22 @@ class TCRService {
   }
 
   async delist (item) {
-    await this.tcr.methods.delist(item.hash).send()
+    await this.tcr.methods.delist(item.hash).send({
+      nonce: await this.web3.eth.getTransactionCount(this.account, 'pending')
+    })
   }
 
   async whitelist (item) {
-    await this.tcr.methods.whitelist(item.hash).send()
+    await this.tcr.methods.whitelist(item.hash).send({
+      nonce: await this.web3.eth.getTransactionCount(this.account, 'pending')
+    })
   }
 
   async vote (hash, option, amount) {
     let data = this.tcr.methods.vote(this.account, hash, option, amount).encodeABI()
-    await this.token.methods.approveAndCall(this.address, amount, data).send()
+    await this.token.methods.approveAndCall(this.address, amount, data).send({
+      nonce: await this.web3.eth.getTransactionCount(this.account, 'pending')
+    })
   }
 }
 
