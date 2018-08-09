@@ -34,7 +34,7 @@ func CreateReputationFromStr(rep string) Reputation {
   return Reputation(i)
 }
 
-func PenaltyForUpvote(base Reputation, counter int64) Reputation {
+func PenaltyForVote(base Reputation, counter int64) Reputation {
   return base.MulByPower(big.NewInt(2), big.NewInt(counter))
 }
 

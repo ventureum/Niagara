@@ -36,7 +36,7 @@ func main() {
   postRewards1 := postRewardsRecordExecutor.GetPostRewards(postRewardsRecord1.PostHash)
   log.Printf("postRewards1: %+v\n", postRewards1)
 
-  postRewards2 := postRewardsRecordExecutor.GetPostRewards(postRewardsRecord3.PostHash)
+  postRewards2 := postRewardsRecordExecutor.GetPostRewards(postRewardsRecord2.PostHash)
   log.Printf("postRewards2: %+v\n", postRewards2)
 
   postRewards3 := postRewardsRecordExecutor.GetPostRewards(postRewardsRecord3.PostHash)

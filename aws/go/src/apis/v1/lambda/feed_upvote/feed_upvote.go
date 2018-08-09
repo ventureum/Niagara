@@ -54,7 +54,7 @@ func Handler(request Request) (Response, error) {
 
   // TODO (david.shao):  replace costForUpVote by empirical function
   costForUpVote := feed_attributes.Reputation(1)
-  reputationsPenalty := feed_attributes.PenaltyForUpvote(costForUpVote, voteCount)
+  reputationsPenalty := feed_attributes.PenaltyForVote(costForUpVote, voteCount)
 
   // Validate whether there are enough reputations to consume
   currentReputations := reputationRecordExecutor.ReadReputations(request.Actor)

@@ -16,3 +16,17 @@ BEFORE UPDATE ON %s
 FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_timestamp();
 `
+
+const LOAD_UUID_EXTENSION = `
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+`
+
+const LOAD_VOTE_TYPE_ENUM = `
+DO $$
+BEGIN
+IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'vote_type_enum') THEN
+  CREATE TYPE vote_type_enum AS ENUM ('DOWN','UP');
+END IF;
+END$$;
+`

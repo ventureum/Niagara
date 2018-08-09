@@ -9,6 +9,7 @@ CREATE TABLE post_rewards_records (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (post_hash)
 );
+CREATE INDEX post_rewards_records_index ON post_rewards_records (post_hash, rewards);
 `
 
 const TABLE_NAME_FOR_POST_REWARDS_RECORD = "post_rewards_records"
