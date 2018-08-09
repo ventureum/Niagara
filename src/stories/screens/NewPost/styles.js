@@ -1,13 +1,6 @@
+import { Platform } from 'react-native'
+
 export default {
-  modalHeader: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 10,
-    marginLeft: 15,
-    marginRight: 15
-  },
   modalContainer: {
     flex: 1,
     flexDirection: 'column',
@@ -15,6 +8,7 @@ export default {
     alignItems: 'stretch'
   },
   avatarContainer: {
+    paddingTop: Platform.OS === 'ios' ? 0 : 10,
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -24,7 +18,8 @@ export default {
     flex: 9,
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    paddingTop: 5
+    paddingTop: 10,
+    backgroundColor: '#f8f8f8'
   },
   textInputContainer: {
     flex: 6

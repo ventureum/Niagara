@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { FlatList, RefreshControl, View } from 'react-native'
+import { FlatList, RefreshControl, View, Platform } from 'react-native'
 import { Container, Body, Header, Left, Right, Button, Icon, Title, Text, Content, Fab } from 'native-base'
 import FeedCardBasic from '../../components/FeedCardBasic'
 import WalletUtils from '../../../utils/wallet'
@@ -58,8 +58,12 @@ export default class Discover extends Component {
       <Container>
         <Header >
           <Left>
-            <Button transparent onPress={() => this.props.navigation.goBack()}>
-              <Icon name='arrow-back' />
+            <Button transparent>
+              <Icon
+                active
+                name='menu'
+                onPress={() => this.props.navigation.openDrawer()}
+              />
             </Button>
           </Left>
           <Body>
@@ -74,12 +78,26 @@ export default class Discover extends Component {
               </Button>
               : <View />
             }
-            <Button onPress={this.toSearchPage} >
-              <Icon name='search' />
-            </Button>
-            <Button onPress={this.onRefresh} >
-              <Icon name='refresh' />
-            </Button>
+            {Platform.OS === 'ios' &&
+              <Button transparent onPress={this.toSearchPage} >
+                <Icon name='search' />
+              </Button>
+            }
+            {Platform.OS === 'android' &&
+              <Button onPress={this.toSearchPage} >
+                <Icon name='search' />
+              </Button>
+            }
+            {Platform.OS === 'ios' &&
+              <Button transparent onPress={this.onRefresh} >
+                <Icon name='refresh' />
+              </Button>
+            }
+            {Platform.OS === 'android' &&
+              <Button onPress={this.onRefresh} >
+                <Icon name='refresh' />
+              </Button>
+            }
           </Right>
         </Header>
         {this.props.boardHash !== BOARD_ALL_HASH
@@ -119,7 +137,7 @@ export default class Discover extends Component {
           style={{ backgroundColor: '#5067FF' }}
           position='bottomRight'
           onPress={this.toNewPost}>
-          <Icon name='add' />
+          <Icon name='add' style={{fontSize: 40, lineHeight: 40, paddingTop: Platform.OS === 'ios' ? 5 : 0}}/>
         </Fab>
       </Container >
     )

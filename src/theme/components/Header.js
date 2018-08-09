@@ -8,7 +8,7 @@ export default (variables = variable) => {
 
   const headerTheme = {
     '.span': {
-      height: 128,
+      height: 150,
       'NativeBase.Left': {
         alignSelf: 'flex-start'
       },
@@ -134,7 +134,6 @@ export default (variables = variable) => {
           'NativeBase.Icon': {
             color: variables.toolbarBtnColor,
             fontSize: variables.iconHeaderSize,
-            marginTop: 2,
             marginRight: 5,
             marginLeft: 2
           },
@@ -157,7 +156,6 @@ export default (variables = variable) => {
           'NativeBase.Icon': {
             color: variables.toolbarBtnColor,
             fontSize: variables.iconHeaderSize,
-            marginTop: 2,
             marginRight: 2,
             marginLeft: 2
           },
@@ -192,7 +190,8 @@ export default (variables = variable) => {
       },
       flex: platform === 'ios' && platformStyle !== 'material' ? 1 : 0.5,
       alignSelf: 'center',
-      alignItems: 'flex-start'
+      alignItems: 'flex-start',
+      justifyContent: 'center'
     },
     'NativeBase.Body': {
       flex: 1,

@@ -10,7 +10,8 @@ export default {
     paddingBottom: 5,
     paddingTop: 5,
     borderBottomColor: '#bbb',
-    borderBottomWidth: StyleSheet.hairlineWidth
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    backgroundColor: '#f8f8f8'
   },
   transactionContainer: {
     flexDirection: 'row',

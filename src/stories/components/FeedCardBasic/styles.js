@@ -2,13 +2,14 @@ import { StyleSheet } from 'react-native'
 
 const styles = StyleSheet.create({
   card: {
-    paddingTop: 20,
+    paddingTop: 15,
     paddingBottom: 5,
-    paddingLeft: 4,
-    paddingRight: 4,
+    paddingLeft: 10,
+    paddingRight: 10,
     borderBottomColor: '#bbb',
     borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'column',
+    backgroundColor: '#f8f8f8',
     alignItems: 'stretch',
     flexWrap: 'wrap'
   },

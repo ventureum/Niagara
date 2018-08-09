@@ -1,12 +1,12 @@
-import { StyleSheet } from 'react-native'
+import { StyleSheet, Platform } from 'react-native'
 
 const styles: any = StyleSheet.create({
   container: {
-    backgroundColor: '#FBFAFA'
+    backgroundColor: 'white'
   },
   textContent: {
     fontSize: 14,
-    color: 'white'
+    color: Platform.OS === 'ios' ? 'black' : 'white'
   }
 })
 export default styles

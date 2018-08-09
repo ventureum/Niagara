@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { FlatList } from 'react-native'
+import { Platform, FlatList } from 'react-native'
 import {
   Container,
   Header,
@@ -50,9 +50,16 @@ class TokenToggle extends React.Component {
           </Button>
         </Left>
         <Right>
-          <Button onPress={this.toSearchPage} >
-            <Icon name='search' />
-          </Button>
+          {Platform.OS === 'ios' &&
+            <Button transparent onPress={this.toSearchPage} >
+              <Icon name='search' />
+            </Button>
+          }
+          {Platform.OS === 'android' &&
+            <Button onPress={this.toSearchPage} >
+              <Icon name='search' />
+            </Button>
+          }
         </Right>
       </Header>
       <Content>

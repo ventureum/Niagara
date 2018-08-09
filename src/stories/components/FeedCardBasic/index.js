@@ -43,9 +43,9 @@ export default class FeedCard extends React.Component {
             >
               <Text
                 style={{
-                  paddingLeft: 10,
                   color: '#aaa',
-                  fontSize: 14
+                  fontSize: 14,
+                  paddingLeft: 10
                 }}
               >
                 {'@' + post.actor}
@@ -67,14 +67,14 @@ export default class FeedCard extends React.Component {
                   fontWeight: 'bold',
                   fontSize: 16,
                   color: 'black',
-                  paddingLeft: 10
+                  marginTop: 10
                 }}
               >
                 {post.content.title}
               </Text>
               {(post.content.image === undefined)
-                ? <Markdown >{post.content.subtitle}</Markdown>
-                : <Markdown >{`![user image](${post.content.image})\n\n${post.content.subtitle}`}</Markdown>
+                ? <Markdown>{post.content.subtitle}</Markdown>
+                : <Markdown>{`![user image](${post.content.image})\n\n${post.content.subtitle}`}</Markdown>
               }
             </View>
             <View style={styles.cardFooter}>

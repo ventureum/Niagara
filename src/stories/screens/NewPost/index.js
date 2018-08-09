@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { KeyboardAvoidingView, View, TextInput, Switch, ScrollView } from 'react-native'
-import { Icon, Text, Button, Thumbnail, Spinner, Toast } from 'native-base'
+import { KeyboardAvoidingView, View, TextInput, Switch, ScrollView, Platform } from 'react-native'
+import { Container, Icon, Title, Text, Header, Left, Body, Right, Button, Thumbnail, Spinner, Toast } from 'native-base'
 import styles from './styles'
 import WalletUtils from '../../../utils/wallet'
 import { processContent } from '../../../utils/content'
@@ -45,24 +45,25 @@ export default class NewPost extends Component {
 
   render () {
     return (
-      <KeyboardAvoidingView enabled style={styles.modalContainer}>
-        <View style={styles.modalHeader}>
-          <Icon
-            active
-            name='arrow-back'
-            onPress={() => {
-              this.props.navigation.goBack()
-            }}
-          />
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text>{this.state.toMainnet ? 'On-chain' : 'Off-chain'}</Text>
+      <Container>
+        <Header >
+          <Left>
+            <Button transparent onPress={() => this.props.navigation.goBack()}>
+              <Icon name='arrow-back' />
+            </Button>
+          </Left>
+          <Body style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Title>{this.state.toMainnet ? 'On-chain ' : 'Off-chain '}</Title>
             <Switch
               value={this.state.toMainnet}
               onValueChange={(value) => {
+                console.log(value)
                 this.setState({ toMainnet: value })
               }}
               style={{ marginRight: 3 }}
             />
+          </Body>
+          <Right>
             {this.props.loading
               ? <Spinner color='green' style={{ paddingBottom: 8 }} />
               : <Button
@@ -76,34 +77,36 @@ export default class NewPost extends Component {
                 <Text>Tweet</Text>
               </Button>
             }
+          </Right>
+        </Header>
+        <KeyboardAvoidingView enabled style={styles.modalContainer}>
+          <View style={styles.infoContainer}>
+            <View style={styles.avatarContainer}>
+              <Thumbnail small source={{ uri: this.props.avatar }} />
+            </View>
+            <View style={styles.textInputContainer} >
+              <ScrollView>
+                <TextInput
+                  placeholder='Title'
+                  onChangeText={(title) => {
+                    this.setState({ title })
+                  }}
+                  value={this.state.title}
+                />
+                <TextInput
+                  placeholder='Share your ideas!'
+                  multiline
+                  underlineColorAndroid='transparent'
+                  onChangeText={(text) => {
+                    this.setState({ text })
+                  }}
+                  value={this.state.text}
+                />
+              </ScrollView>
+            </View>
           </View>
-        </View>
-        <View style={styles.infoContainer}>
-          <View style={styles.avatarContainer}>
-            <Thumbnail small source={{ uri: this.props.avatar }} />
-          </View>
-          <View style={styles.textInputContainer} >
-            <ScrollView>
-              <TextInput
-                placeholder='Title'
-                onChangeText={(title) => {
-                  this.setState({ title })
-                }}
-                value={this.state.title}
-              />
-              <TextInput
-                placeholder='Share your ideas!'
-                multiline
-                underlineColorAndroid='transparent'
-                onChangeText={(text) => {
-                  this.setState({ text })
-                }}
-                value={this.state.text}
-              />
-            </ScrollView>
-          </View>
-        </View>
-      </KeyboardAvoidingView >
+        </KeyboardAvoidingView>
+      </Container>
     )
   }
 }
