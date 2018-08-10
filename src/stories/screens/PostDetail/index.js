@@ -37,6 +37,16 @@ export default class PostDetail extends Component {
     this.props.navigation.navigate('Reply', { post })
   }
 
+  onRefresh = () => {
+    const { post } = this.props
+    this.props.getReplies(post.postHash)
+    this.props.fetchUserMilstoneData(post.postHash)
+  }
+
+  submitPutOption = (postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action) => {
+    this.props.processPutOption(postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action, this.onRefresh)
+  }
+
   render () {
     const { post, replies } = this.props
     return (
@@ -44,9 +54,9 @@ export default class PostDetail extends Component {
         <ScrollView
           refreshControl={
             <RefreshControl
-              refreshing={this.props.loading}
+              refreshing={this.props.loading || this.props.milestoneDataLoading}
               onRefresh={() => {
-                this.props.getReplies(post.postHash)
+                this.onRefresh()
               }}
             />}
         >
@@ -72,8 +82,9 @@ export default class PostDetail extends Component {
               <FeedCard post={post} />
               <MilestoneCard
                 milestoneData={this.props.milestoneData}
-                processPutOption={this.props.processPutOption}
+                submitPutOption={this.submitPutOption}
                 postHash={post.postHash}
+                milestoneDataLoading={this.props.milestoneDataLoading}
               />
             </View >
             : <FeedCard post={post} />
@@ -96,7 +107,6 @@ export default class PostDetail extends Component {
           onPress={() => { this.toReply(post) }}>
           <Icon name='ios-list-box-outline' />
         </Fab>
-
       </View >
     )
   }

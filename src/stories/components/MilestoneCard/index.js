@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, Picker, Button, TextInput } from 'react-native'
+import { View, Text, Picker, Button, TextInput, RefreshControl } from 'react-native'
 import styles from './styles'
 import { Icon } from 'native-base'
 import { BigNumber } from 'bignumber.js'
@@ -12,9 +12,7 @@ export default class MilestoneCard extends Component {
     amount: '',
     cost: new BigNumber(0),
     fee: new BigNumber(0),
-    userOptionBalance: (new BigNumber(this.props.milestoneData.userOptionBalance))
-      .div(new BigNumber(10).pow(this.props.milestoneData.tokenDecimals))
-
+    submitAble: true
   }
 
   estimateFee = (amount) => {
@@ -35,22 +33,26 @@ export default class MilestoneCard extends Component {
     return cost
   }
 
-  onSubmit = (postHash, amount, fee, action) => {
+  onSubmit = (postHash, amount, milestoneTokenAddress, fee, action) => {
     const baseDecimal = new BigNumber(10).pow(this.props.milestoneData.tokenDecimals)
     const numToken = (new BigNumber(amount)).times(baseDecimal)
     const numVtxFeeToken = fee.times(BASE_18)
-    this.props.processPutOption(postHash, numToken, numVtxFeeToken, action)
+    this.props.submitPutOption(postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action)
   }
 
   render () {
     const {
       milestoneEndTime,
-      tokenSymbol
+      tokenSymbol,
+      userOptionBalance,
+      tokenDecimals,
+      milestoneTokenAddress
     } = this.props.milestoneData
-
+    let readableOptionBalance = (new BigNumber(userOptionBalance))
+      .div(new BigNumber(10).pow(tokenDecimals))
     return (
       <View style={styles.shadow}>
-        <View style={styles.cardContainer} >
+        <View style={styles.cardContainer}>
           <View style={styles.header} >
             <View style={styles.headerLeft}>
               <Icon name='home' />
@@ -87,7 +89,7 @@ export default class MilestoneCard extends Component {
               fontSize: 14,
               color: '#9822ae',
               fontWeight: '500'
-            }}>{this.state.userOptionBalance.toString()} {tokenSymbol}</Text>
+            }}>{readableOptionBalance.toString()} {tokenSymbol}</Text>
           </View>
           <View style={styles.formContainer}>
             <View style={styles.inputContainer}>
@@ -131,13 +133,14 @@ export default class MilestoneCard extends Component {
             <Button
               title='Submit'
               color='#9822ae'
+              disabled={this.props.milestoneDataLoading}
               onPress={() => {
-                this.onSubmit(this.props.postHash, this.state.amount, this.state.fee, this.state.action)
+                this.onSubmit(this.props.postHash, this.state.amount, milestoneTokenAddress, this.state.fee, this.state.action)
               }}
             />
           </View>
         </View>
-      </View>
+      </View >
     )
   }
 }

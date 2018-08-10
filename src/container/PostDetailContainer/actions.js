@@ -22,21 +22,21 @@ function fetchUserMilstoneData (postHash) {
   }
 }
 
-function _processPurchasePutOption (postHash, purchaser, numToken, numVtxFeeToken, newTransaction) {
+function _processPurchasePutOption (postHash, purchaser, numToken, numVtxFeeToken, newTransaction, refreshCallback) {
   return {
-    type: 'PURCHASE_PUT_OPTION',
-    payload: forum.purchasePutOption(postHash, purchaser, numToken, numVtxFeeToken, newTransaction)
+    type: 'PROCESS_PUT_OPTION',
+    payload: forum.purchasePutOption(postHash, purchaser, numToken, numVtxFeeToken, newTransaction, refreshCallback)
   }
 }
 
-function _processExecutePutOption (postHash, numToken, numVtxFeeToken, newTransaction) {
+function _processExecutePutOption (postHash, numToken, milestoneTokenAddress, numVtxFeeToken, newTransaction, refreshCallback) {
   return {
-    type: 'EXECUTE_PUT_OPTION',
-    payload: forum.executePutOption(postHash, numToken, numVtxFeeToken, newTransaction)
+    type: 'PROCESS_PUT_OPTION',
+    payload: forum.executePutOption(postHash, numToken, milestoneTokenAddress, numVtxFeeToken, newTransaction, refreshCallback)
   }
 }
 
-function processPutOption (postHash, numToken, numVtxFeeToken, action) {
+function processPutOption (postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action, refreshCallback) {
   return (dispatch, getState) => {
     const purchaserAddress = getState().walletReducer.walletAddress
     if (action === 'Purchase') {
@@ -45,14 +45,17 @@ function processPutOption (postHash, numToken, numVtxFeeToken, action) {
         purchaserAddress,
         numToken,
         numVtxFeeToken,
-        (txHash) => { dispatch(newTransaction(txHash)) }
+        (txHash) => { dispatch(newTransaction(txHash)) },
+        refreshCallback
       ))
     } else {
       dispatch(_processExecutePutOption(
         postHash,
         numToken,
+        milestoneTokenAddress,
         numVtxFeeToken,
-        (txHash) => { dispatch(newTransaction(txHash)) }
+        (txHash) => { dispatch(newTransaction(txHash)) },
+        refreshCallback
       ))
     }
   }

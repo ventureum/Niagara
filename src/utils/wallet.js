@@ -185,7 +185,8 @@ export default class WalletUtils {
   */
   static getERC20Instance (address) {
     const _web3 = this.getWeb3Instance()
-    return new _web3.eth.Contract(ERC20_ABI, address)
+    const account = this.getWallet().walletAddress
+    return new _web3.eth.Contract(ERC20_ABI, address, { from: account, gas: 500000 })
   }
 
   /*

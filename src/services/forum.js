@@ -329,6 +329,7 @@ function fetchUserMilstoneData (postHash, userAddress) {
     const tokenSymbol = await tokenInstance.methods.symbol().call()
 
     resolve({
+      milestoneTokenAddress,
       milestoneAvailableToken,
       milestonePrices,
       milestoneEndTime,
@@ -341,23 +342,23 @@ function fetchUserMilstoneData (postHash, userAddress) {
   })
 }
 
-function purchasePutOption (postHash, purchaser, numToken, numVtxFeeToken, newTransation) {
+function purchasePutOption (postHash, purchaser, numToken, numVtxFeeToken, newTransation, refreshCallback) {
   return new Promise(async (resolve, reject) => {
     const vtxInstance = await WalletUtils.getContractInstance('Token')
     const forum = await WalletUtils.getContractInstance('Forum')
-    await vtxInstance.methods.approve(forum.options.address, numVtxFeeToken).send({
-      gasPrice: GAS_PRICE,
-      gas: GAS_LIMIT
-    })
-    forum.methods.purchasePutOption(postHash, purchaser, numToken).send({
-      gasPrice: GAS_PRICE,
-      gas: GAS_LIMIT
-    })
-      .on('transactionHash', (txHash) => {
+
+    const forumPurchasePutOptionData = forum.methods.purchasePutOption(postHash, purchaser, numToken).encodeABI()
+
+    vtxInstance.methods.approveAndCall(forum.options.address, numVtxFeeToken, forumPurchasePutOptionData)
+      .send({
+        gasPrice: GAS_PRICE,
+        gas: GAS_LIMIT
+      }).on('transactionHash', (txHash) => {
         if (newTransation !== undefined) {
           newTransation(txHash)
         }
       }).on('receipt', (receipt) => {
+        refreshCallback()
         resolve(receipt)
       }).on('error', (error) => {
         reject(error)
@@ -365,21 +366,26 @@ function purchasePutOption (postHash, purchaser, numToken, numVtxFeeToken, newTr
   })
 }
 
-function executePutOption (postHash, numToken, numVtxFeeToken, newTransation) {
+function executePutOption (postHash, numToken, milestoneTokenAddress, numVtxFeeToken, newTransation, refreshCallback) {
   return new Promise(async (resolve, reject) => {
-    const vtxInstance = await WalletUtils.getContractInstance('Token')
+    const tokenInstance = WalletUtils.getERC20Instance(milestoneTokenAddress)
     const forum = await WalletUtils.getContractInstance('Forum')
 
-    vtxInstance.methods.approve(forum.options.address, numVtxFeeToken).send({
+    await tokenInstance.methods.approve(forum.options.address, numVtxFeeToken).send({
       gasPrice: GAS_PRICE,
       gas: GAS_LIMIT
     })
-    forum.methods.executePutOption(postHash, numToken).send()
+
+    forum.methods.executePutOption(postHash, numToken).send({
+      gasPrice: GAS_PRICE,
+      gas: GAS_LIMIT
+    })
       .on('transactionHash', (txHash) => {
         if (newTransation !== undefined) {
           newTransation(txHash)
         }
       }).on('receipt', (receipt) => {
+        refreshCallback()
         resolve(receipt)
       }).on('error', (error) => {
         reject(error)
