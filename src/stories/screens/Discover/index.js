@@ -32,6 +32,8 @@ export default class Discover extends Component {
     return (
       <FeedCardBasic post={item}
         navigation={this.props.navigation}
+        updatePostRewards={this.props.updatePostRewards}
+        boardID={this.props.boardHash}
       />
     )
   }

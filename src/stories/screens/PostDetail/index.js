@@ -40,7 +40,9 @@ export default class PostDetail extends Component {
   onRefresh = () => {
     const { post } = this.props
     this.props.getReplies(post.postHash)
-    this.props.fetchUserMilstoneData(post.postHash)
+    if (post.postType === 'MILESTONE') {
+      this.props.fetchUserMilstoneData(post.postHash)
+    }
   }
 
   submitPutOption = (postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action) => {
@@ -79,7 +81,10 @@ export default class PostDetail extends Component {
           </View>
           {post.postType === 'MILESTONE'
             ? <View>
-              <FeedCard post={post} />
+              <FeedCard
+                post={post}
+                updatePostRewards={this.props.updatePostRewards}
+              />
               <MilestoneCard
                 milestoneData={this.props.milestoneData}
                 submitPutOption={this.submitPutOption}
@@ -87,7 +92,10 @@ export default class PostDetail extends Component {
                 milestoneDataLoading={this.props.milestoneDataLoading}
               />
             </View >
-            : <FeedCard post={post} />
+            : <FeedCard
+              post={post}
+              updatePostRewards={this.props.updatePostRewards}
+            />
           }
           <KeyboardAvoidingView enabled>
             <FlatList

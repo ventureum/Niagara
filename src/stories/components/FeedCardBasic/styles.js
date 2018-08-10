@@ -14,8 +14,9 @@ const styles = StyleSheet.create({
   },
   cardFooter: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 0
+    justifyContent: 'space-between',
+    paddingLeft: 20,
+    paddingRight: 30
   },
   badgeCount: {
     fontSize: 12,
@@ -23,7 +24,8 @@ const styles = StyleSheet.create({
   },
   footerIcons: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    justifyContent: 'space-around'
   },
   header: {
     flex: 1,

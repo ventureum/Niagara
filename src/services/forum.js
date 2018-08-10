@@ -4,7 +4,7 @@ import axios from 'axios'
 import bs58 from 'bs58'
 
 const stream = require('getstream')
-const client = stream.connect(Config.STREAM_API_KEY)
+const client = stream.connect(Config.STREAM_API_KEY, null, 39296)
 const GAS_PRICE = '20000000000'
 const MINIMUM_BALANCE = 10000000000000000
 const GAS_LIMIT = '6500000'
@@ -58,7 +58,6 @@ function getBytes32FromMultiash (multihash) {
     size: decoded[1]
   }
 }
-// @param size less than 10
 
 /*
   @param feed A string consist of the name of target feed group and userID.
@@ -73,14 +72,15 @@ function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
   return new Promise(async (resolve, reject) => {
     // get feed token from lamda API
     const feedSlug = feed.split(':')
+    const toFeedTokenApi = {
+      'feedSlug': feedSlug[0],
+      'userId': feedSlug[1],
+      'getStreamApiKey': Config.STREAM_API_KEY,
+      'getStreamApiSecret': Config.STREAM_API_SECRET
+    }
     const response = await axios.post(
       Config.FEED_TOKEN_API,
-      {
-        'feedSlug': feedSlug[0],
-        'userId': feedSlug[1],
-        'getStreamApiKey': Config.STREAM_API_KEY,
-        'getStreamApiSecret': Config.STREAM_API_SECRET
-      }
+      toFeedTokenApi
     )
     if (!response.data.ok) {
       reject(response.data.message)
@@ -145,7 +145,7 @@ function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
     let offChainPostDetails = []
     for (let i = 0; i < offChainPosts.length; i++) {
       const result = await axios.post(
-        Config.GET_FEED_POST_API,
+        `${Config.FEED_END_POINT}/get-feed-post`,
         {
           'postHash': offChainPosts[i],
           'getStreamApiKey': Config.STREAM_API_KEY,
@@ -291,7 +291,7 @@ function newOffChainPost (content, boardId, parentHash, postType, poster) {
       'getStreamApiSecret': Config.STREAM_API_SECRET
     }
     const result = await axios.post(
-      Config.FEED_POST_API,
+      `${Config.FEED_END_POINT}/feed-post`,
       toDataBase
     )
     if (result.data.ok) {
@@ -393,6 +393,58 @@ function executePutOption (postHash, numToken, milestoneTokenAddress, numVtxFeeT
   })
 }
 
+function updatePostRewards (actor, boardId, postHash, value) {
+  return new Promise(async (resolve, reject) => {
+    const toDataBase = {
+      actor,
+      boardId,
+      postHash,
+      value
+    }
+    const result = await axios.post(
+      `${Config.FEED_END_POINT}/feed-upvote`,
+      toDataBase
+    )
+    if (result.data.ok) {
+      resolve(result)
+    } else {
+      reject(result)
+    }
+  })
+}
+
+function getReputation (userAddress) {
+  return new Promise(async (resolve, reject) => {
+    const result = await axios.post(
+      `${Config.FEED_END_POINT}/get-reputations`,
+      { UserAddress: userAddress }
+    )
+    if (result.data.ok) {
+      resolve(result.data.reputations)
+    } else {
+      reject(result.data.message)
+    }
+  })
+}
+
+function refuelReputation (userAddress, reputations, refreshProfile) {
+  return new Promise(async (resolve, reject) => {
+    const result = await axios.post(
+      `${Config.FEED_END_POINT}/refuel-reputations`,
+      {
+        UserAddress: userAddress,
+        reputations: reputations
+      }
+    )
+    if (result.data.ok) {
+      refreshProfile()
+      resolve(result.data.reputations)
+    } else {
+      reject(result.data.message)
+    }
+  })
+}
+
 export {
   batchReadFeedsByBoardId,
   checkBalanceForTx,
@@ -401,5 +453,8 @@ export {
   newOffChainPost,
   fetchUserMilstoneData,
   purchasePutOption,
-  executePutOption
+  executePutOption,
+  updatePostRewards,
+  getReputation,
+  refuelReputation
 }

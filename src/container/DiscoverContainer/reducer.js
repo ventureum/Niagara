@@ -102,6 +102,24 @@ export default function (state: any = initialState, action: Function) {
       errorMessage: ''
     }
   }
-
+  if (action.type === 'UPDATE_POST_REWARDS_FULFILLED') {
+    return {
+      ...state,
+      loading: false
+    }
+  }
+  if (action.type === 'UPDATE_POST_REWARDS_PENDING') {
+    return {
+      ...state,
+      loading: true
+    }
+  }
+  if (action.type === 'UPDATE_POST_REWARDS_REJECTED') {
+    return {
+      ...state,
+      loading: false,
+      errorMessage: action.payload
+    }
+  }
   return state
 }

@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PostDetail from '../../stories/screens/PostDetail'
 import { getReplies, fetchUserMilstoneData, processPutOption, clearPostDetail } from './actions'
+import { updatePostRewards } from '../DiscoverContainer/actions'
 
 class PostDetailContainer extends Component {
   constructor (props) {
@@ -31,6 +32,7 @@ class PostDetailContainer extends Component {
         getReplies={this.props.getReplies}
         milestoneDataLoading={this.props.milestoneDataLoading}
         fetchUserMilstoneData={this.props.fetchUserMilstoneData}
+        updatePostRewards={this.props.updatePostRewards}
       />
     )
   }
@@ -49,7 +51,8 @@ const mapDispatchToProps = (dispatch) => ({
   fetchUserMilstoneData: (postHash) => dispatch(fetchUserMilstoneData(postHash)),
   processPutOption: (postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action, refreshCallback) =>
     dispatch(processPutOption(postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action, refreshCallback)),
-  clearPostDetail: () => dispatch(clearPostDetail())
+  clearPostDetail: () => dispatch(clearPostDetail()),
+  updatePostRewards: (boardId, postHash, value) => dispatch(updatePostRewards(boardId, postHash, value))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(PostDetailContainer)

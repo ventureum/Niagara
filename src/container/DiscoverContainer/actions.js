@@ -48,10 +48,10 @@ function _newOnChainPost (content, boardId, parentHash, postType, newContentToIP
     payload: forum.newOnChainPost(content, boardId, parentHash, postType, newContentToIPFS, newTransaction)
   }
 }
-function _newOffChainPost (content, boardId, parentHash, postType, poster) {
+function _newOffChainPost (content, boardId, parentHash, postType, actor) {
   return {
     type: 'NEW_POST',
-    payload: forum.newOffChainPost(content, boardId, parentHash, postType, poster)
+    payload: forum.newOffChainPost(content, boardId, parentHash, postType, actor)
   }
 }
 function newPost (content, boardId, parentHash, postType, destination) {
@@ -62,7 +62,7 @@ function newPost (content, boardId, parentHash, postType, destination) {
         boardId,
         parentHash,
         postType,
-        () => {},
+        () => { },
         (txHash) => { dispatch(newTransaction(txHash)) }
       ))
     }
@@ -79,4 +79,16 @@ function newPost (content, boardId, parentHash, postType, destination) {
   }
 }
 
-export { refreshPosts, setTokens, getMorePosts, switchBoard, newPost }
+function _updatePostRewards (actor, boardId, postHash, value) {
+  return {
+    type: 'UPDATE_POST_REWARDS',
+    payload: forum.updatePostRewards(actor, boardId, postHash, value)
+  }
+}
+function updatePostRewards (boardId, postHash, value) {
+  return (dispatch, getState) => {
+    const actor = getState().walletReducer.walletAddress
+    dispatch(_updatePostRewards(actor, boardId, postHash, value))
+  }
+}
+export { refreshPosts, setTokens, getMorePosts, switchBoard, newPost, updatePostRewards }
