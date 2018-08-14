@@ -109,39 +109,43 @@ function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
         offChainPosts.push(feedData.results[i].object.split(':')[1])
       }
     }
-    // get the flatten array of ipfs path, token address, author, rewards, # of replies from forum contract
-    const forum = await WalletUtils.getContractInstance('Forum')
-    const onChainPostData = await forum.methods.getBatchPosts(onChainPosts).call()
-    let onChainPostMeta = []
 
-    // Transform the flatten array from forum contract into an array of post objects
-    const web3 = WalletUtils.getWeb3Instance()
-    let BN = web3.utils.BN
-    let precision = 2
-    for (let i = 0; i < onChainPostData.length; i += 7) {
-      let hex = web3.utils.toBN(onChainPostData[i])
-      let base = new BN(10).pow(new BN(18 - precision))
+    if (onChainPosts.length > 0) {
+      // get the flatten array of ipfs path, token address, author, rewards, # of replies from forum contract
+      const forum = await WalletUtils.getContractInstance('Forum')
+      const onChainPostData = await forum.methods.getBatchPosts(onChainPosts).call()
+      let onChainPostMeta = []
 
-      if (!hex.isZero()) {
-        onChainPostMeta.push({
-          postHash: onChainPostData[i],
-          ipfsPath: getMultihashFromBytes32(onChainPostData[i + 2]),
-          actor: '0x' + onChainPostData[i + 3].substr(26, 40),
-          rewards: (web3.utils.toBN(onChainPostData[i + 4]).div(base).toNumber()) / (10 ** 2),
-          repliesLength: web3.utils.toDecimal(onChainPostData[i + 5]),
-          postType: typeMap.get(onChainPostData[i + 6].slice(0, 10))
-        })
-      } else {
-        break
+      // Transform the flatten array from forum contract into an array of post objects
+      const web3 = WalletUtils.getWeb3Instance()
+      let BN = web3.utils.BN
+      let precision = 2
+      for (let i = 0; i < onChainPostData.length; i += 7) {
+        let hex = web3.utils.toBN(onChainPostData[i])
+        let base = new BN(10).pow(new BN(18 - precision))
+
+        if (!hex.isZero()) {
+          onChainPostMeta.push({
+            postHash: onChainPostData[i],
+            ipfsPath: getMultihashFromBytes32(onChainPostData[i + 2]),
+            actor: '0x' + onChainPostData[i + 3].substr(26, 40),
+            rewards: (web3.utils.toBN(onChainPostData[i + 4]).div(base).toNumber()) / (10 ** 2),
+            repliesLength: web3.utils.toDecimal(onChainPostData[i + 5]),
+            postType: typeMap.get(onChainPostData[i + 6].slice(0, 10))
+          })
+        } else {
+          break
+        }
+      }
+
+      // get the content of each post
+      let onChainPostDetails = []
+      for (let i = 0; i < onChainPostMeta.length; i++) {
+        let singleContent = await _getSingleContent(onChainPostMeta[i])
+        onChainPostDetails.push(singleContent)
       }
     }
 
-    // get the content of each post
-    let onChainPostDetails = []
-    for (let i = 0; i < onChainPostMeta.length; i++) {
-      let singleContent = await _getSingleContent(onChainPostMeta[i])
-      onChainPostDetails.push(singleContent)
-    }
     let offChainPostDetails = []
     for (let i = 0; i < offChainPosts.length; i++) {
       const result = await axios.post(
