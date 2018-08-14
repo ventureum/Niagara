@@ -36,6 +36,7 @@ func (postRecord *PostRecord) ToPostRecordResult() *PostRecordResult{
     Actor:       postRecord.Actor,
     BoardId:     postRecord.BoardId,
     ParentHash:  postRecord.ParentHash,
+    PostHash:    postRecord.PostHash,
     PostType:    postRecord.PostType,
     Content:     feed_attributes.CreatedContantFromToJsonText(postRecord.Content),
     UpdateCount: postRecord.UpdateCount,

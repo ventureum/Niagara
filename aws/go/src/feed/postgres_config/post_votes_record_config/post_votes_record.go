@@ -13,3 +13,6 @@ type PostVotesRecord struct {
   CreatedAt time.Time `db:"created_at"`
   UpdatedAt time.Time `db:"updated_at"`
 }
+
+
+const STACK_FRACTION float64 = 0.01

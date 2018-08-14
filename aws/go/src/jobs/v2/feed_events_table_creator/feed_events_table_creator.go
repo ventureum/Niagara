@@ -9,19 +9,32 @@ import (
   "feed/postgres_config/post_reputations_record_config"
   "feed/postgres_config/post_replies_record_config"
   "feed/postgres_config/actor_reputations_record_config"
+  "github.com/aws/aws-lambda-go/lambda"
 )
 
-func main () {
+type Response struct {
+  Ok bool `json:"ok"`
+  Message string `json:"message,omitempty"`
+}
+
+func ProcessRequest(response *Response) {
+  defer func() {
+    if errStr := recover(); errStr != nil { //catch
+      response.Message = errStr.(string)
+    }
+  }()
 
   db := client_config.ConnectPostgresClient()
+  defer db.Close()
+
+  db.LoadUuidExtension()
+  db.LoadVoteTypeEnum()
 
   postVotesRecordExecutor := post_votes_record_config.PostVotesRecordExecutor{*db}
-  postVotesRecordExecutor.LoadVoteTypeEnum()
   postVotesRecordExecutor.DeletePostVotesRecordTable()
   postVotesRecordExecutor.CreatePostVotesRecordTable()
 
   reputationsRefuelRecordExecutor := reputations_refuel_record_config.ReputationsRefuelRecordExecutor{*db}
-  reputationsRefuelRecordExecutor.LoadUuidExtension()
   reputationsRefuelRecordExecutor.DeleteReputationsRefuelRecordTable()
   reputationsRefuelRecordExecutor.CreateReputationsRefuelRecordTable()
 
@@ -30,7 +43,6 @@ func main () {
   postRewardsRecordExecutor.CreatePostRewardsRecordTable()
 
   postReputationsRecordExecutor := post_reputations_record_config.PostReputationsRecordExecutor{*db}
-  postReputationsRecordExecutor.LoadVoteTypeEnum()
   postReputationsRecordExecutor.DeletePostReputationsRecordTable()
   postReputationsRecordExecutor.CreatePostReputationsRecordTable()
 
@@ -45,4 +57,16 @@ func main () {
   actorReputationsRecordExecutor := actor_reputations_record_config.ActorReputationsRecordExecutor{*db}
   actorReputationsRecordExecutor.DeleteActorReputationsRecordTable()
   actorReputationsRecordExecutor.CreateActorReputationsRecordTable()
+  response.Ok = true
+}
+
+func Handler() (response Response, err error) {
+  response.Ok = false
+  ProcessRequest(&response)
+  return response, nil
+}
+
+
+func main() {
+  lambda.Start(Handler)
 }

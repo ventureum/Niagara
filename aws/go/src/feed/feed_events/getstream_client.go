@@ -14,8 +14,7 @@ type GetStreamClient struct {
 func ConnectGetStreamClient() (*GetStreamClient) {
   client, err := stream.NewClientFromEnv()
   if err != nil {
-    log.Println("Failed to connect to GetStreamClient")
-    log.Fatal(err)
+    log.Panicf("Failed to connect to GetStreamClient with error: %+v", err)
   }
   log.Println("Connected to GetStream Client")
   return &GetStreamClient{C:  client}
@@ -62,8 +61,7 @@ func (getStreamClient *GetStreamClient) GetAllFeedActivitiesByFeedId(feedId feed
   flatFeed := getStreamClient.C.FlatFeed(string(feedId.FeedSlug), string(feedId.UserId))
   flatFeedResponse, err := flatFeed.GetActivities(stream.WithActivitiesLimit(10))
   if err != nil {
-    log.Printf("Failed to get activities for feedId: %s\n", feedId.Value())
-    log.Fatal(err.Error())
+    log.Panicf("Failed to get activities for feedId %s\n with error: %+v\n", feedId.Value(), err)
   }
   log.Printf("%+v\n",flatFeedResponse.Results)
 }
@@ -71,8 +69,7 @@ func (getStreamClient *GetStreamClient) GetAllFeedActivitiesByFeedId(feedId feed
 func (getStreamClient *GetStreamClient) GetAllFeedActivitiesByFlatFeed(flatFeed *stream.FlatFeed) {
   flatFeedResponse, err := flatFeed.GetActivities()
   if err != nil {
-    log.Printf("Failed to get activities for feedId: %s\n", flatFeed.ID())
-    log.Fatal(err.Error())
+    log.Panicf("Failed to get activities for feedId %s with error: %+v\n", flatFeed.ID(), err)
   }
   log.Printf("Activities for Feed Id %s\n %+v\n",flatFeed.ID(), flatFeedResponse.Results)
 }

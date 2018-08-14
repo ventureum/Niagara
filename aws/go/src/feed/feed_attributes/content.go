@@ -16,7 +16,7 @@ type Content struct {
 func (content *Content) ToJsonText() types.JSONText {
   marshaled, err := json.Marshal(content)
   if err != nil {
-    log.Fatal("Failed to marshal Content %+v", content)
+    log.Panicf("Failed to marshal Content %+v with error: %+v\n", content, err)
   }
   return types.JSONText(string(marshaled))
 }
@@ -25,7 +25,7 @@ func CreatedContantFromToJsonText(jsonText types.JSONText) *Content{
   var content Content
   err := jsonText.Unmarshal(&content)
   if err != nil {
-    log.Fatal("Failed to unmarshal jsonText %+v", jsonText)
+    log.Panicf("Failed to unmarshal jsonText %+v with error: %+v\n", jsonText, err)
   }
   return &content
 }

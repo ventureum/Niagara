@@ -4,6 +4,8 @@ import (
   "github.com/ethereum/go-ethereum/common"
   "feed/feed_attributes"
   "math/big"
+  "feed/postgres_config/post_config"
+  "feed/postgres_config/post_votes_record_config"
 )
 
 type Event interface{}
@@ -20,15 +22,6 @@ type PostEventResult struct {
   Timestamp *big.Int
 }
 
-type PostEvent struct {
-  Actor      string     // indexed
-  BoardId    string    // indexed
-  ParentHash string
-  PostHash   string   // indexed
-  PostType   feed_attributes.PostType
-  Timestamp  feed_attributes.BlockTimestamp
-}
-
 type UpvoteEventResult struct {
   Actor   common.Address // indexed
   BoardId   common.Hash    // indexed
@@ -37,31 +30,20 @@ type UpvoteEventResult struct {
   Timestamp *big.Int
 }
 
-type UpvoteEvent struct {
-  Actor   string // indexed
-  BoardId   string // indexed
-  PostHash  string // indexed
-  Value     feed_attributes.Vote
-  Timestamp feed_attributes.BlockTimestamp
-}
-
-func (postEventResult *PostEventResult) ToPostEvent() *PostEvent {
-  return &PostEvent {
+func (postEventResult *PostEventResult) ToPostRecord() *post_config.PostRecord {
+  return &post_config.PostRecord {
     Actor:      postEventResult.Poster.String(),
     BoardId:    postEventResult.BoardId.String(),
     ParentHash: postEventResult.ParentHash.String(),
     PostHash:   postEventResult.PostHash.String(),
-    PostType:   feed_attributes.CreatePostTypeFromHashStr(common.Bytes2Hex(postEventResult.TypeHash[:])),
-    Timestamp:  feed_attributes.CreateBlockTimestampFromBigInt(postEventResult.Timestamp),
+    PostType:   feed_attributes.CreatePostTypeFromHashStr("0x" + common.Bytes2Hex(postEventResult.TypeHash[:])).Value(),
   }
 }
 
-func (upvoteEventResult *UpvoteEventResult) ToUpvoteEvent() *UpvoteEvent{
-  return &UpvoteEvent {
+func (upvoteEventResult *UpvoteEventResult) ToPostVotesRecord() *post_votes_record_config.PostVotesRecord{
+  return &post_votes_record_config.PostVotesRecord {
     Actor:   upvoteEventResult.Actor.String(),
-    BoardId:   upvoteEventResult.BoardId.String(),
     PostHash:  upvoteEventResult.PostHash.String(),
-    Value:     feed_attributes.Vote(upvoteEventResult.Value.Int64()),
-    Timestamp: feed_attributes.CreateBlockTimestampFromBigInt(upvoteEventResult.Timestamp),
+    VoteType: feed_attributes.CreateVoteTypeFromValue(upvoteEventResult.Value.Int64()),
   }
 }
