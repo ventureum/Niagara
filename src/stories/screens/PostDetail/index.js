@@ -1,11 +1,9 @@
 import React, { Component } from 'react'
-import { Fab, Icon } from 'native-base'
+import { Fab, Content, Icon, Left, Right, Header, Body, Container, Button, Title } from 'native-base'
 import {
   FlatList,
   View,
   KeyboardAvoidingView,
-  Text,
-  ScrollView,
   RefreshControl
 } from 'react-native'
 import CommentCard from '../../components/CommentCard'
@@ -52,8 +50,20 @@ export default class PostDetail extends Component {
   render () {
     const { post, replies } = this.props
     return (
-      <View style={styles.container}>
-        <ScrollView
+      <Container>
+        <Header>
+          <Left>
+            <Button transparent onPress={() => this.props.navigation.goBack()}>
+              <Icon name='arrow-back' />
+            </Button>
+          </Left>
+          <Body>
+            <Title>Post</Title>
+          </Body>
+          <Right />
+        </Header>
+        <Content
+          style={styles.content}
           refreshControl={
             <RefreshControl
               refreshing={this.props.loading || this.props.milestoneDataLoading}
@@ -62,23 +72,6 @@ export default class PostDetail extends Component {
               }}
             />}
         >
-          <View style={styles.header} >
-            <View style={styles.headerLeft} >
-              <Icon
-                active
-                name='arrow-back'
-                onPress={() => {
-                  this.props.navigation.goBack()
-                }}
-              />
-              <Text style={{
-                fontWeight: '500',
-                fontSize: 18,
-                color: '#0f0f0f',
-                paddingLeft: 16
-              }}> Post </Text>
-            </View>
-          </View>
           {post.postType === 'MILESTONE'
             ? <View>
               <FeedCard
@@ -91,7 +84,7 @@ export default class PostDetail extends Component {
                 postHash={post.postHash}
                 milestoneDataLoading={this.props.milestoneDataLoading}
               />
-            </View >
+            </View>
             : <FeedCard
               post={post}
               updatePostRewards={this.props.updatePostRewards}
@@ -105,8 +98,8 @@ export default class PostDetail extends Component {
               onEndReachedThreshold={0.5}
               onEndReached={this.props.getMorePosts}
             />
-          </KeyboardAvoidingView >
-        </ScrollView>
+          </KeyboardAvoidingView>
+        </Content>
         <Fab
           active
           containerStyle={{}}
@@ -115,7 +108,7 @@ export default class PostDetail extends Component {
           onPress={() => { this.toReply(post) }}>
           <Icon name='ios-list-box-outline' />
         </Fab>
-      </View >
+      </Container>
     )
   }
 }

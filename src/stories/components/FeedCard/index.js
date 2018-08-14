@@ -6,7 +6,6 @@ import {
 } from 'react-native'
 
 import {
-  Thumbnail,
   Icon,
   Button
 } from 'native-base'
@@ -26,39 +25,26 @@ export default class FeedCard extends React.Component {
             flexDirection: 'row',
             justifyContent: 'flex-start'
           }}>
-            <Thumbnail small source={{ uri: post.avatar }} />
-            <View
-              style={{
-                flexDirection: 'column',
-                justifyContent: 'space-between'
-              }}
-            >
+            <View>
+              <Text style={styles.title}>
+                {post.content.title}
+              </Text>
               <Text
                 style={{
-                  paddingLeft: 10,
                   color: '#aaa',
                   fontSize: 14
                 }}
               >
                 {'@' + post.actor}
               </Text>
-              <Text style={{ paddingLeft: 10, paddingBottom: 5, fontSize: 13, color: '#aaa' }}>
+              <Text style={{ fontSize: 13, color: '#aaa' }}>
                 {moment.utc(post.time).fromNow()}
               </Text>
             </View>
           </View>
           <SourceBadge source={post.source} />
         </View>
-        <Text
-          style={{
-            fontWeight: 'bold',
-            fontSize: 16,
-            color: 'black'
-          }}
-        >
-          {post.content.title}
-        </Text>
-        <Markdown >{post.content.text}</Markdown>
+        <Markdown>{post.content.text}</Markdown>
         <View style={styles.cardFooter}>
           <View style={styles.footerIcons}>
             <Button transparent

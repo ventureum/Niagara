@@ -7,7 +7,6 @@ import {
   Title,
   Content,
   Text,
-  Body,
   Right,
   List,
   ListItem,

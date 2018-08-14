@@ -3,7 +3,7 @@ import * as React from 'react'
 import {
   View,
   Text,
-  TouchableWithoutFeedback
+  TouchableHighlight
 } from 'react-native'
 
 import {
@@ -28,54 +28,40 @@ export default class FeedCard extends React.Component {
   render () {
     let { post } = this.props
     return (
-      <View style={styles.card}>
-        <View style={styles.header}>
-          <View style={{
-            flexDirection: 'row',
-            justifyContent: 'flex-start'
-          }}>
-            <Thumbnail small source={{ uri: post.avatar }} />
-            <View
-              style={{
-                flexDirection: 'column',
-                justifyContent: 'space-between'
-              }}
-            >
-              <Text
-                style={{
-                  color: '#aaa',
-                  fontSize: 14,
-                  paddingLeft: 10
-                }}
-              >
-                {'@' + post.actor}
-              </Text>
-              <Text style={{ paddingLeft: 10, paddingBottom: 5, fontSize: 13, color: '#aaa' }}>
-                {moment.utc(post.time).fromNow()}
-              </Text>
+      <TouchableHighlight onPress={() => {
+        this.toDetail(post)
+      }}>
+        <View style={styles.card}>
+          {post.content.image &&
+            <Markdown style={styles.md}>{`![user image](${post.content.image})`}</Markdown>
+          }
+          <View style={styles.header}>
+            <View style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-start'
+            }}>
+              <View>
+                <Text style={styles.title}>
+                  {post.content.title}
+                </Text>
+                <Text
+                  style={{
+                    color: '#aaa',
+                    fontSize: 14
+                  }}
+                >
+                  {'@' + post.actor}
+                </Text>
+                <Text style={{ fontSize: 13, color: '#aaa' }}>
+                  {moment.utc(post.time).fromNow()}
+                </Text>
+              </View>
             </View>
+            <SourceBadge source={post.source} />
           </View>
-          <SourceBadge source={post.source} />
-        </View>
-        <TouchableWithoutFeedback onPress={() => {
-          this.toDetail(post)
-        }}>
           <View>
-            <View>
-              <Text
-                style={{
-                  fontWeight: 'bold',
-                  fontSize: 16,
-                  color: 'black',
-                  marginTop: 10
-                }}
-              >
-                {post.content.title}
-              </Text>
-              {(post.content.image === undefined)
-                ? <Markdown>{post.content.subtitle}</Markdown>
-                : <Markdown>{`![user image](${post.content.image})\n\n${post.content.subtitle}`}</Markdown>
-              }
+            <View style={styles.content}>
+              <Markdown>{post.content.subtitle}</Markdown>
             </View>
             <View style={styles.cardFooter}>
               <View style={styles.footerIcons}>
@@ -109,8 +95,8 @@ export default class FeedCard extends React.Component {
               </View>
             </View>
           </View>
-        </TouchableWithoutFeedback>
-      </View>
+        </View>
+      </TouchableHighlight>
     )
   }
 }

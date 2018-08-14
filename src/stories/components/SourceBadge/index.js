@@ -12,7 +12,7 @@ export default class SourceBadge extends Component {
         justifyContent: 'center',
         backgroundColor: badgeColor,
         borderRadius: 5,
-        height: '60%',
+        height: this.props.height || '40%',
         paddingLeft: 5,
         paddingRight: 5
       }}>

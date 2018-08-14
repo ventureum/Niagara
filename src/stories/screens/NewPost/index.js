@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { KeyboardAvoidingView, View, TextInput, Switch, ScrollView, Platform } from 'react-native'
+import { KeyboardAvoidingView, View, TextInput, Switch, ScrollView } from 'react-native'
 import { Container, Icon, Title, Text, Header, Left, Body, Right, Button, Thumbnail, Spinner, Toast } from 'native-base'
 import styles from './styles'
 import WalletUtils from '../../../utils/wallet'
@@ -57,7 +57,6 @@ export default class NewPost extends Component {
             <Switch
               value={this.state.toMainnet}
               onValueChange={(value) => {
-                console.log(value)
                 this.setState({ toMainnet: value })
               }}
               style={{ marginRight: 3 }}
