@@ -1,10 +1,8 @@
 import * as React from 'react'
-
 import {
   View,
   Text
 } from 'react-native'
-
 import { Thumbnail } from 'native-base'
 import styles from './styles'
 import Markdown from 'react-native-markdown-renderer'

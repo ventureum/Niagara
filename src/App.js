@@ -23,6 +23,7 @@ import SearchPage from './stories/screens/SearchPage'
 import TokenToggle from './container/TokenToggleContainer'
 import NewPost from './container/NewPostContainer'
 import PostDetail from './container/PostDetailContainer'
+import RefuelReputation from './container/RefuelReputationContainer'
 
 const Drawer = DrawerNavigator(
   {
@@ -55,8 +56,8 @@ const App = StackNavigator(
     SearchPage: { screen: SearchPage },
     TokenToggle: { screen: TokenToggle },
     NewPost: { screen: NewPost },
-    PostDetail: { screen: PostDetail }
-
+    PostDetail: { screen: PostDetail },
+    RefuelReputation: {screen: RefuelReputation}
   },
   {
     initialRouteName: 'Login',

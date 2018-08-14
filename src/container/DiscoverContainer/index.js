@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Discover from '../../stories/screens/Discover'
-import { refreshPosts, getMorePosts, switchBoard, newPost } from './actions'
+import { refreshPosts, getMorePosts, switchBoard, newPost, updatePostRewards } from './actions'
 
 class DiscoverContainer extends Component {
   constructor (props) {
@@ -21,6 +21,7 @@ class DiscoverContainer extends Component {
         boardName={this.props.boardName}
         newPost={this.props.newPost}
         errorMessage={this.props.errorMessage}
+        updatePostRewards={this.props.updatePostRewards}
       />
     )
   }
@@ -38,7 +39,8 @@ const mapDispatchToProps = (dispatch) => ({
   refreshPosts: (boardHash) => dispatch(refreshPosts('board', boardHash)),
   getMorePosts: (boardHash) => dispatch(getMorePosts('board', boardHash)),
   switchBoard: (boardHash, boardName) => dispatch(switchBoard(boardHash, boardName)),
-  newPost: (content, boardId, parentHash, postType, destination) => dispatch(newPost(content, boardId, parentHash, postType, destination))
+  newPost: (content, boardId, parentHash, postType, destination) => dispatch(newPost(content, boardId, parentHash, postType, destination)),
+  updatePostRewards: (boardId, postHash, value) => dispatch(updatePostRewards(boardId, postHash, value))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(DiscoverContainer)
