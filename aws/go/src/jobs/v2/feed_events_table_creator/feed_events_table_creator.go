@@ -27,8 +27,10 @@ func ProcessRequest(response *Response) {
   db := client_config.ConnectPostgresClient()
   defer db.Close()
 
+  db.Begin()
   db.LoadUuidExtension()
   db.LoadVoteTypeEnum()
+  db.LoadActorTypeEnum()
 
   postVotesRecordExecutor := post_votes_record_config.PostVotesRecordExecutor{*db}
   postVotesRecordExecutor.DeletePostVotesRecordTable()
@@ -57,6 +59,8 @@ func ProcessRequest(response *Response) {
   actorReputationsRecordExecutor := actor_reputations_record_config.ActorReputationsRecordExecutor{*db}
   actorReputationsRecordExecutor.DeleteActorReputationsRecordTable()
   actorReputationsRecordExecutor.CreateActorReputationsRecordTable()
+
+  db.Commit()
   response.Ok = true
 }
 

@@ -75,3 +75,36 @@ const UpvoteEventABI = `[{
   "name": "Upvote",
   "type": "event"
 }]`
+
+const PurchaseReputationABI = `[{
+  "anonymous": false,
+  "inputs": [
+    {
+      "indexed": true,
+      "name": "msgSender",
+      "type": "address"
+    },
+    {
+      "indexed": true,
+      "name": "purchaser",
+      "type": "address"
+    },
+    {
+      "indexed": false,
+      "name": "numVetX",
+      "type": "uint256"
+    },
+    {
+      "indexed": false,
+      "name": "numReputation",
+      "type": "uint256"
+    },
+    {
+      "indexed": false,
+      "name": "timestamp",
+      "type": "uint256"
+    }
+  ],
+  "name": "PurchaseReputation",
+  "type": "event"
+}]`

@@ -21,6 +21,7 @@ import (
   "feed/postgres_config/post_reputations_record_config"
   "time"
   "errors"
+  "feed/postgres_config/purchase_reputations_record_config"
 )
 
 
@@ -59,6 +60,7 @@ func createFilterQuery(forumAddressHex string) ethereum.FilterQuery {
     Topics: [][]common.Hash{{
       PostEventTopic,
       UpvoteEventTopic,
+      PurchaseReputationsEventTopic,
     }},
   }
   return query
@@ -135,6 +137,18 @@ func matchEvent(topics []common.Hash, data []byte) (*Event, error) {
       upvoteEventResult.PostHash = topics[3]
       event = *upvoteEventResult.ToPostVotesRecord()
       return &event, nil
+
+    case PurchaseReputationsEventTopic:
+      var purchaseReputationsEventResult PurchaseReputationsEventResult
+      purchaseReputationsEventAbi, _ := abi.JSON(strings.NewReader(PurchaseReputationABI))
+      err := purchaseReputationsEventAbi.Unpack(&purchaseReputationsEventResult, "PurchaseReputation", data)
+      if err != nil {
+        return nil, err
+      }
+      purchaseReputationsEventResult.MsgSender = common.BytesToAddress(topics[1].Bytes())
+      purchaseReputationsEventResult.Purchaser = common.BytesToAddress(topics[2].Bytes())
+      event = *purchaseReputationsEventResult.ToPurchaseReputationsRecord()
+      return &event, nil
   }
 
   return nil, nil
@@ -151,7 +165,9 @@ func processEvent(
     case reflect.TypeOf(post_votes_record_config.PostVotesRecord{}):
       postVotesRecord := (*event).(post_votes_record_config.PostVotesRecord)
       ProcessPostVotesRecord(&postVotesRecord, postgresFeedClient)
-
+    case reflect.TypeOf(purchase_reputations_record_config.PurchaseReputationsRecord{}):
+      purchaseReputationsRecord := (*event).(purchase_reputations_record_config.PurchaseReputationsRecord)
+      ProcessPurchaseReputationsRecord(&purchaseReputationsRecord, postgresFeedClient)
   }
 }
 
@@ -269,6 +285,7 @@ func ProcessPostVotesRecord(
   actorReputationsRecordExecutor.SubActorReputationsTx(postVotesRecord.Actor, votePenalty)
 
   // Record current vote
+  postVotesRecord.SignedReputations = actorReputation.Value() * postVotesRecord.VoteType.Value()
   postVotesRecordExecutor.UpsertPostVotesRecordTx(postVotesRecord)
 
   // Update Actor Reputation For the postHash
@@ -295,6 +312,22 @@ func ProcessPostVotesRecord(
       actorReputationsRecordExecutor.AddActorReputationsTx(actorAddress, feed_attributes.Reputation(rewards))
     }
   }
+
+  postgresFeedClient.Commit()
+}
+
+func ProcessPurchaseReputationsRecord(
+    purchaseReputationsRecord *purchase_reputations_record_config.PurchaseReputationsRecord,
+    postgresFeedClient *client_config.PostgresFeedClient) {
+  postgresFeedClient.Begin()
+
+  actorReputationsRecordExecutor := actor_reputations_record_config.ActorReputationsRecordExecutor{
+    *postgresFeedClient}
+  purchaseReputationsRecordExecutor := purchase_reputations_record_config.PurchaseReputationsRecordExecutor{
+    *postgresFeedClient}
+  purchaseReputationsRecordExecutor.UpsertPurchaseReputationsRecordTx(purchaseReputationsRecord)
+  actorReputationsRecordExecutor.AddActorReputationsTx(
+    purchaseReputationsRecord.Purchaser, feed_attributes.Reputation(purchaseReputationsRecord.Reputations))
 
   postgresFeedClient.Commit()
 }

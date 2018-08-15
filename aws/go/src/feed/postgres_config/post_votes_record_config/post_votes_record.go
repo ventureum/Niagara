@@ -10,6 +10,7 @@ type PostVotesRecord struct {
   Actor string  `db:"actor"`
   PostHash string  `db:"post_hash"`
   VoteType feed_attributes.VoteType `db:"vote_type"`
+  SignedReputations int64 `db:"signed_reputations"`
   CreatedAt time.Time `db:"created_at"`
   UpdatedAt time.Time `db:"updated_at"`
 }

@@ -30,3 +30,12 @@ IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'vote_type_enum') THEN
 END IF;
 END$$;
 `
+
+const LOAD_ACTOR_TYPE_ENUM = `
+DO $$
+BEGIN
+IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'actor_type_enum') THEN
+  CREATE TYPE actor_type_enum AS ENUM ('USER','KOL', 'ADMIN');
+END IF;
+END$$;
+`
