@@ -68,7 +68,7 @@ function getBytes32FromMultiash (multihash) {
     API. size must satisfy: 0 < size <= 10
   @return return a array of post details
 */
-function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
+function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
   return new Promise(async (resolve, reject) => {
     // get feed token from lamda API
     const feedSlug = feed.split(':')
@@ -88,10 +88,13 @@ function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
     // get feed data from Stream API
     const targetFeed = client.feed(feedSlug[0], feedSlug[1], response.data.feedToken)
     let feedData
-    if (id_lt === null) {
+    if (id_lt === null && id_gt === null) {
       feedData = await targetFeed.get({ limit: size })
-    } else {
+    } else if (id_lt !== null && id_gt === null) {
       feedData = await targetFeed.get({ limit: size, id_lt: id_lt })
+    } else if (id_lt === null && id_gt !== null) {
+      console.log('gt', id_gt)
+      feedData = await targetFeed.get({ limit: size, id_gt: id_gt })
     }
 
     // build the arrays of post hash from feed data
@@ -116,7 +119,18 @@ function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
     if (onChainPosts.length > 0) {
       // get the flatten array of ipfs path, token address, author, rewards, # of replies from forum contract
       const forum = await WalletUtils.getContractInstance('Forum')
-      const onChainPostData = await forum.methods.getBatchPosts(onChainPosts).call()
+      let onChainPostData = []
+      let receiveBuffer
+      while (onChainPosts.length > 10) {
+        const portionToFetch = onChainPosts.slice(0, 10)
+        receiveBuffer = await forum.methods.getBatchPosts(portionToFetch).call()
+        onChainPostData = onChainPostData.concat(receiveBuffer)
+        onChainPosts = onChainPosts.slice(10)
+      }
+      receiveBuffer = await forum.methods.getBatchPosts(onChainPosts).call()
+      onChainPostData = onChainPostData.concat(receiveBuffer)
+
+      onChainPostData = await forum.methods.getBatchPosts(onChainPosts).call()
       let onChainPostMeta = []
 
       // Transform the flatten array from forum contract into an array of post objects
@@ -460,5 +474,6 @@ export {
   executePutOption,
   updatePostRewards,
   getReputation,
-  refuelReputation
+  refuelReputation,
+  client
 }

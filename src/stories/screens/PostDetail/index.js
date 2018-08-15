@@ -11,6 +11,7 @@ import FeedCard from '../../components/FeedCard'
 import styles from './styles'
 import WalletUtils from '../../../utils/wallet'
 import MilestoneCard from '../../components/MilestoneCard'
+import ActiveSession from '../../components/ActiveSession'
 
 export default class PostDetail extends Component {
   constructor (props) {
@@ -71,6 +72,7 @@ export default class PostDetail extends Component {
                 this.onRefresh()
               }}
             />}
+          contentContainerStyle={styles.scrolViewContainer}
         >
           {post.postType === 'MILESTONE'
             ? <View>
@@ -90,15 +92,21 @@ export default class PostDetail extends Component {
               updatePostRewards={this.props.updatePostRewards}
             />
           }
-          <KeyboardAvoidingView enabled>
-            <FlatList
-              data={replies}
-              renderItem={this.onRenderItem}
-              keyExtractor={item => item.id}
-              onEndReachedThreshold={0.5}
-              onEndReached={this.props.getMorePosts}
-            />
-          </KeyboardAvoidingView>
+          {post.endTime === undefined
+            ? <ActiveSession
+              onPress={() => {
+                this.props.navigation.navigate('ChatPage', { post, replies })
+              }} />
+            : <KeyboardAvoidingView enabled>
+              <FlatList
+                data={replies}
+                renderItem={this.onRenderItem}
+                keyExtractor={item => item.id}
+                onEndReachedThreshold={0.5}
+                onEndReached={this.props.getMorePosts}
+              />
+            </KeyboardAvoidingView >
+          }
         </Content>
         <Fab
           active
