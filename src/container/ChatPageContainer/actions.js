@@ -1,6 +1,6 @@
-import {batchReadFeedsByBoardId} from '../../services/forum'
+import { batchReadFeedsByBoardId } from '../../services/forum'
 
-const INITIAL_FETCH_SIZE = 50
+const INITIAL_FETCH_SIZE = 20
 
 function getInitialChatHistory (postHash) {
   return {
@@ -36,10 +36,32 @@ function fetchLatestChat (postHash) {
   }
 }
 
+function _fetchEalierChat (postHash, earliestUUID) {
+  return {
+    type: 'FETCH_EARLIER_CHAT',
+    payload: batchReadFeedsByBoardId(
+      `comment:${postHash}`,
+      earliestUUID,
+      null,
+      INITIAL_FETCH_SIZE
+    )
+  }
+}
+
+function fetchEalierChat (postHash) {
+  return (dispatch, getState) => {
+    const earliestUUID = getState().chatPageReducer.earliestUUID
+    dispatch(_fetchEalierChat(
+      postHash,
+      earliestUUID
+    ))
+  }
+}
+
 function clearChat () {
   return {
     type: 'CLEAR_CHAT'
   }
 }
 
-export {getInitialChatHistory, fetchLatestChat, clearChat}
+export { getInitialChatHistory, fetchLatestChat, clearChat, fetchEalierChat }

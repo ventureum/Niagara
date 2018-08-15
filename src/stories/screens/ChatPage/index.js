@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
-import { GiftedChat } from 'react-native-gifted-chat'
+import { GiftedChat, LoadEarlier } from 'react-native-gifted-chat'
 import { processContent } from '../../../utils/content'
+import WalletUtils from '../../../utils/wallet'
 let moment = require('moment')
 
 export default class ChatPage extends Component {
@@ -23,7 +24,7 @@ export default class ChatPage extends Component {
             createdAt: moment.utc(chatContent[i].time).local(),
             user: {
               _id: chatContent[i].actor,
-              name: chatContent[i].actor,
+              name: WalletUtils.getAddrAbbre(chatContent[i].actor),
               avatar: 'https://placeimg.com/140/140/any'
             }
           }
@@ -51,6 +52,22 @@ export default class ChatPage extends Component {
     }
   }
 
+  onLoadEarlier = () => {
+    this.props.fetchEalierChat(this.props.post.postHash)
+  }
+
+  renderLoadEarlier = (props) => {
+    console.log(props)
+    let label = 'Load earlier message.'
+    if (this.props.reachEarliestChat) {
+      label = 'Reached earliest message.'
+    }
+    return (
+      <LoadEarlier {...props}
+        label={label} />
+    )
+  }
+
   render () {
     return (
       <GiftedChat
@@ -59,8 +76,13 @@ export default class ChatPage extends Component {
           this.onSend(messages)
         }}
         user={{
-          _id: this.props.userAddress
+          _id: this.props.userAddress,
+          name: this.props.userAddress
         }}
+        loadEarlier
+        onLoadEarlier={this.onLoadEarlier}
+        isLoadingEarlier={this.props.chatContentLoading}
+        renderLoadEarlier={this.renderLoadEarlier}
       />
     )
   }
