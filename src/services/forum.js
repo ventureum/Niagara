@@ -93,7 +93,6 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
     } else if (id_lt !== null && id_gt === null) {
       feedData = await targetFeed.get({ limit: size, id_lt: id_lt })
     } else if (id_lt === null && id_gt !== null) {
-      console.log('gt', id_gt)
       feedData = await targetFeed.get({ limit: size, id_gt: id_gt })
     }
 
@@ -161,22 +160,20 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
     }
 
     let offChainPostDetails = []
-    for (let i = 0; i < offChainPosts.length; i++) {
-      const result = await axios.post(
+    const pResult = await Promise.all(offChainPosts.map((postHash) => {
+      return axios.post(
         `${Config.FEED_END_POINT}/get-feed-post`,
         {
-          'postHash': offChainPosts[i],
+          'postHash': postHash,
           'getStreamApiKey': Config.STREAM_API_KEY,
           'getStreamApiSecret': Config.STREAM_API_SECRET
         }
       )
-
-      if (!result.data.ok) {
-        reject(response.data.message)
-      }
+    }))
+    for (let i = 0; i < pResult.length; i++) {
       let precision = 2
       let base = new BN(10).pow(new BN(18 - precision))
-      const { post } = result.data
+      const { post } = pResult[i].data
       offChainPostDetails.push({
         postHash: post.postHash,
         actor: post.actor,

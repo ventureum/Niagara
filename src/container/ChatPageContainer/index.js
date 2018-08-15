@@ -5,7 +5,12 @@ import { connect } from 'react-redux'
 import Config from 'react-native-config'
 import axios from 'axios'
 import { client } from '../../services/forum'
-import { getInitialChatHistory, fetchLatestChat, clearChat } from './actions'
+import {
+  getInitialChatHistory,
+  fetchLatestChat,
+  clearChat,
+  fetchEalierChat
+} from './actions'
 
 class ChatPageContainer extends Component {
   constructor (props) {
@@ -61,6 +66,9 @@ class ChatPageContainer extends Component {
         newPost={this.props.newPost}
         userAddress={this.props.userAddress}
         boardHash={this.props.boardHash}
+        chatContentLoading={this.props.chatContentLoading}
+        fetchEalierChat={this.props.fetchEalierChat}
+        reachEarliestChat={this.props.reachEarliestChat}
       />
     )
   }
@@ -70,11 +78,14 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(newPost(content, boardId, parentHash, postType, destination)),
   getInitialChatHistory: (postHash) => dispatch(getInitialChatHistory(postHash)),
   fetchLatestChat: (postHash) => dispatch(fetchLatestChat(postHash)),
+  fetchEalierChat: (postHash) => dispatch(fetchEalierChat(postHash)),
   clearChat: () => dispatch(clearChat())
 })
 
 const mapStateToProps = state => ({
   chatContent: state.chatPageReducer.chatContent,
+  chatContentLoading: state.chatPageReducer.chatContentLoading,
+  reachEarliestChat: state.chatPageReducer.reachEarliestChat,
   userAddress: state.walletReducer.walletAddress,
   boardHash: state.discoverReducer.boardHash
 })
