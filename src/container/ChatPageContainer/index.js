@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import ChatPage from '../../stories/screens/ChatPage'
-import { newPost } from '../DiscoverContainer/actions'
+import { newPost, updatePostRewards } from '../DiscoverContainer/actions'
 import { connect } from 'react-redux'
 import Config from 'react-native-config'
 import axios from 'axios'
@@ -69,6 +69,7 @@ class ChatPageContainer extends Component {
         chatContentLoading={this.props.chatContentLoading}
         fetchEalierChat={this.props.fetchEalierChat}
         reachEarliestChat={this.props.reachEarliestChat}
+        updatePostRewards={this.props.updatePostRewards}
       />
     )
   }
@@ -79,6 +80,7 @@ const mapDispatchToProps = (dispatch) => ({
   getInitialChatHistory: (postHash) => dispatch(getInitialChatHistory(postHash)),
   fetchLatestChat: (postHash) => dispatch(fetchLatestChat(postHash)),
   fetchEalierChat: (postHash) => dispatch(fetchEalierChat(postHash)),
+  updatePostRewards: (boardId, postHash, value) => dispatch(updatePostRewards(boardId, postHash, value)),
   clearChat: () => dispatch(clearChat())
 })
 
