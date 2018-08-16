@@ -110,6 +110,9 @@ function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
       }
     }
 
+    const web3 = WalletUtils.getWeb3Instance()
+    let BN = web3.utils.BN
+    let onChainPostDetails = []
     if (onChainPosts.length > 0) {
       // get the flatten array of ipfs path, token address, author, rewards, # of replies from forum contract
       const forum = await WalletUtils.getContractInstance('Forum')
@@ -117,8 +120,6 @@ function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
       let onChainPostMeta = []
 
       // Transform the flatten array from forum contract into an array of post objects
-      const web3 = WalletUtils.getWeb3Instance()
-      let BN = web3.utils.BN
       let precision = 2
       for (let i = 0; i < onChainPostData.length; i += 7) {
         let hex = web3.utils.toBN(onChainPostData[i])
@@ -139,7 +140,6 @@ function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
       }
 
       // get the content of each post
-      let onChainPostDetails = []
       for (let i = 0; i < onChainPostMeta.length; i++) {
         let singleContent = await _getSingleContent(onChainPostMeta[i])
         onChainPostDetails.push(singleContent)
