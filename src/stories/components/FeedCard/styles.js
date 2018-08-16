@@ -4,8 +4,8 @@ const styles = StyleSheet.create({
   card: {
     paddingTop: 20,
     paddingBottom: 5,
-    paddingLeft: 4,
-    paddingRight: 4,
+    paddingLeft: 15,
+    paddingRight: 15,
     borderBottomColor: '#bbb',
     borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'column',
@@ -28,6 +28,11 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between'
+  },
+  title: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    color: 'black'
   }
 })
 

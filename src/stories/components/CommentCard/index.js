@@ -32,7 +32,7 @@ export default class CommentCard extends React.Component {
                 {moment.utc(post.time).fromNow()}
               </Text>
             </View>
-            <SourceBadge source={post.source} />
+            <SourceBadge height='60%' source={post.source} />
           </View>
           <View style={styles.commentContainer} >
             <Markdown> {post.content.text} </Markdown>

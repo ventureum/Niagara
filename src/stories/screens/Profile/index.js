@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, Content, Container, Body, ListItem, Left, Icon, Button, Thumbnail } from 'native-base'
+import { Text, Header, Title, Content, Container, Body, ListItem, Left, Icon, Right, Button, Thumbnail } from 'native-base'
 import { View, TouchableOpacity } from 'react-native'
 import styles from './styles'
 
@@ -15,10 +15,22 @@ export default class Profile extends Component {
   render () {
     return (
       <Container>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>Profile</Text>
-        </View>
-        <Content>
+        <Header>
+          <Left>
+            <Button transparent>
+              <Icon
+                active
+                name='menu'
+                onPress={() => this.props.navigation.openDrawer()}
+              />
+            </Button>
+          </Left>
+          <Body>
+            <Title>Profile</Title>
+          </Body>
+          <Right />
+        </Header>
+        <Content style={{backgroundColor: '#f8f8f8'}}>
           <View style={styles.nameCardContainer}>
             <View style={styles.nameCard}>
               <Thumbnail circle large source={{ uri: this.props.avatar }} />
@@ -35,7 +47,9 @@ export default class Profile extends Component {
             </View>
           </View>
           <View style={styles.paddingSpace} />
-          <ListItem icon
+          <ListItem
+            style={{height: 60}}
+            icon
             onPress={() => {
               this.props.navigation.navigate('Transaction')
             }}>

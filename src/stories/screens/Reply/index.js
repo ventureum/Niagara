@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { Text, Icon, Toast } from 'native-base'
-import { TextInput, View, KeyboardAvoidingView, TouchableOpacity, ScrollView, Switch } from 'react-native'
+import { Text, Icon, Toast, Container, Header, Left, Right, Body, Title, Button } from 'native-base'
+import { TextInput, View, KeyboardAvoidingView, ScrollView, Switch } from 'react-native'
 import styles from './styles'
 import { processContent } from '../../../utils/content'
 export default class Reply extends Component {
@@ -43,52 +43,57 @@ export default class Reply extends Component {
     const { post } = this.props
 
     return (
-      <KeyboardAvoidingView style={styles.replyContainer}>
-        <View style={styles.replyHeader} >
-          <View style={styles.headerLeft} >
-            <Icon
-              active
-              name='arrow-back'
-              onPress={() => {
-                this.props.navigation.goBack()
-              }}
-            />
-            <Text style={{ paddingLeft: 20 }}> Reply to Post</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.headerRight}
-            onPress={() => {
-              this.onSendComment(post, this.state.text)
-            }}>
+      <Container style={styles.container}>
+        <Header>
+          <Left>
+            <Button transparent onPress={() => this.props.navigation.goBack()}>
+              <Icon name='arrow-back' />
+            </Button>
+          </Left>
+          <Body style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Title>{this.state.onChain ? 'On-chain ' : 'Off-chain '}</Title>
             <Switch
               value={this.state.onChain}
               onValueChange={(value) => {
                 this.setState({ onChain: value })
               }}
-              style={{ marginRight: 4 }}
+              style={{ marginRight: 3 }}
             />
-            <Text>POST</Text>
-          </TouchableOpacity>
-        </View>
-        <ScrollView>
-          <View style={styles.postTitle}>
-            <Text style={{ fontWeight: 'bold', color: 'black', fontSize: 16 }}>{post.content.title}</Text>
-          </View>
-          <View>
-            <TextInput
-              autoFocus
-              placeholder='Share your ideas!'
-              multiline
-              underlineColorAndroid='transparent'
-              onChangeText={(text) => {
-                this.setState({ text })
+          </Body>
+          <Right>
+            <Button
+              style={{ height: '70%' }}
+              info
+              rounded
+              onPress={() => {
+                this.onSendComment(post, this.state.text)
               }}
-              value={this.state.text}
-              selectionColor='red'
-            />
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+            >
+              <Text>POST</Text>
+            </Button>
+          </Right>
+        </Header>
+        <KeyboardAvoidingView style={styles.content}>
+          <ScrollView>
+            <View style={styles.postTitle}>
+              <Text style={{ fontWeight: 'bold', color: 'black', fontSize: 16 }}>{post.content.title}</Text>
+            </View>
+            <View>
+              <TextInput
+                autoFocus
+                placeholder='Share your ideas!'
+                multiline
+                underlineColorAndroid='transparent'
+                onChangeText={(text) => {
+                  this.setState({ text })
+                }}
+                value={this.state.text}
+                selectionColor='red'
+              />
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </Container>
     )
   }
 }

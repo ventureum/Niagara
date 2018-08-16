@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { RefreshControl } from 'react-native'
+import { Platform, RefreshControl, View } from 'react-native'
 import {
   Left,
   Container,
@@ -7,7 +7,6 @@ import {
   Title,
   Content,
   Text,
-  Body,
   Right,
   List,
   ListItem,
@@ -80,27 +79,33 @@ class Assets extends React.Component {
     let identiconBase64 = 'data:image/png;base64,' + identiconData
     return (
       <Container style={styles.container}>
-        <Header span>
+        <Header span style={{ paddingTop: 30, backgroundColor: Platform.OS === 'ios' ? '#f8f8f8' : '#3f51b5'}}>
           <Grid>
-            <Row size={1} />
             <Row size={3}>
-              <Body style={{flexDirection: 'row', justifyContent: 'center'}}>
+              <View style={{width: '100%', flexDirection: 'row', justifyContent: 'center'}}>
                 <Thumbnail small source={{ uri: identiconBase64 }} />
-              </Body>
+              </View>
             </Row>
             <Row size={1}>
-              <Body style={{flexDirection: 'row', justifyContent: 'center'}}>
+              <View style={{width: '100%', flexDirection: 'row', justifyContent: 'center'}}>
                 <Text style={styles.textContent}> {walletAddressAbbre} </Text>
-              </Body>
+              </View>
             </Row>
             <Row size={3}>
               <Left>
-                <Title> ≈ { totalVal }  </Title>
+                <Title style={{marginTop: Platform.OS === 'ios' ? 15 : 10}}> ≈ { totalVal }  </Title>
               </Left>
               <Right>
-                <Button onPress={this.addTokenOnPress}>
-                  <Icon type='MaterialIcons' name='add-circle-outline' style={{fontSize: 37, color: 'white'}} />
-                </Button>
+                {Platform.OS === 'ios' &&
+                  <Button transparent onPress={this.addTokenOnPress} >
+                    <Icon type='MaterialIcons' name='add-circle' />
+                  </Button>
+                }
+                {Platform.OS === 'android' &&
+                  <Button transparent onPress={this.addTokenOnPress}>
+                    <Icon type='MaterialIcons' name='add-circle-outline' style={{fontSize: 37, color: 'white'}} />
+                  </Button>
+                }
               </Right>
             </Row>
           </Grid>

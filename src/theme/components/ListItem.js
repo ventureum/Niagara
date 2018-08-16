@@ -336,7 +336,7 @@ export default (variables = variable) => {
           fontSize: 17
         },
         flex: 1,
-        height: 44,
+        height: 60,
         justifyContent: 'center',
         borderBottomWidth: 1 / PixelRatio.getPixelSizeForLayoutSize(1),
         borderColor: variables.listBorderColor

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Header, Container, Title, Content, Text } from 'native-base'
+import { Header, Body, Left, Button, Right, Container, Icon, Title, Content, Text } from 'native-base'
 import { RefreshControl, FlatList } from 'react-native'
 import TransactionItem from '../../components/TransactionItem'
 
@@ -13,8 +13,16 @@ export default class Transaction extends Component {
     let { transactions } = this.props
     return (
       <Container>
-        <Header >
-          <Title>Transactions</Title>
+        <Header>
+          <Left>
+            <Button transparent onPress={() => this.props.navigation.goBack()}>
+              <Icon name='arrow-back' />
+            </Button>
+          </Left>
+          <Body>
+            <Title>Transactions</Title>
+          </Body>
+          <Right />
         </Header>
         {(transactions.length === 0)
           ? <Content contentContainerStyle={{ flex: 1, justifyContent: 'center', flexDirection: 'row', alignItems: 'center' }}

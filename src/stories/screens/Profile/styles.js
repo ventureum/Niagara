@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start'
   },
   paddingSpace: {
-    height: 10,
+    height: 4,
     backgroundColor: '#dbdcdd'
   },
   reputationContainer: {
