@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { GiftedChat, LoadEarlier } from 'react-native-gifted-chat'
 import { processContent } from '../../../utils/content'
 import WalletUtils from '../../../utils/wallet'
+import { DOWN_VOTE, UP_VOTE } from '../../../utils/constants'
+import Message from '../../components/Message'
 let moment = require('moment')
 
 export default class ChatPage extends Component {
@@ -26,7 +28,9 @@ export default class ChatPage extends Component {
               _id: chatContent[i].actor,
               name: WalletUtils.getAddrAbbre(chatContent[i].actor),
               avatar: 'https://placeimg.com/140/140/any'
-            }
+            },
+            postHash: chatContent[i].postHash,
+            rewards: chatContent[i].rewards
           }
         )
       }
@@ -57,7 +61,6 @@ export default class ChatPage extends Component {
   }
 
   renderLoadEarlier = (props) => {
-    console.log(props)
     let label = 'Load earlier message.'
     if (this.props.reachEarliestChat) {
       label = 'Reached earliest message.'
@@ -65,6 +68,45 @@ export default class ChatPage extends Component {
     return (
       <LoadEarlier {...props}
         label={label} />
+    )
+  }
+
+  onLongPress = (context, message) => {
+    if (message.text) {
+      const options = [
+        'Upvote',
+        'Downvote',
+        'Cancel'
+      ]
+      const cancelButtonIndex = options.length - 1
+      context.actionSheet().showActionSheetWithOptions({
+        options,
+        cancelButtonIndex
+      },
+      (buttonIndex) => {
+        switch (buttonIndex) {
+          case 0:
+            this.updatePostRewards(message.postHash, UP_VOTE)
+            break
+          case 1:
+            this.updatePostRewards(message.postHash, DOWN_VOTE)
+            break
+        }
+      })
+    }
+  }
+
+  updatePostRewards = (postHash, action) => {
+    const { boardHash } = this.props
+    this.props.updatePostRewards(boardHash, postHash, action)
+  }
+
+  renderMessage = (props) => {
+    return (
+      <Message
+        {...props}
+        updatePostRewards={this.updatePostRewards}
+      />
     )
   }
 
@@ -79,10 +121,14 @@ export default class ChatPage extends Component {
           _id: this.props.userAddress,
           name: this.props.userAddress
         }}
+        isAnimated
         loadEarlier
         onLoadEarlier={this.onLoadEarlier}
         isLoadingEarlier={this.props.chatContentLoading}
         renderLoadEarlier={this.renderLoadEarlier}
+        onLongPress={this.onLongPress}
+        renderCustomView={this.renderCustomView}
+        renderMessage={this.renderMessage}
       />
     )
   }

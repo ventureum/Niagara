@@ -95,7 +95,6 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
     } else if (id_lt === null && id_gt !== null) {
       feedData = await targetFeed.get({ limit: size, id_gt: id_gt })
     }
-
     // build the arrays of post hash from feed data
     let postMap = new Map()
     let onChainPosts = []
@@ -171,14 +170,12 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
       )
     }))
     for (let i = 0; i < pResult.length; i++) {
-      let precision = 2
-      let base = new BN(10).pow(new BN(18 - precision))
       const { post } = pResult[i].data
       offChainPostDetails.push({
         postHash: post.postHash,
         actor: post.actor,
-        rewards: (web3.utils.toBN(0).div(base).toNumber()) / (10 ** 2),
-        repliesLength: web3.utils.toDecimal(0),
+        rewards: post.rewards,
+        repliesLength: post.repliesLength,
         postType: post.postType,
         content: post.content
       })
