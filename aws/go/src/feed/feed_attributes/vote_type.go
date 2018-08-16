@@ -20,3 +20,15 @@ func CreateVoteTypeFromValue(voteValue int64) VoteType {
   return voteType
 }
 
+func (voteType VoteType) Value () int64 {
+  var value int64
+  switch voteType {
+    case UP_VOTE_TYPE :
+      value = 1
+    case DOWN_VOTE_TYPE :
+      value= -1
+    default:
+      log.Panicf("Invalid Vote Type: %s", voteType)
+  }
+  return value
+}

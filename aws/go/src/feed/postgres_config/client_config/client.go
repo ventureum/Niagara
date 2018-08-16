@@ -100,3 +100,10 @@ func (postgresFeedClient *PostgresFeedClient) LoadVoteTypeEnum() {
     log.Fatalf("Failed to load vote type enum with error: %+v\n", err)
   }
 }
+
+func (postgresFeedClient *PostgresFeedClient) LoadActorTypeEnum() {
+  _, err := postgresFeedClient.C.Exec(LOAD_ACTOR_TYPE_ENUM)
+  if err != nil {
+    log.Fatalf("Failed to load actor type enum with error: %+v\n", err)
+  }
+}

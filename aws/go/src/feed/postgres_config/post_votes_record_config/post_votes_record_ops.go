@@ -164,4 +164,3 @@ func (postVotesRecordExecutor *PostVotesRecordExecutor) GetActorListByPostHashAn
   }
   return &actorList
 }
-

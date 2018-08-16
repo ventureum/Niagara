@@ -5,13 +5,15 @@ INSERT INTO post_votes_records
 (
   actor,
   post_hash,
-  vote_type
+  vote_type,
+  signed_reputations
 )
 VALUES 
 (
   :actor, 
   :post_hash,
-  :vote_type
+  :vote_type,
+  :signed_reputations
 );
 `
 

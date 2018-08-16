@@ -6,6 +6,7 @@ import (
   "math/big"
   "feed/postgres_config/post_config"
   "feed/postgres_config/post_votes_record_config"
+  "feed/postgres_config/purchase_reputations_record_config"
 )
 
 type Event interface{}
@@ -30,6 +31,14 @@ type UpvoteEventResult struct {
   Timestamp *big.Int
 }
 
+type PurchaseReputationsEventResult struct {
+  MsgSender   common.Address // indexed
+  Purchaser   common.Address // indexed
+  NumVetX     *big.Int
+  NumReputation *big.Int
+  Timestamp *big.Int
+}
+
 func (postEventResult *PostEventResult) ToPostRecord() *post_config.PostRecord {
   return &post_config.PostRecord {
     Actor:      postEventResult.Poster.String(),
@@ -45,5 +54,13 @@ func (upvoteEventResult *UpvoteEventResult) ToPostVotesRecord() *post_votes_reco
     Actor:   upvoteEventResult.Actor.String(),
     PostHash:  upvoteEventResult.PostHash.String(),
     VoteType: feed_attributes.CreateVoteTypeFromValue(upvoteEventResult.Value.Int64()),
+  }
+}
+
+func (purchaseReputationsEventResult *PurchaseReputationsEventResult) ToPurchaseReputationsRecord() *purchase_reputations_record_config.PurchaseReputationsRecord {
+  return &purchase_reputations_record_config.PurchaseReputationsRecord{
+    Purchaser:  purchaseReputationsEventResult.Purchaser.String(),
+    VetX: purchaseReputationsEventResult.NumVetX.Int64(),
+    Reputations: purchaseReputationsEventResult.NumReputation.Int64(),
   }
 }

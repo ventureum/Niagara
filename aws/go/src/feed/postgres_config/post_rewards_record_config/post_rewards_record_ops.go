@@ -70,6 +70,15 @@ func (postRewardsRecordExecutor *PostRewardsRecordExecutor) SubPostRewards(
   log.Printf("Successfully substracted post rewards %d from postHash %s", reputationToSub, postHash)
 }
 
+
+func (postRewardsRecordExecutor *PostRewardsRecordExecutor) UpdatePostRewardsRecordsByAggregations() {
+  _, err := postRewardsRecordExecutor.C.Exec(UPSERT_POST_REWARDS_RECORD_BY_AGGREGATION_COMMAND)
+  if err != nil && err != sql.ErrNoRows {
+    log.Panicf(
+      "Failed to update post rewards records by aggregations with error:\n %+v", err)
+  }
+}
+
 /*
  * Tx versions
  */
@@ -109,7 +118,6 @@ func (postRewardsRecordExecutor *PostRewardsRecordExecutor) AddPostRewardsTx(
   log.Printf("Successfully added post rewards %d for postHash %s", reputationToAdd, postHash)
 }
 
-
 func (postRewardsRecordExecutor *PostRewardsRecordExecutor) SubPostRewardsTx(
     postHash string, reputationToSub feed_attributes.Reputation) {
   _, err := postRewardsRecordExecutor.Tx.Exec(SUB_POST_REWARDS_COMMAND, postHash, reputationToSub)
@@ -119,4 +127,12 @@ func (postRewardsRecordExecutor *PostRewardsRecordExecutor) SubPostRewardsTx(
   }
 
   log.Printf("Successfully substracted post rewards %d from postHash %s", reputationToSub, postHash)
+}
+
+func (postRewardsRecordExecutor *PostRewardsRecordExecutor) UpdatePostRewardsRecordsByAggregationsTx() {
+  _, err := postRewardsRecordExecutor.Tx.Exec(UPSERT_POST_REWARDS_RECORD_BY_AGGREGATION_COMMAND)
+  if err != nil && err != sql.ErrNoRows {
+    log.Panicf(
+      "Failed to update post rewards records by aggregations with error:\n %+v", err)
+  }
 }

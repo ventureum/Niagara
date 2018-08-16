@@ -8,6 +8,7 @@ CREATE TABLE actor_reputations_records (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (actor)
 );
+CREATE INDEX actor_reputations_records_index ON actor_reputations_records (actor, reputations);
 `
 
 const TABLE_NAME_FOR_ACTOR_REPUTATIONS_RECORD = "actor_reputations_records"
