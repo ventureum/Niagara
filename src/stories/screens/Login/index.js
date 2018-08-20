@@ -34,7 +34,7 @@ class Login extends React.Component<Props, State> {
           <View style={styles.buttonsContainer}>
             <View padder>
               <Button block onPress={() => this.props.navigation.navigate('CreateWallet')}>
-                <Text>Create wallet</Text>
+                <Text primaryColor>Create wallet</Text>
               </Button>
             </View>
             <View padder>
@@ -42,7 +42,7 @@ class Login extends React.Component<Props, State> {
                 recoverMode: true
               })
               }>
-                <Text>Recover wallet</Text>
+                <Text primaryColor>Recover wallet</Text>
               </Button>
             </View>
           </View>

@@ -223,6 +223,9 @@ export default class WalletUtils {
   static getAvatar (address) {
     let identiconData
     if (address !== undefined) {
+      if (address.length < 15) {
+        address = this.web3.utils.sha3(address)
+      }
       identiconData = new Identicon(address, 64).toString()
     } else {
       address = this.getWallet().walletAddress

@@ -136,7 +136,6 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
       for (let i = 0; i < onChainPostData.length; i += 7) {
         let hex = web3.utils.toBN(onChainPostData[i])
         let base = new BN(10).pow(new BN(18 - precision))
-
         if (!hex.isZero()) {
           onChainPostMeta.push({
             postHash: onChainPostData[i],
@@ -150,7 +149,6 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
           break
         }
       }
-
       // get the content of each post
       for (let i = 0; i < onChainPostMeta.length; i++) {
         let singleContent = await _getSingleContent(onChainPostMeta[i])

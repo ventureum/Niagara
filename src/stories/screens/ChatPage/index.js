@@ -4,6 +4,7 @@ import { processContent } from '../../../utils/content'
 import WalletUtils from '../../../utils/wallet'
 import { DOWN_VOTE, UP_VOTE } from '../../../utils/constants'
 import Message from '../../components/Message'
+import { Header, Container, Content, Left, Body, Right, Button, Icon, Title } from 'native-base'
 let moment = require('moment')
 
 export default class ChatPage extends Component {
@@ -112,24 +113,38 @@ export default class ChatPage extends Component {
 
   render () {
     return (
-      <GiftedChat
-        messages={this.state.messages}
-        onSend={messages => {
-          this.onSend(messages)
-        }}
-        user={{
-          _id: this.props.userAddress,
-          name: this.props.userAddress
-        }}
-        isAnimated
-        loadEarlier
-        onLoadEarlier={this.onLoadEarlier}
-        isLoadingEarlier={this.props.chatContentLoading}
-        renderLoadEarlier={this.renderLoadEarlier}
-        onLongPress={this.onLongPress}
-        renderCustomView={this.renderCustomView}
-        renderMessage={this.renderMessage}
-      />
+      <Container>
+        <Header>
+          <Left>
+            <Button transparent onPress={() => this.props.navigation.goBack()}>
+              <Icon name='arrow-back' />
+            </Button>
+          </Left>
+          <Body>
+            <Title>Active Chat</Title>
+          </Body>
+          <Right />
+        </Header>
+        <GiftedChat
+          messages={this.state.messages}
+          onSend={messages => {
+            this.onSend(messages)
+          }}
+          user={{
+            _id: this.props.userAddress,
+            name: this.props.userAddress
+          }}
+          isAnimated
+          loadEarlier
+          onLoadEarlier={this.onLoadEarlier}
+          isLoadingEarlier={this.props.chatContentLoading}
+          renderLoadEarlier={this.renderLoadEarlier}
+          onLongPress={this.onLongPress}
+          renderCustomView={this.renderCustomView}
+          renderMessage={this.renderMessage}
+        />
+      </Container>
+
     )
   }
 }

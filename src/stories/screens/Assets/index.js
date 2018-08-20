@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Platform, RefreshControl, View } from 'react-native'
+import { RefreshControl, View, TouchableOpacity } from 'react-native'
 import {
   Left,
   Container,
@@ -14,10 +14,10 @@ import {
   Button,
   Icon
 } from 'native-base'
-import { Row, Grid } from 'react-native-easy-grid'
-import styles from './styles'
 import { BigNumber } from 'bignumber.js'
 import Identicon from 'identicon.js'
+import styles from './styles'
+import ventureum from '../../../theme/variables/ventureum'
 
 var numeral = require('numeral')
 
@@ -59,11 +59,11 @@ class Assets extends React.Component {
       return (
         <ListItem key={i} onPress={() => this.tokenListOnPress(i)}>
           <Left>
-            <Text> {token.symbol } </Text>
+            <Text> {token.symbol} </Text>
           </Left>
           <Right>
-            <Text> { this.format(token.balance) } </Text>
-            <Text note> &#8776; { this.format(token.value) } </Text>
+            <Text> {this.format(token.balance)} </Text>
+            <Text note> &#8776; {this.format(token.value)} </Text>
           </Right>
         </ListItem>)
     })
@@ -78,37 +78,28 @@ class Assets extends React.Component {
     let identiconData = new Identicon(walletAddress, 64).toString()
     let identiconBase64 = 'data:image/png;base64,' + identiconData
     return (
-      <Container style={styles.container}>
-        <Header span style={{ paddingTop: 30, backgroundColor: Platform.OS === 'ios' ? '#f8f8f8' : '#3f51b5'}}>
-          <Grid>
-            <Row size={3}>
-              <View style={{width: '100%', flexDirection: 'row', justifyContent: 'center'}}>
+      <Container>
+        <Header span>
+          <View style={styles.headerContainer}>
+            <View style={styles.userInfoContainer}>
+              <View style={styles.avatarContainer}>
                 <Thumbnail small source={{ uri: identiconBase64 }} />
               </View>
-            </Row>
-            <Row size={1}>
-              <View style={{width: '100%', flexDirection: 'row', justifyContent: 'center'}}>
-                <Text style={styles.textContent}> {walletAddressAbbre} </Text>
+              <View style={styles.addressContainer}>
+                <Text> {walletAddressAbbre} </Text>
               </View>
-            </Row>
-            <Row size={3}>
-              <Left>
-                <Title style={{marginTop: Platform.OS === 'ios' ? 15 : 10}}> ≈ { totalVal }  </Title>
-              </Left>
-              <Right>
-                {Platform.OS === 'ios' &&
-                  <Button transparent onPress={this.addTokenOnPress} >
-                    <Icon type='MaterialIcons' name='add-circle' />
-                  </Button>
-                }
-                {Platform.OS === 'android' &&
-                  <Button transparent onPress={this.addTokenOnPress}>
-                    <Icon type='MaterialIcons' name='add-circle-outline' style={{fontSize: 37, color: 'white'}} />
-                  </Button>
-                }
-              </Right>
-            </Row>
-          </Grid>
+            </View>
+            <View style={styles.wealthContainer}>
+              <Title> ≈ {totalVal}  </Title>
+              <TouchableOpacity onPress={this.addTokenOnPress}>
+                <Icon
+                  type='SimpleLineIcons'
+                  name='magnifier-add'
+                  style={{ fontSize: 28, color: ventureum.secondaryColor }}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
         </Header>
         <Content refreshControl={
           <RefreshControl refreshing={this.props.loading}

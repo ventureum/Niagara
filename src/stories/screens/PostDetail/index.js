@@ -12,6 +12,7 @@ import styles from './styles'
 import WalletUtils from '../../../utils/wallet'
 import MilestoneCard from '../../components/MilestoneCard'
 import ActiveSession from '../../components/ActiveSession'
+import ventureum from '../../../theme/variables/ventureum'
 
 export default class PostDetail extends Component {
   constructor (props) {
@@ -111,7 +112,7 @@ export default class PostDetail extends Component {
         <Fab
           active
           containerStyle={{}}
-          style={{ backgroundColor: 'red' }}
+          style={{ backgroundColor: ventureum.lightSecondaryColor }}
           position='bottomRight'
           onPress={() => { this.toReply(post) }}>
           <Icon name='ios-list-box-outline' />

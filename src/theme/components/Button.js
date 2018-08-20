@@ -1,4 +1,5 @@
 import variable from './../variables/platform'
+import ventureum from '../variables/ventureum'
 
 export default (variables = variable) => {
   const platformStyle = variables.platformStyle
@@ -260,7 +261,8 @@ export default (variables = variable) => {
 
     '.block': {
       justifyContent: 'center',
-      alignSelf: 'stretch'
+      alignSelf: 'stretch',
+      backgroundColor: ventureum.secondaryColor
     },
 
     '.full': {
@@ -460,7 +462,6 @@ export default (variables = variable) => {
     },
 
     paddingVertical: variables.buttonPadding,
-    // paddingHorizontal: variables.buttonPadding + 10,
     backgroundColor: variables.btnPrimaryBg,
     borderRadius: variables.borderRadiusBase,
     borderColor: variables.btnPrimaryBg,
@@ -468,7 +469,6 @@ export default (variables = variable) => {
     height: 45,
     alignSelf: 'flex-start',
     flexDirection: 'row',
-    elevation: 2,
     shadowColor: platformStyle === 'material' ? '#000' : undefined,
     shadowOffset: platformStyle === 'material' ? { width: 0, height: 2 } : undefined,
     shadowOpacity: platformStyle === 'material' ? 0.2 : undefined,

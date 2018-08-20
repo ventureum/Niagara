@@ -6,6 +6,7 @@ import WalletUtils from '../../../utils/wallet'
 import Search from '../../../utils/search.js'
 import SpecialPostCard from '../../components/SpecialPostCard'
 import { BOARD_ALL_HASH } from '../../../utils/constants.js'
+import ventureum from '../../../theme/variables/ventureum'
 
 console.ignoredYellowBox = ['Setting a timer']
 
@@ -78,26 +79,12 @@ export default class Discover extends Component {
               </Button>
               : <View />
             }
-            {Platform.OS === 'ios' &&
-              <Button transparent onPress={this.toSearchPage} >
-                <Icon name='search' />
-              </Button>
-            }
-            {Platform.OS === 'android' &&
-              <Button onPress={this.toSearchPage} >
-                <Icon name='search' />
-              </Button>
-            }
-            {Platform.OS === 'ios' &&
-              <Button transparent onPress={this.onRefresh} >
-                <Icon name='refresh' />
-              </Button>
-            }
-            {Platform.OS === 'android' &&
-              <Button onPress={this.onRefresh} >
-                <Icon name='refresh' />
-              </Button>
-            }
+            <Button transparent onPress={this.toSearchPage} >
+              <Icon name='search' />
+            </Button>
+            <Button transparent onPress={this.onRefresh} >
+              <Icon name='refresh' />
+            </Button>
           </Right>
         </Header>
         {this.props.boardHash !== BOARD_ALL_HASH
@@ -134,10 +121,10 @@ export default class Discover extends Component {
         <Fab
           active
           containerStyle={{}}
-          style={{ backgroundColor: '#5067FF' }}
+          style={{ backgroundColor: ventureum.lightSecondaryColor }}
           position='bottomRight'
           onPress={this.toNewPost}>
-          <Icon name='add' style={{fontSize: 40, lineHeight: 40, paddingTop: Platform.OS === 'ios' ? 5 : 0}}/>
+          <Icon name='add' style={{ fontSize: Platform.OS === 'ios' ? 40 : 30, lineHeight: 40, paddingTop: Platform.OS === 'ios' ? 5 : 0 }} />
         </Fab>
       </Container >
     )

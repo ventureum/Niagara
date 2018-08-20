@@ -70,6 +70,7 @@ class ChatPageContainer extends Component {
         fetchEalierChat={this.props.fetchEalierChat}
         reachEarliestChat={this.props.reachEarliestChat}
         updatePostRewards={this.props.updatePostRewards}
+        navigation={this.props.navigation}
       />
     )
   }

@@ -87,7 +87,8 @@ export default (variables = variable) => {
     height: variables.footerHeight,
     elevation: 3,
     left: 0,
-    right: 0
+    right: 0,
+    paddingTop: 1
   }
 
   return footerTheme

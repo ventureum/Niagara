@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Text, Header, Title, Content, Container, Body, ListItem, Left, Icon, Right, Button, Thumbnail } from 'native-base'
 import { View, TouchableOpacity } from 'react-native'
 import styles from './styles'
+import ventureum from '../../../theme/variables/ventureum'
 
 export default class Profile extends Component {
   componentWillMount () {
@@ -30,7 +31,7 @@ export default class Profile extends Component {
           </Body>
           <Right />
         </Header>
-        <Content style={{backgroundColor: '#f8f8f8'}}>
+        <Content>
           <View style={styles.nameCardContainer}>
             <View style={styles.nameCard}>
               <Thumbnail circle large source={{ uri: this.props.avatar }} />
@@ -54,7 +55,7 @@ export default class Profile extends Component {
               this.props.navigation.navigate('Transaction')
             }}>
             <Left>
-              <Button style={{ backgroundColor: '#FF9501' }}>
+              <Button style={{ backgroundColor: ventureum.secondaryColor }}>
                 <Icon active name='list' />
               </Button>
             </Left>
@@ -67,7 +68,7 @@ export default class Profile extends Component {
               this.props.navigation.navigate('RefuelReputation', {refreshProfile: this.onRefresh})
             }}>
             <Left>
-              <Button style={{ backgroundColor: '#FF9501' }}>
+              <Button style={{ backgroundColor: ventureum.secondaryColor }}>
                 <Icon active name='ios-people-outline' />
               </Button>
             </Left>

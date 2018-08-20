@@ -70,7 +70,7 @@ class TokenToggle extends React.Component {
             keyExtractor={(item, index) => item.address}
             extraData={this.props}
           />
-          : <Card>
+          : <Card transparent>
             <CardItem>
               <Body>
                 <Text>

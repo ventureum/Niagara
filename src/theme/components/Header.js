@@ -1,5 +1,5 @@
-import { PixelRatio } from 'react-native'
-
+import { PixelRatio, StyleSheet } from 'react-native'
+import ventureum from '../variables/ventureum'
 import variable from './../variables/platform'
 
 export default (variables = variable) => {
@@ -8,7 +8,7 @@ export default (variables = variable) => {
 
   const headerTheme = {
     '.span': {
-      height: 150,
+      height: platform === 'ios' ? 170 : 150,
       'NativeBase.Left': {
         alignSelf: 'flex-start'
       },
@@ -299,9 +299,9 @@ export default (variables = variable) => {
     flexDirection: 'row',
     paddingHorizontal: 10,
     justifyContent: 'center',
-    paddingTop: platform === 'ios' ? 15 : 0,
-    borderBottomWidth: platform === 'ios' ? 1 / PixelRatio.getPixelSizeForLayoutSize(1) : 0,
-    borderBottomColor: variables.toolbarDefaultBorder,
+    paddingTop: platform === 'ios' ? 25 : 5,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: ventureum.borderColor,
     height: variables.toolbarHeight,
     elevation: 3,
     shadowColor: platformStyle === 'material' ? '#000' : undefined,
@@ -311,6 +311,7 @@ export default (variables = variable) => {
     top: 0,
     left: 0,
     right: 0
+
   }
 
   return headerTheme

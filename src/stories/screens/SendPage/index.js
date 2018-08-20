@@ -70,7 +70,8 @@ export default class SendPage extends Component {
         <Content>
           <Form>
             <Item >
-              <Input placeholder="Receiver's Address"
+              <Input
+                placeholder="Receiver's Address"
                 onChangeText={(text) => this.setState({ receiverAddr: text })}
                 value={this.state.receiverAddr}
               />
@@ -85,7 +86,9 @@ export default class SendPage extends Component {
               <Input disabled value={String(this.props.tokenBalance)} />
             </Item>
             <Item >
-              <Input placeholder='Amount'
+              <Input
+                placeholder='Amount'
+                keyboardType='numeric'
                 onChangeText={(text) => this.setState({ amount: text })}
                 value={String(this.state.amount)} />
             </Item>

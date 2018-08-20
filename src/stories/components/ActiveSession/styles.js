@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native'
+import ventureum from '../../../theme/variables/ventureum'
 
 const styles = StyleSheet.create({
   container: {
@@ -6,7 +7,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#459b07',
+    backgroundColor: ventureum.lightSecondaryColor,
     elevation: 10
   }
 })

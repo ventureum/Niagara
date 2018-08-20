@@ -1,19 +1,28 @@
 import { StyleSheet } from 'react-native'
+import ventureum from '../../../theme/variables/ventureum'
 
 const styles: any = StyleSheet.create({
-  container: {
-    backgroundColor: '#FBFAFA'
-  },
-  textContent: {
-    fontSize: 14,
-    color: 'white'
-  },
   listContent: {
     fontSize: 14,
     color: 'black'
   },
-  smallText: {
-    fontSize: 10
+  footerButton: {
+    backgroundColor: ventureum.lightSecondaryColor,
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center'
+  },
+  headerContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center'
+  },
+  headerInfo: {
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    backgroundColor: ventureum.primaryColor
   }
 })
 export default styles

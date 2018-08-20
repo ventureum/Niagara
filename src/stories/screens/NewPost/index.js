@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
-import { KeyboardAvoidingView, View, TextInput, Switch, ScrollView } from 'react-native'
+import { KeyboardAvoidingView, View, TextInput, Switch, ScrollView, Alert, TouchableOpacity, Platform } from 'react-native'
 import { Container, Icon, Title, Text, Header, Left, Body, Right, Button, Thumbnail, Spinner, Toast } from 'native-base'
 import styles from './styles'
 import WalletUtils from '../../../utils/wallet'
 import { processContent } from '../../../utils/content'
+import { NEW_POST_REPUTATION_COST } from '../../../utils/constants'
 
 export default class NewPost extends Component {
   constructor (props) {
@@ -38,8 +39,30 @@ export default class NewPost extends Component {
       const web3 = WalletUtils.getWeb3Instance()
       const noParent = web3.utils.padRight('0x0', 64)
       const postType = 'POST'
-      this.props.newPost(content, boardId, noParent, postType, destination)
-      this.props.navigation.goBack()
+      let message = `A new ${destination} reply costs ${NEW_POST_REPUTATION_COST} reputation`
+      if (destination === 'ON-CHAIN') {
+        message += `\n\nAdditional transaction fee applies to ON-CHAIN post`
+      }
+      Alert.alert(
+        'Please confirm',
+        message,
+        [
+          {
+            text: 'Cancel',
+            onPress: () => {
+            },
+            style: 'cancel'
+          },
+          {
+            text: 'Confirm',
+            onPress: () => {
+              this.props.newPost(content, boardId, noParent, postType, destination)
+              this.props.navigation.goBack()
+            }
+          }
+        ],
+        { cancelable: false }
+      )
     }
   }
 
@@ -65,16 +88,14 @@ export default class NewPost extends Component {
           <Right>
             {this.props.loading
               ? <Spinner color='green' style={{ paddingBottom: 8 }} />
-              : <Button
-                style={{ height: '70%' }}
-                info
-                rounded
+              : <TouchableOpacity
+                style={styles.tweetButton}
                 onPress={() => {
                   this.onTweet(this.state.title, this.state.text)
                 }}
               >
-                <Text>Tweet</Text>
-              </Button>
+                <Text style={styles.headerButtonText}>Tweet</Text>
+              </TouchableOpacity>
             }
           </Right>
         </Header>
@@ -85,13 +106,17 @@ export default class NewPost extends Component {
             </View>
             <View style={styles.textInputContainer} >
               <ScrollView>
-                <TextInput
-                  placeholder='Title'
-                  onChangeText={(title) => {
-                    this.setState({ title })
-                  }}
-                  value={this.state.title}
-                />
+                <View style={styles.divider} >
+                  <TextInput
+                    placeholder='Title'
+                    onChangeText={(title) => {
+                      this.setState({ title })
+                    }}
+                    value={this.state.title}
+                    underlineColorAndroid='transparent'
+                    style={{ paddingBottom: Platform.OS === 'ios' ? 4 : 0 }}
+                  />
+                </View>
                 <TextInput
                   placeholder='Share your ideas!'
                   multiline
@@ -100,6 +125,7 @@ export default class NewPost extends Component {
                     this.setState({ text })
                   }}
                   value={this.state.text}
+                  style={{ paddingTop: Platform.OS === 'ios' ? 4 : 0 }}
                 />
               </ScrollView>
             </View>
