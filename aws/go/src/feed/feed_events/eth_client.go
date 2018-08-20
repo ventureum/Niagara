@@ -194,7 +194,6 @@ func ProcessPostRecord(
 
   // Insert Activity to GetStream
   activity := ConvertPostRecordToActivity(postRecord, source, feed_attributes.BlockTimestamp(updatedTimestamp.Unix()))
-  activity.Time = feed_attributes.CreateBlockTimestampFromTime(updatedTimestamp)
   getStreamClient.AddFeedActivityToGetStream(activity)
 
   // Update Post Replies Record

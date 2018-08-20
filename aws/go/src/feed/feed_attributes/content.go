@@ -21,7 +21,7 @@ func (content *Content) ToJsonText() types.JSONText {
   return types.JSONText(string(marshaled))
 }
 
-func CreatedContantFromToJsonText(jsonText types.JSONText) *Content{
+func CreatedContentFromToJsonText(jsonText types.JSONText) *Content{
   var content Content
   err := jsonText.Unmarshal(&content)
   if err != nil {
