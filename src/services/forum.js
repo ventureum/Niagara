@@ -68,7 +68,7 @@ function getBytes32FromMultiash (multihash) {
     API. size must satisfy: 0 < size <= 10
   @return return a array of post details
 */
-function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
+function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
   return new Promise(async (resolve, reject) => {
     // get feed token from lamda API
     const feedSlug = feed.split(':')
@@ -88,12 +88,13 @@ function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
     // get feed data from Stream API
     const targetFeed = client.feed(feedSlug[0], feedSlug[1], response.data.feedToken)
     let feedData
-    if (id_lt === null) {
+    if (id_lt === null && id_gt === null) {
       feedData = await targetFeed.get({ limit: size })
-    } else {
+    } else if (id_lt !== null && id_gt === null) {
       feedData = await targetFeed.get({ limit: size, id_lt: id_lt })
+    } else if (id_lt === null && id_gt !== null) {
+      feedData = await targetFeed.get({ limit: size, id_gt: id_gt })
     }
-
     // build the arrays of post hash from feed data
     let postMap = new Map()
     let onChainPosts = []
@@ -116,7 +117,18 @@ function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
     if (onChainPosts.length > 0) {
       // get the flatten array of ipfs path, token address, author, rewards, # of replies from forum contract
       const forum = await WalletUtils.getContractInstance('Forum')
-      const onChainPostData = await forum.methods.getBatchPosts(onChainPosts).call()
+      let onChainPostData = []
+      let receiveBuffer
+      while (onChainPosts.length > 10) {
+        const portionToFetch = onChainPosts.slice(0, 10)
+        receiveBuffer = await forum.methods.getBatchPosts(portionToFetch).call()
+        onChainPostData = onChainPostData.concat(receiveBuffer)
+        onChainPosts = onChainPosts.slice(10)
+      }
+      receiveBuffer = await forum.methods.getBatchPosts(onChainPosts).call()
+      onChainPostData = onChainPostData.concat(receiveBuffer)
+
+      onChainPostData = await forum.methods.getBatchPosts(onChainPosts).call()
       let onChainPostMeta = []
 
       // Transform the flatten array from forum contract into an array of post objects
@@ -147,27 +159,23 @@ function batchReadFeedsByBoardId (feed, id_lt = null, size = 10) {
     }
 
     let offChainPostDetails = []
-    for (let i = 0; i < offChainPosts.length; i++) {
-      const result = await axios.post(
+    const pResult = await Promise.all(offChainPosts.map((postHash) => {
+      return axios.post(
         `${Config.FEED_END_POINT}/get-feed-post`,
         {
-          'postHash': offChainPosts[i],
+          'postHash': postHash,
           'getStreamApiKey': Config.STREAM_API_KEY,
           'getStreamApiSecret': Config.STREAM_API_SECRET
         }
       )
-
-      if (!result.data.ok) {
-        reject(response.data.message)
-      }
-      let precision = 2
-      let base = new BN(10).pow(new BN(18 - precision))
-      const { post } = result.data
+    }))
+    for (let i = 0; i < pResult.length; i++) {
+      const { post } = pResult[i].data
       offChainPostDetails.push({
         postHash: post.postHash,
         actor: post.actor,
-        rewards: (web3.utils.toBN(0).div(base).toNumber()) / (10 ** 2),
-        repliesLength: web3.utils.toDecimal(0),
+        rewards: post.rewards,
+        repliesLength: post.repliesLength,
         postType: post.postType,
         content: post.content
       })
@@ -460,5 +468,6 @@ export {
   executePutOption,
   updatePostRewards,
   getReputation,
-  refuelReputation
+  refuelReputation,
+  client
 }

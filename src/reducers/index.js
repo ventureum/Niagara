@@ -10,6 +10,7 @@ import sendPageReducer from '../container/SendPageContainer/reducer'
 import network from '../container/NetworkContainer/reducer'
 import postDetailReducer from '../container/PostDetailContainer/reducer'
 import profileReducer from '../container/ProfileContainer/reducer'
+import chatPageReducer from '../container/ChatPageContainer/reducer'
 
 export default combineReducers({
   form: formReducer,
@@ -21,5 +22,6 @@ export default combineReducers({
   sendPageReducer,
   network,
   postDetailReducer,
-  profileReducer
+  profileReducer,
+  chatPageReducer
 })
