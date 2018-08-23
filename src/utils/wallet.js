@@ -29,7 +29,7 @@ export default class WalletUtils {
     @param newTransaction A callback function to be called when a new transaction
       is sent but before receipt is issued
   */
-  static async sendTransaction (receiverAddress, tokenSymbol, tokenAddress, amount, gasLimit = 500000, newTransaction) {
+  static async sendTransaction(receiverAddress, tokenSymbol, tokenAddress, amount, gasLimit = 500000, newTransaction) {
     const { walletReducer } = store.getState()
 
     const _web3 = this.getWeb3Instance()
@@ -77,12 +77,12 @@ export default class WalletUtils {
   /*
    * Reads an Web3 wallet instance from Redux store
    */
-  static getWallet () {
+  static getWallet() {
     const { walletReducer } = store.getState()
     return walletReducer
   }
 
-  static getWeb3HTTPProvider () {
+  static getWeb3HTTPProvider() {
     switch (store.getState().network) {
       case 'ropsten':
         return new Web3.providers.HttpProvider(
@@ -110,7 +110,7 @@ export default class WalletUtils {
   /**
    * Returns a web3 instance with the user's wallet
    */
-  static getWeb3Instance () {
+  static getWeb3Instance() {
     if (!this.web3) {
       const wallet = this.getWallet()
 
@@ -130,7 +130,7 @@ export default class WalletUtils {
    *
    * @param {Object} token
    */
-  static getBalance ({ address, symbol, decimals }) {
+  static getBalance({ address, symbol, decimals }) {
     if (symbol === 'ETH') {
       return this.getEthBalance()
     }
@@ -141,7 +141,7 @@ export default class WalletUtils {
   /**
    * Get the user's wallet ETH balance
    */
-  static getEthBalance () {
+  static getEthBalance() {
     const { walletReducer } = store.getState()
 
     const _web3 = this.getWeb3Instance()
@@ -163,7 +163,7 @@ export default class WalletUtils {
    * @param {String} contractAddress
    * @param {Number} decimals
    */
-  static getERC20Balance (contractAddress, decimals) {
+  static getERC20Balance(contractAddress, decimals) {
     const { walletReducer } = store.getState()
 
     return new Promise((resolve, reject) => {
@@ -183,7 +183,7 @@ export default class WalletUtils {
     Return a web3 contract object of the ERC20 instance
     @param {String} addressof the ERC20 contract
   */
-  static getERC20Instance (address) {
+  static getERC20Instance(address) {
     const _web3 = this.getWeb3Instance()
     const account = this.getWallet().walletAddress
     return new _web3.eth.Contract(ERC20_ABI, address, { from: account, gas: 500000 })
@@ -194,7 +194,7 @@ export default class WalletUtils {
     @param {String} Name of the contract
     @dev Intended to be used only with Ventureum product
   */
-  static async getContractInstance (name) {
+  static async getContractInstance(name) {
     const _web3 = this.getWeb3Instance()
     const networkId = await _web3.eth.net.getId()
     const account = this.getWallet().walletAddress
@@ -220,10 +220,10 @@ export default class WalletUtils {
   /*
     generate user avatar by its address
   */
-  static getAvatar (address) {
+  static getAvatar(address = '') {
     let identiconData
-    if (address !== undefined) {
-      if (address.length < 15) {
+    if (address.length !== 0) {
+      if (address.length < 42) {
         address = this.web3.utils.sha3(address)
       }
       identiconData = new Identicon(address, 64).toString()
@@ -237,14 +237,14 @@ export default class WalletUtils {
   /*
     generate the abbreviation of user address
   */
-  static getAddrAbbre (address) {
+  static getAddrAbbre(address) {
     return address.slice(0, 8) + '...' + address.slice(-6)
   }
 
   /*
      Load a list of erc20 tokens
    */
-  static loadTokens () {
+  static loadTokens() {
     this.tokens = tokenData.tokens
 
     // Modify the following token info for testing
@@ -273,7 +273,7 @@ export default class WalletUtils {
      @returns {(Object | Array)} (array of) token data
      including address, symbol, name, decimals, etc
    */
-  static getToken (symbol, address) {
+  static getToken(symbol, address) {
     if (address && this.addressToToken[address]) {
       return this.tokens[this.addressToToken[address]]
     } else if (this.symbolToToken[symbol]) {

@@ -127,8 +127,9 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
       }
       receiveBuffer = await forum.methods.getBatchPosts(onChainPosts).call()
       onChainPostData = onChainPostData.concat(receiveBuffer)
-
-      onChainPostData = await forum.methods.getBatchPosts(onChainPosts).call()
+      if (onChainPosts.length !== onChainPostData.length * 7){
+        reject(new Error('On-Chain data does not match.'))
+      }
       let onChainPostMeta = []
 
       // Transform the flatten array from forum contract into an array of post objects
@@ -167,6 +168,10 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
         }
       )
     }))
+
+    if (pResult.length!== offChainPosts.length){
+      reject(new Error('Off-Chain data does not match.'))
+    }
     for (let i = 0; i < pResult.length; i++) {
       const { post } = pResult[i].data
       offChainPostDetails.push({
