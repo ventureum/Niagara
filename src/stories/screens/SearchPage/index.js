@@ -74,7 +74,7 @@ class SearchPage extends React.Component {
             renderItem={this.renderItem}
             keyExtractor={(item, index) => item.value}
           />
-          : <Card>
+          : <Card transparent>
             <CardItem>
               <Body>
                 <Text>

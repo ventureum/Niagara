@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { Text, Icon, Toast, Container, Header, Left, Right, Body, Title, Button } from 'native-base'
-import { TextInput, View, KeyboardAvoidingView, ScrollView, Switch } from 'react-native'
+import { TextInput, View, KeyboardAvoidingView, ScrollView, Switch, Alert, TouchableOpacity } from 'react-native'
 import styles from './styles'
 import { processContent } from '../../../utils/content'
+import { NEW_REPLY_REPUTATION_COST } from '../../../utils/constants'
 export default class Reply extends Component {
   constructor (props) {
     super(props)
@@ -34,8 +35,30 @@ export default class Reply extends Component {
       const boardId = this.props.boardHash
       const parentHash = parentPost.postHash
       const postType = 'COMMENT'
-      this.props.newPost(content, boardId, parentHash, postType, destination)
-      this.props.navigation.goBack()
+      let message = `A new ${destination} reply costs ${NEW_REPLY_REPUTATION_COST} reputation`
+      if (destination === 'ON-CHAIN') {
+        message += `\n\nAdditional transaction fee applies to ON-CHAIN post`
+      }
+      Alert.alert(
+        'Please confirm',
+        message,
+        [
+          {
+            text: 'Cancel',
+            onPress: () => {
+            },
+            style: 'cancel'
+          },
+          {
+            text: 'Confirm',
+            onPress: () => {
+              this.props.newPost(content, boardId, parentHash, postType, destination)
+              this.props.navigation.goBack()
+            }
+          }
+        ],
+        { cancelable: false }
+      )
     }
   }
 
@@ -61,16 +84,14 @@ export default class Reply extends Component {
             />
           </Body>
           <Right>
-            <Button
-              style={{ height: '70%' }}
-              info
-              rounded
+            <TouchableOpacity
+              style={styles.replyButton}
               onPress={() => {
                 this.onSendComment(post, this.state.text)
               }}
             >
-              <Text>POST</Text>
-            </Button>
+              <Text style={styles.headerButtonText}>reply</Text>
+            </TouchableOpacity>
           </Right>
         </Header>
         <KeyboardAvoidingView style={styles.content}>

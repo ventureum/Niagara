@@ -1,6 +1,7 @@
 import color from 'color'
 
 import { Platform, Dimensions, PixelRatio } from 'react-native'
+import ventureum from './ventureum'
 
 const deviceHeight = Dimensions.get('window').height
 const deviceWidth = Dimensions.get('window').width
@@ -40,12 +41,12 @@ export default {
   checkboxTickColor: '#fff',
 
   // Segment
-  segmentBackgroundColor: platform === 'ios' ? '#F8F8F8' : '#3F51B5',
+  segmentBackgroundColor: platform === 'ios' ? '#F8F8F8' : ventureum.primaryColor,
   segmentActiveBackgroundColor: platform === 'ios' ? '#007aff' : '#fff',
   segmentTextColor: platform === 'ios' ? '#007aff' : '#fff',
-  segmentActiveTextColor: platform === 'ios' ? '#fff' : '#3F51B5',
+  segmentActiveTextColor: platform === 'ios' ? '#fff' : ventureum.primaryColor,
   segmentBorderColor: platform === 'ios' ? '#007aff' : '#fff',
-  segmentBorderColorMain: platform === 'ios' ? '#a7a6ab' : '#3F51B5',
+  segmentBorderColorMain: platform === 'ios' ? '#a7a6ab' : ventureum.primaryColor,
 
   // New Variable
   get defaultTextColor () {
@@ -108,7 +109,7 @@ export default {
   cardDefaultBg: '#fff',
 
   // Color
-  brandPrimary: platform === 'ios' ? '#007aff' : '#3F51B5',
+  brandPrimary: platform === 'ios' ? '#007aff' : ventureum.primaryColor,
   brandInfo: '#62B1F6',
   brandSuccess: '#5cb85c',
   brandDanger: '#d9534f',
@@ -117,7 +118,7 @@ export default {
 
   // Font
   fontFamily: platform === 'ios' ? 'System' : 'Roboto',
-  fontSizeBase: 15,
+  fontSizeBase: 14,
 
   get fontSizeH1 () {
     return this.fontSizeBase * 1.8
@@ -131,35 +132,35 @@ export default {
 
   // Footer
   footerHeight: 55,
-  footerDefaultBg: platform === 'ios' ? '#F8F8F8' : '#3F51B5',
+  footerDefaultBg: ventureum.primaryColor,
 
   // FooterTab
-  tabBarTextColor: platform === 'ios' ? '#6b6b6b' : '#b3c7f9',
+  tabBarTextColor: ventureum.textOnPrimary,
   tabBarTextSize: platform === 'ios' ? 14 : 11,
-  activeTab: platform === 'ios' ? '#007aff' : '#fff',
-  sTabBarActiveTextColor: '#007aff',
-  tabBarActiveTextColor: platform === 'ios' ? '#007aff' : '#fff',
-  tabActiveBgColor: platform === 'ios' ? '#cde1f9' : '#3F51B5',
+  activeTab: ventureum.secondaryColor,
+  sTabBarActiveTextColor: ventureum.secondaryColor,
+  tabBarActiveTextColor: ventureum.secondaryColor,
+  tabActiveBgColor: ventureum.primaryColor,
 
   // Tab
-  tabDefaultBg: platform === 'ios' ? '#F8F8F8' : '#3F51B5',
-  topTabBarTextColor: platform === 'ios' ? '#6b6b6b' : '#b3c7f9',
-  topTabBarActiveTextColor: platform === 'ios' ? '#007aff' : '#fff',
-  topTabActiveBgColor: platform === 'ios' ? '#cde1f9' : undefined,
-  topTabBarBorderColor: platform === 'ios' ? '#a7a6ab' : '#fff',
-  topTabBarActiveBorderColor: platform === 'ios' ? '#007aff' : '#fff',
+  tabDefaultBg: ventureum.primaryColor,
+  topTabBarTextColor: ventureum.textOnPrimary,
+  topTabBarActiveTextColor: ventureum.secondaryColor,
+  topTabActiveBgColor: ventureum.primaryColor,
+  topTabBarBorderColor: ventureum.primaryColor,
+  topTabBarActiveBorderColor: ventureum.primaryColor,
 
   // Header
-  toolbarBtnColor: platform === 'ios' ? '#007aff' : '#fff',
-  toolbarDefaultBg: platform === 'ios' ? '#F8F8F8' : '#3F51B5',
+  toolbarBtnColor: ventureum.secondaryColor,
+  toolbarDefaultBg: ventureum.primaryColor,
   toolbarHeight: platform === 'ios' ? 64 : 56,
   toolbarIconSize: platform === 'ios' ? 20 : 22,
   toolbarSearchIconSize: platform === 'ios' ? 20 : 23,
-  toolbarInputColor: platform === 'ios' ? '#CECDD2' : '#fff',
+  toolbarInputColor: ventureum.primaryColor,
   searchBarHeight: platform === 'ios' ? 30 : 40,
-  toolbarInverseBg: '#222',
-  toolbarTextColor: platform === 'ios' ? '#000' : '#fff',
-  toolbarDefaultBorder: platform === 'ios' ? '#a7a6ab' : '#3F51B5',
+  toolbarInverseBg: ventureum.secondaryColor,
+  toolbarTextColor: ventureum.textOnPrimary,
+  toolbarDefaultBorder: ventureum.primaryColor,
   iosStatusbar: platform === 'ios' ? 'dark-content' : 'light-content',
   get statusBarColor () {
     return color(this.toolbarDefaultBg)
@@ -212,7 +213,7 @@ export default {
   cardBorderColor: '#ccc',
 
   // Changed Variable
-  listItemPadding: platform === 'ios' ? 10 : 12,
+  listItemPadding: ventureum.basicPadding,
 
   listNoteColor: '#808080',
   listNoteSize: 13,
@@ -223,7 +224,7 @@ export default {
 
   // Radio Button
   radioBtnSize: platform === 'ios' ? 25 : 23,
-  radioSelectedColorAndroid: '#3F51B5',
+  radioSelectedColorAndroid: ventureum.secondaryColor,
 
   // New Variable
   radioBtnLineHeight: platform === 'ios' ? 29 : 24,
@@ -241,13 +242,13 @@ export default {
   inverseSpinnerColor: '#1A191B',
 
   // Tabs
-  tabBgColor: '#F8F8F8',
+  tabBgColor: ventureum.primaryColor,
   tabFontSize: 15,
-  tabTextColor: '#222222',
+  tabTextColor: ventureum.textOnPrimary,
 
   // Text
-  textColor: '#000',
-  inverseTextColor: '#fff',
+  textColor: ventureum.textOnPrimary,
+  inverseTextColor: ventureum.textOnSecondary,
   noteFontSize: 14,
 
   // Title
@@ -257,12 +258,12 @@ export default {
   subtitleColor: platform === 'ios' ? '#8e8e93' : '#FFF',
 
   // New Variable
-  titleFontColor: platform === 'ios' ? '#000' : '#FFF',
+  titleFontColor: ventureum.textOnPrimary,
 
   // Other
   borderRadiusBase: platform === 'ios' ? 5 : 2,
   borderWidth: 1 / PixelRatio.getPixelSizeForLayoutSize(1),
-  contentPadding: 10,
+  contentPadding: ventureum.basicPadding,
 
   get darkenHeader () {
     return color(this.tabBgColor)

@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native'
+import ventureum from '../../../theme/variables/ventureum'
 
 const styles = StyleSheet.create({
   container: {
@@ -15,6 +16,17 @@ const styles = StyleSheet.create({
     borderColor: '#8c8c8c',
     alignItems: 'center',
     paddingBottom: 10
+  },
+  headerButtonText: {
+    fontSize: ventureum.pageTitleFontSize,
+    color: ventureum.secondaryColor,
+    fontWeight: ventureum.lessBold
+  },
+  replyButton: {
+    paddingRight: ventureum.basicPadding,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 })
 

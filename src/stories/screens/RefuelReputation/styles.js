@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native'
+import ventureum from '../../../theme/variables/ventureum'
 
 const styles = StyleSheet.create({
   purchaseContainer: {
@@ -20,7 +21,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start'
   },
   transferButton: {
-    backgroundColor: '#3db239',
+    backgroundColor: ventureum.lightSecondaryColor,
     flexDirection: 'column',
     alignItems: 'center',
     paddingTop: 15,

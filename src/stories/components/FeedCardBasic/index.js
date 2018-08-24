@@ -3,32 +3,47 @@ import * as React from 'react'
 import {
   View,
   Text,
-  TouchableHighlight
+  TouchableOpacity,
+  Alert
 } from 'react-native'
-
 import {
-  Thumbnail,
   Icon,
-  Button
+  Button,
+  Toast
 } from 'native-base'
 import styles from './styles'
 import Markdown from 'react-native-markdown-renderer'
 import SourceBadge from '../SourceBadge'
 import { DOWN_VOTE, UP_VOTE } from '../../../utils/constants'
+import ConfirmationModel from '../../components/ConfirmationModal'
 
 let moment = require('moment')
 
 export default class FeedCard extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      confirmModalVisible: false,
+      action: 0,
+      canceled: false
+    }
+  }
   toDetail = (post) => {
     this.props.navigation.navigate('PostDetail', {
       post
     })
   }
 
+  toggleConfirmationModal = () => {
+    this.setState({
+      confirmModalVisible: !this.state.confirmModalVisible
+    })
+  }
+
   render () {
     let { post } = this.props
     return (
-      <TouchableHighlight onPress={() => {
+      <TouchableOpacity onPress={() => {
         this.toDetail(post)
       }}>
         <View style={styles.card}>
@@ -68,7 +83,10 @@ export default class FeedCard extends React.Component {
                 <Button transparent
                   dark
                   onPress={() => {
-                    this.props.updatePostRewards(this.props.boardID, post.postHash, UP_VOTE)
+                    this.setState({
+                      confirmModalVisible: !this.state.confirmModalVisible,
+                      action: UP_VOTE
+                    })
                   }}
                 >
                   <Icon name='ios-arrow-up-outline' />
@@ -76,7 +94,12 @@ export default class FeedCard extends React.Component {
                 <Text style={styles.badgeCount}>{post.rewards}</Text>
                 <Button transparent
                   dark
-                  onPress={() => { this.props.updatePostRewards(this.props.boardID, post.postHash, DOWN_VOTE) }}
+                  onPress={() => {
+                    this.setState({
+                      confirmModalVisible: !this.state.confirmModalVisible,
+                      action: DOWN_VOTE
+                    })
+                  }}
                 >
                   <Icon name='ios-arrow-down-outline' />
                 </Button>
@@ -95,8 +118,25 @@ export default class FeedCard extends React.Component {
               </View>
             </View>
           </View>
+          <ConfirmationModel
+            modalVisible={this.state.confirmModalVisible}
+            toggleModal={this.toggleConfirmationModal}
+            onAction={() => {
+              Toast.show({
+                text: 'Action sent!',
+                buttonText: 'Undo',
+                type: 'undo',
+                onClose: (reason) => {
+                  if (reason === 'timeout') {
+                    this.props.updatePostRewards(this.props.boardID, post.postHash, this.state.action)
+                  }
+                },
+                duration: 3000
+              })
+            }}
+          />
         </View>
-      </TouchableHighlight>
+      </TouchableOpacity>
     )
   }
 }

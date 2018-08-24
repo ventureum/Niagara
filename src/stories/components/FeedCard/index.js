@@ -2,20 +2,38 @@ import * as React from 'react'
 
 import {
   View,
-  Text
+  Text,
+  Alert
 } from 'react-native'
-
 import {
   Icon,
-  Button
+  Button,
+  Toast
 } from 'native-base'
 import styles from './styles'
 import Markdown from 'react-native-markdown-renderer'
 import SourceBadge from '../SourceBadge'
 import { DOWN_VOTE, UP_VOTE } from '../../../utils/constants'
+import ConfirmationModel from '../ConfirmationModal'
+
 let moment = require('moment')
 
 export default class FeedCard extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      confirmModalVisible: false,
+      action: 0,
+      canceled: false
+    }
+  }
+
+  toggleConfirmationModal = () => {
+    this.setState({
+      confirmModalVisible: !this.state.confirmModalVisible
+    })
+  }
+
   render () {
     let { post } = this.props
     return (
@@ -50,7 +68,10 @@ export default class FeedCard extends React.Component {
             <Button transparent
               dark
               onPress={() => {
-                this.props.updatePostRewards(this.props.boardID, post.postHash, UP_VOTE)
+                this.setState({
+                  confirmModalVisible: !this.state.confirmModalVisible,
+                  action: UP_VOTE
+                })
               }}
             >
               <Icon name='ios-arrow-up-outline' />
@@ -59,7 +80,10 @@ export default class FeedCard extends React.Component {
             <Button transparent
               dark
               onPress={() => {
-                this.props.updatePostRewards(this.props.boardID, post.postHash, DOWN_VOTE)
+                this.setState({
+                  confirmModalVisible: !this.state.confirmModalVisible,
+                  action: DOWN_VOTE
+                })
               }}
             >
               <Icon name='ios-arrow-down-outline' />
@@ -75,6 +99,23 @@ export default class FeedCard extends React.Component {
             </Button>
           </View>
         </View>
+        <ConfirmationModel
+          modalVisible={this.state.confirmModalVisible}
+          toggleModal={this.toggleConfirmationModal}
+          onAction={() => {
+            Toast.show({
+              text: 'Action sent!',
+              buttonText: 'Undo',
+              type: 'undo',
+              onClose: (reason) => {
+                if (reason === 'timeout') {
+                  this.props.updatePostRewards(this.props.boardID, post.postHash, this.state.action)
+                }
+              },
+              duration: 3000
+            })
+          }}
+        />
       </View>
     )
   }

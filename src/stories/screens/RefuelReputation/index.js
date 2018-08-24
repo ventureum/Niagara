@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { View, Text, TouchableOpacity, Alert } from 'react-native'
-import { Thumbnail, Input, Item, Icon } from 'native-base'
+import { Thumbnail, Input, Item, Icon, Container, Header, Left, Button, Body, Title, Right } from 'native-base'
 import styles from './styles'
 import { BigNumber } from 'bignumber.js'
 
@@ -39,9 +39,44 @@ export default class RefuelReputation extends Component {
     return false
   }
 
+  onPress = (reputation, refreshProfile) => {
+    const { cost } = this.state
+    Alert.alert(
+      'Please confirm the following',
+      `Reputation: ${reputation}\nCost: ${cost.toFixed(DECIMAL_FIXED)} VTX`,
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {
+          },
+          style: 'cancel'
+        },
+        {
+          text: 'Purchase',
+          onPress: () => {
+            this.props.refuelReputation(parseInt(reputation), refreshProfile)
+            this.props.navigation.goBack()
+          }
+        }
+      ],
+      { cancelable: false }
+    )
+  }
+
   render () {
     return (
-      <View style={styles.background}>
+      <Container style={styles.background}>
+        <Header>
+          <Left>
+            <Button transparent onPress={() => this.props.navigation.goBack()}>
+              <Icon name='arrow-back' />
+            </Button>
+          </Left>
+          <Body style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Title>Get Reputation</Title>
+          </Body>
+          <Right />
+        </Header>
         <View style={styles.purchaseContainer}>
           <View style={styles.nameCard}>
             <Thumbnail circle large source={{ uri: this.props.avatar }} />
@@ -74,14 +109,13 @@ export default class RefuelReputation extends Component {
           <TouchableOpacity
             style={styles.transferButton}
             onPress={() => {
-              this.props.refuelReputation(parseInt(this.state.reputation), this.props.refreshProfile)
-              this.props.navigation.goBack()
+              this.onPress(parseInt(this.state.reputation), this.props.refreshProfile)
             }}
           >
             <Text style={{ color: 'white' }}>Purchase</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </Container>
     )
   }
 }

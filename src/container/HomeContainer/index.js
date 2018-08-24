@@ -34,21 +34,21 @@ export default (MainScreenNavigator = TabNavigator(
               vertical
               active={props.navigationState.index === 1}
               onPress={() => props.navigation.navigate('TCR')}>
-              <Icon name='view-list' type='MaterialCommunityIcons' />
+              <Icon name='format-list-bulleted' type='MaterialCommunityIcons' />
               <Text>TCR</Text>
             </Button>
             <Button
               vertical
               active={props.navigationState.index === 2}
               onPress={() => props.navigation.navigate('Discover')}>
-              <Icon name='compass' />
+              <Icon type='MaterialCommunityIcons' name='compass-outline' />
               <Text>Discover</Text>
             </Button>
             <Button
               vertical
               active={props.navigationState.index === 3}
               onPress={() => props.navigation.navigate('Profile')}>
-              <Icon name='person' type='MaterialIcons' />
+              <Icon name='person-outline' type='MaterialIcons' />
               <Text>Profile</Text>
             </Button>
           </FooterTab>

@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native'
+import ventureum from '../../../theme/variables/ventureum'
 
 export default {
   itemContainer: {
@@ -11,7 +12,7 @@ export default {
     paddingTop: 5,
     borderBottomColor: '#bbb',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    backgroundColor: '#f8f8f8'
+    backgroundColor: ventureum.primaryColor
   },
   transactionContainer: {
     flexDirection: 'row',
@@ -22,11 +23,11 @@ export default {
   fulfilledText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: 'green'
+    color: ventureum.lightSecondaryColor
   },
   pendingText: {
     fontSize: 20,
-    color: 'red'
+    color: ventureum.darkPrimaryColor
   },
   hashText: {
     fontSize: 18,

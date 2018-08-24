@@ -1,27 +1,43 @@
 import { Platform } from 'react-native'
+import ventureum from '../../../theme/variables/ventureum'
+import { StyleSheet } from 'react-native'
 
 export default {
   modalContainer: {
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'flex-start',
-    alignItems: 'stretch'
+    alignItems: 'stretch',
+    backgroundColor: ventureum.primaryColor
   },
   avatarContainer: {
     paddingTop: Platform.OS === 'ios' ? 0 : 10,
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'flex-start'
   },
   infoContainer: {
-    flex: 9,
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    paddingTop: 10,
-    backgroundColor: '#f8f8f8'
+    paddingTop: 10
   },
   textInputContainer: {
-    flex: 6
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    paddingHorizontal: ventureum.basicPadding
+  },
+  headerButtonText: {
+    fontSize: ventureum.pageTitleFontSize,
+    color: ventureum.secondaryColor,
+    fontWeight: ventureum.lessBold
+  },
+  divider: {
+    paddingBottom: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: ventureum.borderColor,
+    flexDirection: 'column',
+    justifyContent: 'flex-end'
   }
 }

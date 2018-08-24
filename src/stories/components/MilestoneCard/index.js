@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, Picker, Button, TextInput, RefreshControl } from 'react-native'
+import { View, Text, Picker, Button, TextInput, Alert } from 'react-native'
 import styles from './styles'
 import { Icon } from 'native-base'
 import { BigNumber } from 'bignumber.js'
@@ -37,7 +37,25 @@ export default class MilestoneCard extends Component {
     const baseDecimal = new BigNumber(10).pow(this.props.milestoneData.tokenDecimals)
     const numToken = (new BigNumber(amount)).times(baseDecimal)
     const numVtxFeeToken = fee.times(BASE_18)
-    this.props.submitPutOption(postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action)
+    const {tokenSymbol} = this.props.milestoneData
+    Alert.alert(
+      'Purchase Put-option',
+      `Please confirm the following information:\n\nPurchasing ${amount} ${tokenSymbol}\nCost: ${this.state.cost} Ether\nFees: ${fee} VTX`,
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {
+          },
+          style: 'cancel'
+        },
+        { text: 'Confirm',
+          onPress: () => {
+            this.props.submitPutOption(postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action)
+          }
+        }
+      ],
+      { cancelable: false }
+    )
   }
 
   render () {

@@ -24,6 +24,7 @@ import TokenToggle from './container/TokenToggleContainer'
 import NewPost from './container/NewPostContainer'
 import PostDetail from './container/PostDetailContainer'
 import RefuelReputation from './container/RefuelReputationContainer'
+import ChatPage from './container/ChatPageContainer'
 
 const Drawer = DrawerNavigator(
   {
@@ -57,7 +58,8 @@ const App = StackNavigator(
     TokenToggle: { screen: TokenToggle },
     NewPost: { screen: NewPost },
     PostDetail: { screen: PostDetail },
-    RefuelReputation: {screen: RefuelReputation}
+    RefuelReputation: {screen: RefuelReputation},
+    ChatPage: {screen: ChatPage}
   },
   {
     initialRouteName: 'Login',

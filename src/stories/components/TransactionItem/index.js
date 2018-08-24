@@ -41,7 +41,7 @@ export default class TransactionItem extends Component {
         </View>
         {(status === 'Fulfilled' && this.state.expanded)
           ? <TransactionDetail receipt={this.props.transaction.receipt} />
-          : <View />
+          : null
         }
       </TouchableOpacity>
     )
