@@ -13,6 +13,10 @@ export default {
   lightSecondaryColor: '#4cb0af',
   darkSecondaryColor: '#005354',
 
+  // Other Color
+  errorColor: '#f93b3b',
+  lightErrorColor: '#ff6d6d',
+
   // Unclickable
   unClickable: '#808080',
 

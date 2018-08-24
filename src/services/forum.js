@@ -68,7 +68,7 @@ function getBytes32FromMultiash (multihash) {
     API. size must satisfy: 0 < size <= 10
   @return return a array of post details
 */
-function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
+function batchReadFeedsByBoardId (requester, feed, id_lt = null, id_gt = null, size) {
   return new Promise(async (resolve, reject) => {
     // get feed token from lamda API
     const feedSlug = feed.split(':')
@@ -95,6 +95,7 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
     } else if (id_lt === null && id_gt !== null) {
       feedData = await targetFeed.get({ limit: size, id_gt: id_gt })
     }
+
     // build the arrays of post hash from feed data
     let postMap = new Map()
     let onChainPosts = []
@@ -144,7 +145,8 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
             actor: '0x' + onChainPostData[i + 3].substr(26, 40),
             rewards: (web3.utils.toBN(onChainPostData[i + 4]).div(base).toNumber()) / (10 ** 2),
             repliesLength: web3.utils.toDecimal(onChainPostData[i + 5]),
-            postType: typeMap.get(onChainPostData[i + 6].slice(0, 10))
+            postType: typeMap.get(onChainPostData[i + 6].slice(0, 10)),
+            actorAddrAbbre: WalletUtils.getAddrAbbre('0x' + onChainPostData[i + 3].substr(26, 40))
           })
         } else {
           break
@@ -158,11 +160,13 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
     }
 
     let offChainPostDetails = []
+
     const pResult = await Promise.all(offChainPosts.map((postHash) => {
       return axios.post(
         `${Config.FEED_END_POINT}/get-feed-post`,
         {
           'postHash': postHash,
+          'requestor': requester,
           'getStreamApiKey': Config.STREAM_API_KEY,
           'getStreamApiSecret': Config.STREAM_API_SECRET
         }
@@ -173,14 +177,20 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
       reject(new Error('Off-Chain data does not match.'))
     }
     for (let i = 0; i < pResult.length; i++) {
-      const { post } = pResult[i].data
+      if (!pResult[i].data.ok) {
+        reject(pResult[i].data.message.errorMessage)
+      }
+      const { post, postVoteCountInfo, requestorVoteCountInfo } = pResult[i].data
       offChainPostDetails.push({
         postHash: post.postHash,
         actor: post.actor,
         rewards: post.rewards,
         repliesLength: post.repliesLength,
         postType: post.postType,
-        content: post.content
+        content: post.content,
+        postVoteCountInfo,
+        requestorVoteCountInfo,
+        actorAddrAbbre: WalletUtils.getAddrAbbre(post.actor)
       })
     }
 
@@ -202,6 +212,7 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
         })
       }
     }
+
     resolve(postDetails)
   })
 }
@@ -420,6 +431,7 @@ function updatePostRewards (actor, boardId, postHash, value) {
       `${Config.FEED_END_POINT}/feed-upvote`,
       toDataBase
     )
+
     if (result.data.ok) {
       resolve(result)
     } else {
@@ -460,6 +472,27 @@ function refuelReputation (userAddress, reputations, refreshProfile) {
   })
 }
 
+function getVoteCostEstimate (requestor, postHash) {
+  const QUERY = 0
+  return new Promise(async (resolve, reject) => {
+    const toDataBase = {
+      actor: requestor,
+      postHash,
+      value: QUERY
+    }
+    const result = await axios.post(
+      `${Config.FEED_END_POINT}/feed-upvote`,
+      toDataBase
+    )
+
+    if (result.data.ok) {
+      resolve(result.data.voteInfo)
+    } else {
+      reject(result)
+    }
+  })
+}
+
 export {
   batchReadFeedsByBoardId,
   checkBalanceForTx,
@@ -472,5 +505,6 @@ export {
   updatePostRewards,
   getReputation,
   refuelReputation,
-  client
+  client,
+  getVoteCostEstimate
 }

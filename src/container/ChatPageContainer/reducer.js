@@ -94,5 +94,37 @@ export default function (state = initialState, action) {
   if (action.type === 'CLEAR_CHAT') {
     return initialState
   }
+
+  if (action.type === 'UPDATE_POST_REWARDS_FULFILLED') {
+    const { voteInfo } = action.payload.data
+    return {
+      ...state,
+      loading: false,
+      chatContent: state.chatContent.map(
+        (item) => {
+          return (item.postHash === voteInfo.postHash ? {
+            ...item,
+            postVoteCountInfo: voteInfo.postVoteCountInfo,
+            requestorVoteCountInfo: voteInfo.requestorVoteCountInfo
+          } : item
+          )
+        }
+      )
+    }
+  }
+  if (action.type === 'UPDATE_POST_REWARDS_PENDING') {
+    return {
+      ...state,
+      loading: true
+    }
+  }
+  if (action.type === 'UPDATE_POST_REWARDS_REJECTED') {
+    return {
+      ...state,
+      loading: false,
+      errorMessage: action.payload
+    }
+  }
+
   return state
 }

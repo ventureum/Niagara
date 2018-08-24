@@ -2,23 +2,31 @@ import * as forum from '../../services/forum'
 import { newTransaction } from '../TransactionContainer/actions'
 
 function refreshPosts (feedSlug, feedId) {
-  return {
-    type: 'REFRESH_POSTS',
-    payload: forum.batchReadFeedsByBoardId(feedSlug + ':' + feedId)
+  return (dispatch, getState) => {
+    const requester = getState().walletReducer.walletAddress
+    dispatch(_refreshPosts(requester, feedSlug, feedId))
   }
 }
 
-function _getMorePosts (feedSlug, feedId, lastUUID) {
+function _refreshPosts (requester, feedSlug, feedId) {
+  return {
+    type: 'REFRESH_POSTS',
+    payload: forum.batchReadFeedsByBoardId(requester, feedSlug + ':' + feedId)
+  }
+}
+
+function _getMorePosts (requester, feedSlug, feedId, lastUUID) {
   return {
     type: 'GET_MORE_POSTS',
-    payload: forum.batchReadFeedsByBoardId(feedSlug + ':' + feedId, lastUUID)
+    payload: forum.batchReadFeedsByBoardId(requester, feedSlug + ':' + feedId, lastUUID)
   }
 }
 
 function getMorePosts (feedSlug, feedId) {
   return (dispatch, getState) => {
     const lastUUID = getState().discoverReducer.lastUUID
-    dispatch(_getMorePosts(feedSlug, feedId, lastUUID))
+    const requester = getState().walletReducer.walletAddress
+    dispatch(_getMorePosts(requester, feedSlug, feedId, lastUUID))
   }
 }
 
@@ -91,4 +99,34 @@ function updatePostRewards (boardId, postHash, value) {
     dispatch(_updatePostRewards(actor, boardId, postHash, value))
   }
 }
-export { refreshPosts, setTokens, getMorePosts, switchBoard, newPost, updatePostRewards }
+
+function _getVoteCostEstimate (requester, postHash) {
+  return {
+    type: 'GET_VOTE_COST_ESTIMATE',
+    payload: forum.getVoteCostEstimate(requester, postHash)
+  }
+}
+
+function getVoteCostEstimate (postHash) {
+  return (dispatch, getState) => {
+    const requester = getState().walletReducer.walletAddress
+    dispatch(_getVoteCostEstimate(requester, postHash))
+  }
+}
+
+function resetErrorMessage () {
+  return {
+    type: 'RESET_ERROR_MESSAGE'
+  }
+}
+
+export {
+  refreshPosts,
+  setTokens,
+  getMorePosts,
+  switchBoard,
+  newPost,
+  updatePostRewards,
+  getVoteCostEstimate,
+  resetErrorMessage
+}

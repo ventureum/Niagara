@@ -7,6 +7,7 @@ import Search from '../../../utils/search.js'
 import SpecialPostCard from '../../components/SpecialPostCard'
 import { BOARD_ALL_HASH } from '../../../utils/constants.js'
 import ventureum from '../../../theme/variables/ventureum'
+import { Alert } from 'react-native'
 
 console.ignoredYellowBox = ['Setting a timer']
 
@@ -27,7 +28,6 @@ export default class Discover extends Component {
   onRenderItem = ({ item }) => {
     item = {
       ...item,
-      actor: WalletUtils.getAddrAbbre(item.actor),
       avatar: WalletUtils.getAvatar(item.actor)
     }
     return (
@@ -35,6 +35,12 @@ export default class Discover extends Component {
         navigation={this.props.navigation}
         updatePostRewards={this.props.updatePostRewards}
         boardID={this.props.boardHash}
+        getVoteCostEstimate={this.props.getVoteCostEstimate}
+        fetchingVoteCost={this.props.fetchingVoteCost}
+        voteInfo={this.props.voteInfo}
+        voteInfoError={this.props.voteInfoError}
+        setCurrentParentPost={this.props.setCurrentParentPost}
+        loading={this.props.loading}
       />
     )
   }
@@ -55,6 +61,16 @@ export default class Discover extends Component {
   }
 
   render () {
+    if (this.props.errorMessage !== '') {
+      Alert.alert(
+        'Failed',
+        this.props.errorMessage,
+        [
+          {text: 'OK', onPress: () => this.props.resetErrorMessage()}
+        ],
+        { cancelable: false }
+      )
+    }
     return (
       <Container>
         <Header >

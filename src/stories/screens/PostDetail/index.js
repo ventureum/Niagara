@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Fab, Content, Icon, Left, Right, Header, Body, Container, Button, Title } from 'native-base'
 import {
   FlatList,
-  View,
   KeyboardAvoidingView,
   RefreshControl
 } from 'react-native'
@@ -29,7 +28,15 @@ export default class PostDetail extends Component {
       avatar: WalletUtils.getAvatar(item.actor)
     }
     return (
-      <CommentCard post={item} />
+      <CommentCard
+        post={item}
+        updatePostRewards={this.props.updatePostRewards}
+        getVoteCostEstimate={this.props.getVoteCostEstimate}
+        fetchingVoteCost={this.props.fetchingVoteCost}
+        voteInfo={this.props.voteInfo}
+        voteInfoError={this.props.voteInfoError}
+        loading={this.props.loading}
+      />
     )
   }
 
@@ -75,25 +82,25 @@ export default class PostDetail extends Component {
             />}
           contentContainerStyle={styles.scrolViewContainer}
         >
+          <FeedCard
+            post={post}
+            updatePostRewards={this.props.updatePostRewards}
+            getVoteCostEstimate={this.props.getVoteCostEstimate}
+            fetchingVoteCost={this.props.fetchingVoteCost}
+            voteInfo={this.props.voteInfo}
+            voteInfoError={this.props.voteInfoError}
+            loading={this.props.loading}
+          />
           {post.postType === 'MILESTONE'
-            ? <View>
-              <FeedCard
-                post={post}
-                updatePostRewards={this.props.updatePostRewards}
-              />
-              <MilestoneCard
-                milestoneData={this.props.milestoneData}
-                submitPutOption={this.submitPutOption}
-                postHash={post.postHash}
-                milestoneDataLoading={this.props.milestoneDataLoading}
-              />
-            </View>
-            : <FeedCard
-              post={post}
-              updatePostRewards={this.props.updatePostRewards}
+            ? <MilestoneCard
+              milestoneData={this.props.milestoneData}
+              submitPutOption={this.submitPutOption}
+              postHash={post.postHash}
+              milestoneDataLoading={this.props.milestoneDataLoading}
             />
+            : null
           }
-          {post.endTime === undefined
+          {post.endTime !== undefined
             ? <ActiveSession
               onPress={() => {
                 this.props.navigation.navigate('ChatPage', { post, replies })
@@ -105,6 +112,7 @@ export default class PostDetail extends Component {
                 keyExtractor={item => item.id}
                 onEndReachedThreshold={0.5}
                 onEndReached={this.props.getMorePosts}
+                extraData={this.props.voteInfo}
               />
             </KeyboardAvoidingView >
           }

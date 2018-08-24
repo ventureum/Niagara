@@ -1,11 +1,22 @@
-import { batchReadFeedsByBoardId } from '../../services/forum'
+import * as forum from '../../services/forum'
 
 const INITIAL_FETCH_SIZE = 20
 
 function getInitialChatHistory (postHash) {
+  return (dispatch, getState) => {
+    const requester = getState().walletReducer.walletAddress
+    dispatch(_getInitialChatHistory(
+      requester,
+      postHash
+    ))
+  }
+}
+
+function _getInitialChatHistory (requester, postHash) {
   return {
     type: 'GET_INITIAL_CHAT_HISTORY',
-    payload: batchReadFeedsByBoardId(
+    payload: forum.batchReadFeedsByBoardId(
+      requester,
       `comment:${postHash}`,
       null,
       null,
@@ -14,14 +25,14 @@ function getInitialChatHistory (postHash) {
   }
 }
 
-function _fetchLatestChat (postHash, latestUUID) {
+function _fetchLatestChat (requester, postHash, latestUUID) {
   return {
     type: 'FETCH_LATEST_CHAT',
-    payload: batchReadFeedsByBoardId(
+    payload: forum.batchReadFeedsByBoardId(
+      requester,
       `comment:${postHash}`,
       null,
-      latestUUID,
-      INITIAL_FETCH_SIZE
+      latestUUID
     )
   }
 }
@@ -29,17 +40,20 @@ function _fetchLatestChat (postHash, latestUUID) {
 function fetchLatestChat (postHash) {
   return (dispatch, getState) => {
     const latestUUID = getState().chatPageReducer.latestUUID
+    const requester = getState().walletReducer.walletAddress
     dispatch(_fetchLatestChat(
+      requester,
       postHash,
       latestUUID
     ))
   }
 }
 
-function _fetchEalierChat (postHash, earliestUUID) {
+function _fetchEalierChat (requester, postHash, earliestUUID) {
   return {
     type: 'FETCH_EARLIER_CHAT',
-    payload: batchReadFeedsByBoardId(
+    payload: forum.batchReadFeedsByBoardId(
+      requester,
       `comment:${postHash}`,
       earliestUUID,
       null,
@@ -51,10 +65,25 @@ function _fetchEalierChat (postHash, earliestUUID) {
 function fetchEalierChat (postHash) {
   return (dispatch, getState) => {
     const earliestUUID = getState().chatPageReducer.earliestUUID
+    const requester = getState().walletReducer.walletAddress
     dispatch(_fetchEalierChat(
+      requester,
       postHash,
       earliestUUID
     ))
+  }
+}
+
+function _updatePostRewards (actor, boardId, postHash, value) {
+  return {
+    type: 'UPDATE_POST_REWARDS',
+    payload: forum.updatePostRewards(actor, boardId, postHash, value)
+  }
+}
+function updatePostRewards (boardId, postHash, value) {
+  return (dispatch, getState) => {
+    const actor = getState().walletReducer.walletAddress
+    dispatch(_updatePostRewards(actor, boardId, postHash, value))
   }
 }
 
@@ -64,4 +93,4 @@ function clearChat () {
   }
 }
 
-export { getInitialChatHistory, fetchLatestChat, clearChat, fetchEalierChat }
+export { getInitialChatHistory, fetchLatestChat, clearChat, fetchEalierChat, updatePostRewards }

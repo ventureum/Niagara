@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import ChatPage from '../../stories/screens/ChatPage'
-import { newPost, updatePostRewards } from '../DiscoverContainer/actions'
+import { newPost, getVoteCostEstimate } from '../DiscoverContainer/actions'
 import { connect } from 'react-redux'
 import Config from 'react-native-config'
 import axios from 'axios'
@@ -9,7 +9,8 @@ import {
   getInitialChatHistory,
   fetchLatestChat,
   clearChat,
-  fetchEalierChat
+  fetchEalierChat,
+  updatePostRewards
 } from './actions'
 
 class ChatPageContainer extends Component {
@@ -18,15 +19,16 @@ class ChatPageContainer extends Component {
     this.state = {
       subscription: null
     }
-    const post = this.props.navigation.getParam('post', {})
+    const {post} = this.props
     this.props.getInitialChatHistory(post.postHash)
     this.subscribeToFeed(
       `comment:${post.postHash}`,
       this.onReceiveUpdate
     )
   }
+
   onReceiveUpdate = (updata) => {
-    const post = this.props.navigation.getParam('post', {})
+    const {post} = this.props
     this.props.fetchLatestChat(post.postHash)
   }
 
@@ -58,11 +60,10 @@ class ChatPageContainer extends Component {
   }
 
   render () {
-    const post = this.props.navigation.getParam('post', {})
     return (
       <ChatPage
         chatContent={this.props.chatContent}
-        post={post}
+        post={this.props.post}
         newPost={this.props.newPost}
         userAddress={this.props.userAddress}
         boardHash={this.props.boardHash}
@@ -71,6 +72,10 @@ class ChatPageContainer extends Component {
         reachEarliestChat={this.props.reachEarliestChat}
         updatePostRewards={this.props.updatePostRewards}
         navigation={this.props.navigation}
+        getVoteCostEstimate={this.props.getVoteCostEstimate}
+        fetchingVoteCost={this.props.fetchingVoteCost}
+        voteInfo={this.props.voteInfo}
+        voteInfoError={this.props.voteInfoError}
       />
     )
   }
@@ -82,7 +87,8 @@ const mapDispatchToProps = (dispatch) => ({
   fetchLatestChat: (postHash) => dispatch(fetchLatestChat(postHash)),
   fetchEalierChat: (postHash) => dispatch(fetchEalierChat(postHash)),
   updatePostRewards: (boardId, postHash, value) => dispatch(updatePostRewards(boardId, postHash, value)),
-  clearChat: () => dispatch(clearChat())
+  clearChat: () => dispatch(clearChat()),
+  getVoteCostEstimate: (postHash) => dispatch(getVoteCostEstimate(postHash))
 })
 
 const mapStateToProps = state => ({
@@ -90,7 +96,13 @@ const mapStateToProps = state => ({
   chatContentLoading: state.chatPageReducer.chatContentLoading,
   reachEarliestChat: state.chatPageReducer.reachEarliestChat,
   userAddress: state.walletReducer.walletAddress,
-  boardHash: state.discoverReducer.boardHash
+  boardHash: state.discoverReducer.boardHash,
+  fetchingVoteCost: state.discoverReducer.fetchingVoteCost,
+  voteInfo: state.discoverReducer.voteInfo,
+  voteInfoError: state.discoverReducer.voteInfoError,
+  post: state.discoverReducer.posts.find((post) => {
+    return post.postHash === state.postDetailReducer.currentParentPostHash
+  })
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChatPageContainer)

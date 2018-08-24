@@ -15,7 +15,8 @@ const styles = {
     marginHorizontal: ventureum.basicPadding * 2,
     paddingVertical: ventureum.basicPadding,
     paddingHorizontal: ventureum.basicPadding * 2,
-    borderRadius: ventureum.borderRadiusBase
+    borderRadius: ventureum.borderRadiusBase,
+    ...ventureum.applyShadow
   },
   headerContainer: {
     flexDirection: 'column',
