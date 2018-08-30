@@ -1,4 +1,4 @@
-package com.reactnativeseed;
+package com.milestone;
 
 import android.app.Application;
 
