@@ -1,4 +1,4 @@
-import { Platform } from 'react-native'
+import { Platform, StyleSheet } from 'react-native'
 
 const platform = Platform.OS
 
@@ -18,19 +18,22 @@ export default {
 
   // Text Color
   textOnPrimary: '#000000',
-  subTextOnPrimary: '#323232',
+  subTextOnPrimary: '#a7a7a7',
   textOnSecondary: '#ffffff',
 
-  // Border Color
+  // Border
   borderColor: '#878787',
+  borderWidth: StyleSheet.hairlineWidth,
 
   // Font Size
   pageTitleFontSize: 20,
+  componentTitleFontSizeBig: 18,
   paragraphFontSize: 14,
   listTitleFontSize: 14,
   componentTitleFontSize: 16,
   buttonFontSize: 14,
   textInputFontSize: 16,
+  subTextFontSize: 12,
 
   // Font Weight
   light: '300',
@@ -40,7 +43,7 @@ export default {
   bold: '700',
 
   // Font Family
-  Fontfamily: platform === 'ios' ? 'Roboto' : 'Roboto_medium',
+  Fontfamily: platform === 'Roboto',
 
   // Spacing
   statusBarSpacing: 15,

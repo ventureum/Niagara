@@ -4,7 +4,7 @@ import axios from 'axios'
 import bs58 from 'bs58'
 
 const stream = require('getstream')
-const client = stream.connect(Config.STREAM_API_KEY, null, 39296)
+const client = stream.connect(Config.STREAM_API_KEY, null, Config.STREAM_APP_ID)
 const GAS_PRICE = '20000000000'
 const MINIMUM_BALANCE = 10000000000000000
 const GAS_LIMIT = '6500000'
@@ -127,7 +127,7 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
       }
       receiveBuffer = await forum.methods.getBatchPosts(onChainPosts).call()
       onChainPostData = onChainPostData.concat(receiveBuffer)
-      if (onChainPosts.length !== onChainPostData.length * 7){
+      if (onChainPosts.length !== onChainPostData.length * 7) {
         reject(new Error('On-Chain data does not match.'))
       }
       let onChainPostMeta = []
@@ -169,7 +169,7 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
       )
     }))
 
-    if (pResult.length!== offChainPosts.length){
+    if (pResult.length !== offChainPosts.length) {
       reject(new Error('Off-Chain data does not match.'))
     }
     for (let i = 0; i < pResult.length; i++) {

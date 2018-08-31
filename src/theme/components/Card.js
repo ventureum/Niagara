@@ -12,15 +12,15 @@ export default (variables = variable) => {
     marginVertical: 5,
     marginHorizontal: 2,
     flex: 1,
-    borderWidth: variables.borderWidth,
+    borderWidth: null,
     borderRadius: 2,
-    borderColor: variables.cardBorderColor,
+    borderColor: 'white',
     flexWrap: 'wrap',
     backgroundColor: variables.cardDefaultBg,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1.5,
+    shadowOffset: { width: 0, height: 0.7 },
+    shadowOpacity: 0.3,
+    shadowRadius: 1.3,
     elevation: 3
   }
 

@@ -25,6 +25,8 @@ import NewPost from './container/NewPostContainer'
 import PostDetail from './container/PostDetailContainer'
 import RefuelReputation from './container/RefuelReputationContainer'
 import ChatPage from './container/ChatPageContainer'
+import TransferPage from './container/TransferPageContainer'
+import ActivityPage from './container/ActivityPageContainer'
 
 const Drawer = DrawerNavigator(
   {
@@ -58,8 +60,10 @@ const App = StackNavigator(
     TokenToggle: { screen: TokenToggle },
     NewPost: { screen: NewPost },
     PostDetail: { screen: PostDetail },
-    RefuelReputation: {screen: RefuelReputation},
-    ChatPage: {screen: ChatPage}
+    RefuelReputation: { screen: RefuelReputation },
+    ChatPage: { screen: ChatPage },
+    TransferPage: { screen: TransferPage },
+    ActivityPage: { screen: ActivityPage }
   },
   {
     initialRouteName: 'Login',

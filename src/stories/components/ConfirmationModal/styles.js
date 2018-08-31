@@ -1,4 +1,3 @@
-import { StyleSheet } from 'react-native'
 import ventureum from '../../../theme/variables/ventureum.js'
 
 const styles = {
@@ -53,6 +52,22 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     margin: ventureum.basicPadding
+  },
+  modalBackground: {
+    backgroundColor: 'black',
+    opacity: 0.3,
+    flex: 1,
+    position: 'absolute'
+  },
+  modelView: {
+    flex: 1,
+    flexDirectionL: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'red'
+  },
+  modelMessage: {
+    backgroundColor: 'white'
   }
 }
 export default styles
