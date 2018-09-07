@@ -1,7 +1,7 @@
 import Config from 'react-native-config'
 import * as React from 'react'
 import { Alert, SafeAreaView } from 'react-native'
-import { Header, Body, Title, Button, Text, View, Icon, Left, Right } from 'native-base'
+import { Header, Body, Title, Button, Text, View, Icon, Left, Right, Container } from 'native-base'
 import PinKeyboard from '../../components/PinKeyboard'
 import PinIndicator from '../../components/PinIndicator'
 import LinearGradient from 'react-native-linear-gradient'
@@ -129,28 +129,28 @@ class CreateWallet extends React.Component<Props, State> {
       : 'Create PIN'
 
     return (
-      <LinearGradient colors={['#090909', '#181724']} style={styles.background}>
+      <Container>
+        <Header>
+          <Left>
+            <Button transparent>
+              <Icon
+                active
+                name='arrow-back'
+                onPress={() => this.props.navigation.goBack()}
+              />
+            </Button>
+          </Left>
+          <Body>
+            <Title>{this.state.isConfirmation ? 'Repeat PIN' : originalTitle}</Title>
+          </Body>
+          <Right />
+        </Header>
         <SafeAreaView style={styles.container}>
-          <Header iosBarStyle='light-content' style={styles.header}>
-            <Left>
-              <Button transparent>
-                <Icon
-                  active
-                  name='arrow-back'
-                  onPress={() => this.props.navigation.goBack()}
-                />
-              </Button>
-            </Left>
-            <Body>
-              <Title style={styles.title}>{this.state.isConfirmation ? 'Repeat PIN' : originalTitle}</Title>
-            </Body>
-            <Right />
-          </Header>
           <View style={styles.explanatoryTextContainer}>
             <Text style={styles.explanatoryText}>
               {this.state.isConfirmation
                 ? "Just to make sure it's correct"
-                : "This PIN will be used to access your wallet. If you forget it, you won't be able to access your VTH."}
+                : "This PIN will be used to access your wallet. If you forget it, you won't be able to access your wallet."}
             </Text>
           </View>
 
@@ -161,7 +161,7 @@ class CreateWallet extends React.Component<Props, State> {
             showBackButton={pinCode.length > 0}
           />
         </SafeAreaView>
-      </LinearGradient>
+      </Container>
     )
   }
 }

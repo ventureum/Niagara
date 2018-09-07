@@ -26,10 +26,13 @@ class Login extends React.Component<Props, State> {
 
   render () {
     return (
-      <LinearGradient colors={['#090909', '#181724']} style={styles.background}>
+      <View style={styles.background}>
         <SafeAreaView style={styles.container}>
           <View style={styles.logoContainer}>
             <Image source={logo} style={styles.logo} resizeMode='contain' />
+            <View padder>
+              <Text style={styles.appName}>Milestone</Text>
+            </View>
           </View>
           <View style={styles.buttonsContainer}>
             <View padder>
@@ -47,7 +50,7 @@ class Login extends React.Component<Props, State> {
             </View>
           </View>
         </SafeAreaView>
-      </LinearGradient>
+      </View>
     )
   }
 }

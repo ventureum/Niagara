@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native'
+import ventureum from '../../../theme/variables/ventureum'
 
 const styles: any = StyleSheet.create({
   container: {
@@ -10,10 +11,11 @@ const styles: any = StyleSheet.create({
   explanatoryTextContainer: {
     height: 80,
     justifyContent: 'center',
-    paddingHorizontal: 50
+    paddingHorizontal: 50,
+    paddingTop: ventureum.basicPadding * 3
   },
   explanatoryText: {
-    color: '#fff',
+    color: ventureum.textOnPrimary,
     fontSize: 13,
     textAlign: 'center'
   },

@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { Alert, SafeAreaView } from 'react-native'
-import { Header, Body, Title, Button, Icon, Left, Right } from 'native-base'
+import { Alert, SafeAreaView, View } from 'react-native'
+import { Header, Body, Title, Button, Icon, Left, Right, Container } from 'native-base'
 import PinKeyboard from '../../components/PinKeyboard'
 import PinIndicator from '../../components/PinIndicator'
 import LinearGradient from 'react-native-linear-gradient'
@@ -61,23 +61,23 @@ class PinCode extends React.Component<Props, State> {
 
   render () {
     return (
-      <LinearGradient colors={['#090909', '#181724']} style={styles.background}>
-        <SafeAreaView style={styles.container}>
-          <Header iosBarStyle='light-content' style={styles.header}>
-            <Left>
-              <Button transparent>
-                <Icon
-                  active
-                  name='arrow-back'
-                  onPress={() => this.props.navigation.goBack()}
-                />
-              </Button>
-            </Left>
-            <Body>
-              <Title style={styles.title}>Enter Pin</Title>
-            </Body>
-            <Right />
-          </Header>
+      <Container>
+        <Header>
+          <Left>
+            <Button transparent>
+              <Icon
+                active
+                name='arrow-back'
+                onPress={() => this.props.navigation.goBack()}
+              />
+            </Button>
+          </Left>
+          <Body>
+            <Title >Enter Pin</Title>
+          </Body>
+          <Right />
+        </Header>
+        <View style={styles.container}>
           <PinIndicator length={this.state.pinCode.length} />
           <PinKeyboard
             onBackPress={this.onBackPress}
@@ -85,8 +85,8 @@ class PinCode extends React.Component<Props, State> {
             onAuthSuccess={this.onAuthSuccess}
             showBackButton={this.state.pinCode.length > 0}
           />
-        </SafeAreaView>
-      </LinearGradient>
+        </View>
+      </Container>
     )
   }
 }
