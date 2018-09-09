@@ -53,11 +53,13 @@ export default class WalletUtils {
         gas: gasLimit
       })
     }
+
     promise.on('transactionHash', (hash) => {
       newTransaction(hash)
     }).on('error', (error) => {
+      console.log(error)
       Toast.show({
-        text: error,
+        text: 'Error in sending the transaction.',
         position: 'center',
         buttonText: 'Okay',
         type: 'danger',

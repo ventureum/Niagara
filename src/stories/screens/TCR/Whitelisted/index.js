@@ -12,7 +12,7 @@ export interface Props {
   list: any;
   loading: String;
 }
-export interface State {}
+export interface State { }
 class Whitelisted extends React.Component<Props, State> {
   render () {
     return (
@@ -23,13 +23,18 @@ class Whitelisted extends React.Component<Props, State> {
         <List style={styles.list}>
           {this.props.list &&
             typeof (this.props.list.whitelistList) === typeof ([]) &&
-            this.props.list.whitelistList.map((item, i) => (
-              <ListItem
-                key={i}
-              >
-                <Text>{item}</Text>
-              </ListItem>
-            ))}
+            this.props.list.whitelistList.map((item, i) => {
+              const txHashAbbr = item.slice(0, 7) + '...' + item.slice(-5)
+              return (
+                <ListItem
+                  key={i}
+                  style={{justifyContent: 'space-between'}}
+                >
+                  <Text>Project Hash: </Text>
+                  <Text>{txHashAbbr}</Text>
+                </ListItem>
+              )
+            })}
         </List>
       </Content>
     )

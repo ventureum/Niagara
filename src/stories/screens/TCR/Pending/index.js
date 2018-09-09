@@ -6,13 +6,14 @@ import {
   ListItem
 } from 'native-base'
 import { RefreshControl } from 'react-native'
+import WalletUtils from '../../../../utils/wallet'
 import styles from './styles'
 export interface Props {
   navigation: any;
   list: any;
   loading: String;
 }
-export interface State {}
+export interface State { }
 class Pending extends React.Component<Props, State> {
   render () {
     return (
@@ -23,13 +24,19 @@ class Pending extends React.Component<Props, State> {
         <List>
           {this.props.list &&
             typeof (this.props.list.pendingList) === typeof ([]) &&
-            this.props.list.pendingList.map((item, i) => (
-              <ListItem
-                key={i}
-              >
-                <Text>{item}</Text>
-              </ListItem>
-            ))}
+            this.props.list.pendingList.map((item, i) => {
+              const txHashAbbr = item.slice(0, 7) + '...' + item.slice(-5)
+              return (
+                <ListItem
+                  key={i}
+                  style={{justifyContent: 'space-between'}}
+                >
+                  <Text>Projet {i + 1}</Text>
+                  <Text>{txHashAbbr}</Text>
+                </ListItem>
+              )
+            }
+            )}
         </List>
       </Content>
     )

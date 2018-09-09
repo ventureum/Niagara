@@ -178,7 +178,7 @@ function batchReadFeedsByBoardId (requester, feed, id_lt = null, id_gt = null, s
     }
     for (let i = 0; i < pResult.length; i++) {
       if (!pResult[i].data.ok) {
-        reject(pResult[i].data.message.errorMessage)
+        reject(pResult[i])
       }
       const { post, postVoteCountInfo, requestorVoteCountInfo } = pResult[i].data
       offChainPostDetails.push({

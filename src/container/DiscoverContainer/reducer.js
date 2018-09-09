@@ -44,7 +44,7 @@ export default function (state: any = initialState, action: Function) {
     return {
       ...state,
       loading: false,
-      errorMessage: action.payload
+      errorMessage: action.payload.data.message.errorCode
     }
   }
   if (action.type === 'GET_MORE_POSTS_FULFILLED') {
@@ -92,7 +92,7 @@ export default function (state: any = initialState, action: Function) {
     return {
       ...state,
       loading: false,
-      errorMessage: action.payload
+      errorMessage: action.payload.data.message.errorCode
     }
   }
 
@@ -154,7 +154,7 @@ export default function (state: any = initialState, action: Function) {
     return {
       ...state,
       fetchingVoteCost: false,
-      voteInfoError: action.payload
+      voteInfoError: action.payload.data.message.errorCode
     }
   }
 

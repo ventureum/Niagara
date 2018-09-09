@@ -4,7 +4,7 @@ import { Container, Icon, Title, Text, Header, Left, Body, Right, Button, Thumbn
 import styles from './styles'
 import WalletUtils from '../../../utils/wallet'
 import { processContent } from '../../../utils/content'
-import { NEW_POST_REPUTATION_COST } from '../../../utils/constants'
+import { NEW_POST_FUEL_COST } from '../../../utils/constants'
 
 export default class NewPost extends Component {
   constructor (props) {
@@ -39,7 +39,7 @@ export default class NewPost extends Component {
       const web3 = WalletUtils.getWeb3Instance()
       const noParent = web3.utils.padRight('0x0', 64)
       const postType = 'POST'
-      let message = `A new ${destination} reply costs ${NEW_POST_REPUTATION_COST} reputation`
+      let message = `A new ${destination} reply costs ${NEW_POST_FUEL_COST} fuel`
       if (destination === 'ON-CHAIN') {
         message += `\n\nAdditional transaction fee applies to ON-CHAIN post`
       }

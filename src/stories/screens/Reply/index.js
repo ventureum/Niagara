@@ -3,7 +3,7 @@ import { Text, Icon, Toast, Container, Header, Left, Right, Body, Title, Button 
 import { TextInput, View, KeyboardAvoidingView, ScrollView, Switch, Alert, TouchableOpacity } from 'react-native'
 import styles from './styles'
 import { processContent } from '../../../utils/content'
-import { NEW_REPLY_REPUTATION_COST } from '../../../utils/constants'
+import { NEW_REPLY_FUEL_COST } from '../../../utils/constants'
 export default class Reply extends Component {
   constructor (props) {
     super(props)
@@ -35,7 +35,7 @@ export default class Reply extends Component {
       const boardId = this.props.boardHash
       const parentHash = parentPost.postHash
       const postType = 'COMMENT'
-      let message = `A new ${destination} reply costs ${NEW_REPLY_REPUTATION_COST} reputation`
+      let message = `A new ${destination} reply costs ${NEW_REPLY_FUEL_COST} fuel`
       if (destination === 'ON-CHAIN') {
         message += `\n\nAdditional transaction fee applies to ON-CHAIN post`
       }

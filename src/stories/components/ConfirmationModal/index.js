@@ -13,7 +13,7 @@ export default class ConfirmationModal extends Component {
         <View style={styles.bodyContainer}>
           <Text style={styles.messageText}>
             {this.props.voteInfoError === null
-              ? `This voting action will cost you ${this.props.voteInfo.fuelCost} reputations.`
+              ? `This voting action will cost you ${this.props.voteInfo.fuelCost} fuel.`
               : 'Vote info fetching error'
             }
           </Text>
