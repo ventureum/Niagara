@@ -1,47 +1,54 @@
 const initialState = {
-  reputation: 0,
-  loading: false,
-  errorMessage: ''
+  loadingUser: false,
+  errorMessage: '',
+  profile: null
 }
 
 export default function (state = initialState, action) {
-  if (action.type === 'UPDATE_REPUTATION_FULFILLED') {
+  if (action.type === 'FETCH_PROFILE_FULFILLED') {
     return {
       ...state,
-      reputation: action.payload,
+      profile: action.payload.profile,
+      loadingUser: false
+    }
+  }
+  if (action.type === 'FETCH_PROFILE_REJECTED') {
+    return {
+      ...state,
+      loadingUser: false,
+      errorMessage: action.payload
+    }
+  }
+  if (action.type === 'FETCH_PROFILE_PENDING') {
+    return {
+      ...state,
+      loadingUser: true
+    }
+  }
+  if (action.type === 'REFUEL_FULFILLED') {
+    return {
+      ...state,
       loading: false
     }
   }
-  if (action.type === 'UPDATE_REPUTATION_REJECTED') {
+  if (action.type === 'REFUEL_REJECTED') {
     return {
       ...state,
       loading: false,
       errorMessage: action.payload
     }
   }
-  if (action.type === 'UPDATE_REPUTATION_PENDING') {
+  if (action.type === 'REFUEL_PENDING') {
     return {
       ...state,
       loading: true
     }
   }
-  if (action.type === 'REFUEL_REPUTATION_FULFILLED') {
+
+  if (action.type === 'SET_ACTOR') {
     return {
       ...state,
-      loading: false
-    }
-  }
-  if (action.type === 'REFUEL_REPUTATION_REJECTED') {
-    return {
-      ...state,
-      loading: false,
-      errorMessage: action.payload
-    }
-  }
-  if (action.type === 'REFUEL_REPUTATION_PENDING') {
-    return {
-      ...state,
-      loading: true
+      profile: { actor: action.payload }
     }
   }
 

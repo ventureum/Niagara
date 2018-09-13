@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { FlatList, RefreshControl, View, Platform } from 'react-native'
+import { FlatList, RefreshControl, View, Platform, Alert } from 'react-native'
 import { Container, Body, Header, Left, Right, Button, Icon, Title, Text, Content, Fab } from 'native-base'
 import FeedCardBasic from '../../components/FeedCardBasic'
 import WalletUtils from '../../../utils/wallet'
@@ -7,7 +7,6 @@ import Search from '../../../utils/search.js'
 import SpecialPostCard from '../../components/SpecialPostCard'
 import { BOARD_ALL_HASH } from '../../../utils/constants.js'
 import ventureum from '../../../theme/variables/ventureum'
-import { Alert } from 'react-native'
 
 console.ignoredYellowBox = ['Setting a timer']
 
@@ -66,7 +65,7 @@ export default class Discover extends Component {
         'Failed',
         this.props.errorMessage,
         [
-          {text: 'OK', onPress: () => this.props.resetErrorMessage()}
+          { text: 'OK', onPress: () => this.props.resetErrorMessage() }
         ],
         { cancelable: false }
       )

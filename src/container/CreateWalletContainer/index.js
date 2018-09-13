@@ -13,7 +13,13 @@ export interface Props {
 export interface State {}
 class CreateWalletContainer extends React.Component<Props, State> {
   render () {
-    return <CreateWallet navigation={this.props.navigation} setPinCode={this.props.setPinCode} setWalletAddress={this.props.setWalletAddress} setPrivateKey={this.props.setPrivateKey} />
+    return <CreateWallet
+      navigation={this.props.navigation}
+      setPinCode={this.props.setPinCode}
+      setWalletAddress={this.props.setWalletAddress}
+      setPrivateKey={this.props.setPrivateKey}
+
+    />
   }
 }
 

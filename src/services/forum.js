@@ -440,21 +440,21 @@ function updatePostRewards (actor, boardId, postHash, value) {
   })
 }
 
-function getReputation (userAddress) {
+function fetchProfile (actor) {
   return new Promise(async (resolve, reject) => {
     const result = await axios.post(
-      `${Config.FEED_END_POINT}/get-reputations`,
-      { UserAddress: userAddress }
+      `${Config.FEED_END_POINT}/get-profile`,
+      { actor: actor }
     )
     if (result.data.ok) {
-      resolve(result.data.reputations)
+      resolve(result.data)
     } else {
       reject(result.data.message)
     }
   })
 }
 
-function refuelReputation (userAddress, reputations, refreshProfile) {
+function refuel (userAddress, reputations, refreshProfile) {
   return new Promise(async (resolve, reject) => {
     const result = await axios.post(
       `${Config.FEED_END_POINT}/refuel-reputations`,
@@ -493,6 +493,27 @@ function getVoteCostEstimate (requestor, postHash) {
   })
 }
 
+function registerUser (UUID, userName, telegramId) {
+  return new Promise(async (resolve, reject) => {
+    const request = {
+      actor: UUID,
+      userName: userName,
+      UserType: 'USER',
+      telegramId: telegramId
+    }
+    console.log(request)
+    const result = await axios.post(
+      `${Config.FEED_END_POINT}/profile`,
+      request
+    )
+    if (result.data.ok) {
+      resolve(result.data.ok)
+    } else {
+      reject(result)
+    }
+  })
+}
+
 export {
   batchReadFeedsByBoardId,
   checkBalanceForTx,
@@ -503,8 +524,9 @@ export {
   purchasePutOption,
   executePutOption,
   updatePostRewards,
-  getReputation,
-  refuelReputation,
+  fetchProfile,
+  refuel,
   client,
-  getVoteCostEstimate
+  getVoteCostEstimate,
+  registerUser
 }

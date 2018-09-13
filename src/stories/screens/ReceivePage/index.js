@@ -9,13 +9,13 @@ import venturem from '../../../theme/variables/ventureum'
 let web3
 
 export default class ReceivePage extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     web3 = wallet.getWeb3Instance()
     this.state = ({ account: web3.eth.defaultAccount })
   }
 
-  render() {
+  render () {
     return (
       <Container>
         <Header>

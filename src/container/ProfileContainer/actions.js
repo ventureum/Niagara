@@ -1,30 +1,56 @@
 import * as forum from '../../services/forum'
+import { shake128 } from 'js-sha3'
 
-function _updateReputation (userAddress) {
+function _fetchProfile (actor) {
   return {
-    type: 'UPDATE_REPUTATION',
-    payload: forum.getReputation(userAddress)
+    type: 'FETCH_PROFILE',
+    payload: forum.fetchProfile(actor)
   }
 }
-function updateReputation () {
+function fetchProfile () {
+  return (dispatch, getState) => {
+    const actor = getState().profileReducer.profile.actor
+    dispatch(_fetchProfile(actor))
+  }
+}
+
+function _refuel (userAddress, reputations, refreshProfile) {
+  return {
+    type: 'REFUEL',
+    payload: forum.refuel(userAddress, reputations, refreshProfile)
+  }
+}
+
+function refuel (reputations, refreshProfile) {
   return (dispatch, getState) => {
     const userAddress = getState().walletReducer.walletAddress
-    dispatch(_updateReputation(userAddress))
+    dispatch(_refuel(userAddress, reputations, refreshProfile))
   }
 }
 
-function _refuelReputation (userAddress, reputations, refreshProfile) {
+function _registerUser (UUID, userName, telegramId) {
   return {
-    type: 'REFUEL_REPUTATION',
-    payload: forum.refuelReputation(userAddress, reputations, refreshProfile)
+    type: 'REGISTER_USER',
+    payload: forum.registerUser(UUID, userName, telegramId)
   }
 }
 
-function refuelReputation (reputations, refreshProfile) {
+function registerUser (idRoot, userName, telegramId) {
+  const shakeHash = shake128(String(idRoot), 128)
+  const hashBytes = Buffer.from(shakeHash, 'hex')
+  const uuidParse = require('uuid-parse')
+  const UUID = uuidParse.unparse(hashBytes)
   return (dispatch, getState) => {
-    const userAddress = getState().walletReducer.walletAddress
-    dispatch(_refuelReputation(userAddress, reputations, refreshProfile))
+    dispatch(setActor(UUID))
+    dispatch(_registerUser(UUID, userName, String(telegramId)))
   }
 }
 
-export { updateReputation, refuelReputation }
+function setActor (actor) {
+  return {
+    type: 'SET_ACTOR',
+    payload: actor
+  }
+}
+
+export { fetchProfile, refuel, registerUser }

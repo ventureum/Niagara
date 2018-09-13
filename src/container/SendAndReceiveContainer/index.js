@@ -38,7 +38,6 @@ class SendAndReceiveContainer extends React.Component {
   render () {
     const { navigation } = this.props
     const tokenIdx = navigation.getParam('tokenIdx', null)
-
     return <SendAndReceive navigation={this.props.navigation}
       loading={this.props.loading}
       token={this.props.tokens[tokenIdx]}

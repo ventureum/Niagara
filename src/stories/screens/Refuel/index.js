@@ -5,7 +5,7 @@ import styles from './styles'
 import { BigNumber } from 'bignumber.js'
 
 const DECIMAL_FIXED = 5
-export default class RefuelReputation extends Component {
+export default class Refuel extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -54,7 +54,7 @@ export default class RefuelReputation extends Component {
         {
           text: 'Purchase',
           onPress: () => {
-            this.props.refuelReputation(parseInt(reputation), refreshProfile)
+            this.props.refuel(parseInt(reputation), refreshProfile)
             this.props.navigation.goBack()
           }
         }

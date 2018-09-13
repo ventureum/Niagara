@@ -2,35 +2,24 @@ import { StyleSheet } from 'react-native'
 import ventureum from '../../../theme/variables/ventureum'
 
 const styles: any = StyleSheet.create({
-  container: {
-    backgroundColor: 'transparent',
-    flex: 1,
-    paddingBottom: 20,
-    paddingHorizontal: 15,
-    justifyContent: 'center'
-  },
   logoContainer: {
+    marginTop: ventureum.basicPadding * 5,
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: ventureum.basicPadding
+    justifyContent: 'center'
   },
   logo: {
     width: '35%',
-    height: '35%'
-  },
-  buttonsContainer: {
-    paddingHorizontal: 15,
-    width: '100%'
-  },
-  background: {
-    flex: 1
+    height: '50%'
   },
   appName: {
     color: 'black',
     fontWeight: ventureum.bold,
-    fontSize: 32,
+    fontSize: 20,
     marginTop: ventureum.basicPadding * 3
   },
-
+  container: {
+    flex: 1,
+    paddingHorizontal: ventureum.basicPadding * 6
+  }
 })
 export default styles

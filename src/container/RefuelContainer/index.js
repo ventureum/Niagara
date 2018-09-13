@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import walletUtils from '../../utils/wallet'
-import { refuelReputation } from '../ProfileContainer/actions'
-import RefuelReputation from '../../stories/screens/RefuelReputation'
+import { refuel } from '../ProfileContainer/actions'
+import Refuel from '../../stories/screens/Refuel'
 
-class RefuelReputationContainer extends Component {
+class RefuelContainer extends Component {
   constructor (props) {
     super(props)
     const avatar = walletUtils.getAvatar()
@@ -13,11 +13,11 @@ class RefuelReputationContainer extends Component {
   render () {
     const refreshProfile = this.props.navigation.getParam('refreshProfile', () => {})
     return (
-      <RefuelReputation
+      <Refuel
         navigation={this.props.navigation}
         avatar={this.state.avatar}
         reputation={this.props.reputation}
-        refuelReputation={this.props.refuelReputation}
+        refuel={this.props.refuel}
         refreshProfile={refreshProfile}
       />
     )
@@ -29,7 +29,7 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  refuelReputation: (reputations, refreshProfile) => dispatch(refuelReputation(reputations, refreshProfile))
+  refuel: (reputations, refreshProfile) => dispatch(refuel(reputations, refreshProfile))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(RefuelReputationContainer)
+export default connect(mapStateToProps, mapDispatchToProps)(RefuelContainer)
