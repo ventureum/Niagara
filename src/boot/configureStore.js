@@ -11,19 +11,19 @@ import logger from 'redux-logger'
 
 const storage = createSensitiveStorage({
   encrypt: true,
-  keychainService: 'vthwallet',
-  sharedPreferencesName: 'vthwallet'
+  keychainService: 'Milestone',
+  sharedPreferencesName: 'Milestone'
 })
 
 const persistConfig = {
-  key: 'vthwallet',
+  key: 'Milestone',
   version: 1,
   storage,
   blacklist: ['discoverReducer', 'sendPageReducer', 'postDetailReducer']
 }
 
 var store = null
-
+var persistor = null
 function configureStore (onCompletion: () => void): any {
   const enhancer = compose(
     applyMiddleware(promiseMiddleware(), thunk, logger),
@@ -35,9 +35,9 @@ function configureStore (onCompletion: () => void): any {
 
   store = createStore(persistReducer(persistConfig, reducer), enhancer)
 
-  persistStore(store, onCompletion)
+  persistor = persistStore(store, onCompletion)
 
   return store
 }
 
-export { store, configureStore }
+export { persistor, store, configureStore }

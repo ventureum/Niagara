@@ -11,7 +11,6 @@ import {
   List,
   ListItem,
   Thumbnail,
-  Button,
   Icon
 } from 'native-base'
 import { BigNumber } from 'bignumber.js'
@@ -54,7 +53,6 @@ class Assets extends React.Component {
 
   render () {
     let { tokens, totalVal, walletAddress } = this.props
-
     const listItems = tokens.map((token, i) => {
       return (
         <ListItem key={i} onPress={() => this.tokenListOnPress(i)}>

@@ -2,19 +2,10 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import Assets from '../../stories/screens/Assets'
-import WalletUtils from '../../utils/wallet.js'
-import { refreshTokens, initTokens } from './actions'
+import { refreshTokens } from './actions'
 
 class AssetsContainer extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      web3: WalletUtils.getWeb3Instance()
-    }
-  }
-
   componentWillMount () {
-    this.props.initTokens()
     this.props.refreshTokens()
   }
 
@@ -23,7 +14,7 @@ class AssetsContainer extends React.Component {
       loading={this.props.loading}
       tokens={this.props.tokens}
       totalVal={0}
-      walletAddress={this.state.web3.eth.defaultAccount}
+      walletAddress={this.props.walletAddress}
       refreshTokens={this.props.refreshTokens}
     />
   }
@@ -31,12 +22,12 @@ class AssetsContainer extends React.Component {
 
 const mapStateToProps = state => ({
   tokens: state.assetsReducer.tokens,
-  loading: state.assetsReducer.loading
+  loading: state.assetsReducer.loading,
+  walletAddress: state.walletReducer.walletAddress
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  refreshTokens: () => dispatch(refreshTokens()),
-  initTokens: () => dispatch(initTokens())
+  refreshTokens: () => dispatch(refreshTokens())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(AssetsContainer)

@@ -1,7 +1,7 @@
 import Config from 'react-native-config'
 import Web3 from 'web3'
 import { store } from '../boot/configureStore.js'
-import {Platform} from 'react-native'
+import { Platform } from 'react-native'
 import { ERC20_ABI } from './contracts/ERC20.js'
 import TCRRegistry from './contracts/Registry'
 import Token from './contracts/VetXToken'
@@ -122,9 +122,7 @@ export default class WalletUtils {
   static getWeb3Instance () {
     if (!this.web3) {
       const wallet = this.getWallet()
-
       this.web3 = new Web3(this.getWeb3HTTPProvider())
-
       this.web3.eth.accounts.wallet.add({
         privateKey: wallet.privateKey,
         address: wallet.walletAddress

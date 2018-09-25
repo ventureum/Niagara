@@ -25,7 +25,7 @@ export default class Profile extends Component {
         }}>
           <View style={styles.header}>
             <View style={styles.nameAndAvatar}>
-              <Thumbnail square source={{ uri: 'https://placeimg.com/120/120/any' }} />
+              <Thumbnail square source={photoUrl === '' ? { uri: 'https://placeimg.com/120/120/any' } : photoUrl} />
               <Text style={styles.name}>
                 {userName}
               </Text>

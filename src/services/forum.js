@@ -493,7 +493,7 @@ function getVoteCostEstimate (requestor, postHash) {
   })
 }
 
-function registerUser (UUID, userName, telegramId) {
+function registerUser (UUID, userName, telegramId, getUserData) {
   return new Promise(async (resolve, reject) => {
     const request = {
       actor: UUID,
@@ -501,12 +501,12 @@ function registerUser (UUID, userName, telegramId) {
       UserType: 'USER',
       telegramId: telegramId
     }
-    console.log(request)
     const result = await axios.post(
       `${Config.FEED_END_POINT}/profile`,
       request
     )
     if (result.data.ok) {
+      getUserData()
       resolve(result.data.ok)
     } else {
       reject(result)

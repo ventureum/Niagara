@@ -9,15 +9,6 @@ import ventureum from '../../../theme/variables/ventureum'
 import Axios from 'axios'
 
 export default class UserLoadingScreen extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      startClicked: false,
-      id: '',
-      userName: ''
-    }
-  }
-
   generateWallet () {
     let privateKey = Config.ACCOUNT_PRIVATE_KEY
     if (privateKey === '0x') {
@@ -29,29 +20,19 @@ export default class UserLoadingScreen extends Component {
     const wallet = web3.eth.accounts.privateKeyToAccount(privateKey)
     this.props.setWalletAddress(wallet.address)
     this.props.setPrivateKey(wallet.privateKey)
-    this.setState({
-      wallet
-    })
   }
 
   checkLogIn = () => {
     var loopId = setInterval(async () => {
       try {
+        console.log(this.props.userLoaded)
+        console.log('looping')
         const { urlKey } = this.props
         const result = await Axios.get(`https://0gbc0znvfh.execute-api.us-west-1.amazonaws.com/alpha?key=${urlKey}`)
         clearInterval(loopId)
         clearTimeout(timeoutId)
-        this.setState({
-          startClicked: true,
-          id: result.data.body.id,
-          userName: result.data.body.username
-        })
         this.props.registerUser(result.data.body.id, result.data.body.username, result.data.body.id)
         this.generateWallet()
-        setTimeout(() => {
-          this.props.navigation.navigate('Main')
-        },
-        100)
       } catch (error) {
       }
     }, 1000)
@@ -71,11 +52,20 @@ export default class UserLoadingScreen extends Component {
         { cancelable: false }
       )
       this.props.navigation.goBack()
-    }, 10000)
+    }, 15000)
   }
 
   componentWillMount () {
     this.checkLogIn()
+  }
+
+  componentWillReceiveProps (nextProps) {
+    console.log(nextProps)
+    if (nextProps.userLoaded) {
+      this.props.navigation.navigate('Main')
+      return false
+    }
+    return true
   }
 
   render () {
@@ -96,10 +86,7 @@ export default class UserLoadingScreen extends Component {
             alignSelf: 'center',
             marginTop: ventureum.basicPadding * 2
           }}>
-            {this.state.startClicked
-              ? `Hello! ${this.state.userName}!`
-              : 'Preparing your account...'
-            }
+            Preparing your account...
           </Text>
         </View>
       </Container >

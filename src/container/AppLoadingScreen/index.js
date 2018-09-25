@@ -4,15 +4,15 @@ import PropTypes from 'prop-types'
 
 class AppLoadingScreen extends Component {
   static propTypes = {
-    profile: PropTypes.object
+    userLoaded: PropTypes.bool
   };
 
   static defaultProps = {
-    profile: null
+    userLoaded: false
   };
 
   componentDidMount () {
-    if (this.props.profile === null) {
+    if (!this.props.userLoaded) {
       return this.props.navigation.navigate('Login')
     }
     return this.props.navigation.navigate('Main')
@@ -24,7 +24,7 @@ class AppLoadingScreen extends Component {
 }
 
 const mapStateToProps = state => ({
-  profile: state.profileReducer.profile
+  userLoaded: state.profileReducer.userLoaded
 })
 
 export default connect(mapStateToProps)(AppLoadingScreen)

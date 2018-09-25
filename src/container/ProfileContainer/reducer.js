@@ -1,7 +1,8 @@
 const initialState = {
   loadingUser: false,
   errorMessage: '',
-  profile: null
+  profile: null,
+  userLoaded: false
 }
 
 export default function (state = initialState, action) {
@@ -9,7 +10,8 @@ export default function (state = initialState, action) {
     return {
       ...state,
       profile: action.payload.profile,
-      loadingUser: false
+      loadingUser: false,
+      userLoaded: true
     }
   }
   if (action.type === 'FETCH_PROFILE_REJECTED') {

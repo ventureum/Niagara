@@ -39,11 +39,7 @@ export default function (state: any = initialState, action: Function) {
       error: true
     }
   }
-  if (action.type === 'INIT_TOKENS') {
-    return {
-      ...initialState
-    }
-  }
+
   if (action.type === 'ADD_TOKEN_TRANSACTION') {
     return update(
       state,

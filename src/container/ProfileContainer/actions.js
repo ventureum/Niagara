@@ -28,10 +28,10 @@ function refuel (reputations, refreshProfile) {
   }
 }
 
-function _registerUser (UUID, userName, telegramId) {
+function _registerUser (UUID, userName, telegramId, getUserData) {
   return {
     type: 'REGISTER_USER',
-    payload: forum.registerUser(UUID, userName, telegramId)
+    payload: forum.registerUser(UUID, userName, telegramId, getUserData)
   }
 }
 
@@ -42,7 +42,14 @@ function registerUser (idRoot, userName, telegramId) {
   const UUID = uuidParse.unparse(hashBytes)
   return (dispatch, getState) => {
     dispatch(setActor(UUID))
-    dispatch(_registerUser(UUID, userName, String(telegramId)))
+    dispatch(_registerUser(
+      UUID,
+      userName,
+      String(telegramId),
+      () => {
+        dispatch(_fetchProfile(UUID))
+      }
+    ))
   }
 }
 

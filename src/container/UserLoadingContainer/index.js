@@ -13,6 +13,7 @@ class UserLoadingContainer extends Component {
         setPrivateKey={this.props.setPrivateKey}
         urlKey={this.props.navigation.getParam('urlKey', '')}
         registerUser={this.props.registerUser}
+        userLoaded={this.props.userLoaded}
       />
     )
   }
@@ -26,7 +27,7 @@ const mapDispatchToProps = (dispatch) =>
   })
 
 const mapStateToProps = state => ({
-  profile: state.profileReducer.profile
+  userLoaded: state.profileReducer.userLoaded
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserLoadingContainer)
