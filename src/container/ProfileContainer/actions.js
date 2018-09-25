@@ -14,40 +14,40 @@ function fetchProfile () {
   }
 }
 
-function _refuel (userAddress, reputations, refreshProfile) {
+function _refuel (actor, reputations, refreshProfile) {
   return {
     type: 'REFUEL',
-    payload: forum.refuel(userAddress, reputations, refreshProfile)
+    payload: forum.refuel(actor, reputations, refreshProfile)
   }
 }
 
 function refuel (reputations, refreshProfile) {
   return (dispatch, getState) => {
-    const userAddress = getState().walletReducer.walletAddress
-    dispatch(_refuel(userAddress, reputations, refreshProfile))
+    const actor = getState().profileReducer.profile.actor
+    dispatch(_refuel(actor, reputations, refreshProfile))
   }
 }
 
-function _registerUser (UUID, userName, telegramId, getUserData) {
+function _registerUser (actor, username, telegramId, getUserData) {
   return {
     type: 'REGISTER_USER',
-    payload: forum.registerUser(UUID, userName, telegramId, getUserData)
+    payload: forum.registerUser(actor, username, telegramId, getUserData)
   }
 }
 
-function registerUser (idRoot, userName, telegramId) {
+function registerUser (idRoot, username, telegramId) {
   const shakeHash = shake128(String(idRoot), 128)
   const hashBytes = Buffer.from(shakeHash, 'hex')
   const uuidParse = require('uuid-parse')
-  const UUID = uuidParse.unparse(hashBytes)
+  const actor = uuidParse.unparse(hashBytes)
   return (dispatch, getState) => {
-    dispatch(setActor(UUID))
+    dispatch(setActor(actor))
     dispatch(_registerUser(
-      UUID,
-      userName,
+      actor,
+      username,
       String(telegramId),
       () => {
-        dispatch(_fetchProfile(UUID))
+        dispatch(_fetchProfile(actor))
       }
     ))
   }

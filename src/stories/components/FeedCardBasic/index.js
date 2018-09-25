@@ -21,7 +21,7 @@ let moment = require('moment')
 let numeral = require('numeral')
 const FORMAT = '0[.]0a'
 
-export default class FeedCard extends React.Component {
+export default class FeedCardBasic extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -260,7 +260,7 @@ export default class FeedCard extends React.Component {
                     fontSize: 14
                   }}
                 >
-                  {'@' + post.actorAddrAbbre}
+                  {'@' + post.username}
                 </Text>
                 <Text style={{ fontSize: 13, color: '#aaa' }}>
                   {moment.utc(post.time).fromNow()}

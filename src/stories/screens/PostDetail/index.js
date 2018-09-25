@@ -24,7 +24,6 @@ export default class PostDetail extends Component {
   onRenderItem = ({ item }) => {
     item = {
       ...item,
-      actor: WalletUtils.getAddrAbbre(item.actor),
       avatar: WalletUtils.getAvatar(item.actor)
     }
     return (

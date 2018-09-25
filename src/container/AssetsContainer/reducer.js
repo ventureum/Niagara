@@ -43,12 +43,12 @@ export default function (state: any = initialState, action: Function) {
   if (action.type === 'ADD_TOKEN_TRANSACTION') {
     return update(
       state,
-      {logs: logs => update(logs || [], {$push: [action.receipt]})}
+      { logs: logs => update(logs || [], { $push: [action.receipt] }) }
     )
   }
   if (action.type === 'REFRESH_LOGS_FULFILLED') {
     let validLogs = []
-    const {result} = action.payload
+    const { result } = action.payload
     if (result.data.message === 'OK') {
       for (let i = 0; i < result.data.result.length; i++) {
         if (validLogs.length === NUMBER_OF_TX_TO_FETCH) {
@@ -62,9 +62,9 @@ export default function (state: any = initialState, action: Function) {
     return update(
       update(
         state,
-        {tokens: {[action.payload.tokenIdx]: {eventLogs: eventLogs => update(eventLogs || [], {$set: validLogs})}}}
+        { tokens: { [action.payload.tokenIdx]: { eventLogs: eventLogs => update(eventLogs || [], { $set: validLogs }) } } }
       ),
-      {loading: {$set: false}}
+      { loading: { $set: false } }
     )
   }
   if (action.type === 'REFRESH_LOGS_PENDING') {
@@ -84,7 +84,7 @@ export default function (state: any = initialState, action: Function) {
     let token = WalletUtils.getToken(action.payload.symbol, action.payload.address)
     for (let i = 0; i < tokens.length; i++) {
       if (tokens[i].symbol === action.payload.symbol &&
-          tokens[i].address === action.payload.address) {
+        tokens[i].address === action.payload.address) {
         // token already exist, ignore the operation
         return state
       }
@@ -92,7 +92,7 @@ export default function (state: any = initialState, action: Function) {
     if (token) {
       return update(
         state,
-        {tokens: tokens => update(tokens || [], {$push: [{...token, balance: 0, value: 0}]})}
+        { tokens: tokens => update(tokens || [], { $push: [{ ...token, balance: 0, value: 0 }] }) }
       )
     }
   }

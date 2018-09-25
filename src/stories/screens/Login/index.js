@@ -2,10 +2,7 @@ import * as React from 'react'
 import {
   Image,
   SafeAreaView,
-  Linking,
-  Platform,
-  ProgressBarAndroid,
-  ProgressViewIOS
+  Linking
 } from 'react-native'
 import { Button, Text, View } from 'native-base'
 import logo from './images/logo.png'
@@ -18,13 +15,8 @@ class Login extends React.Component<Props, State> {
       <View padder>
         <Button block onPress={
           () => {
-            var nanoid
+            var nanoid = require('nanoid/non-secure')
             let urlKey = 'key'
-            if (Platform.OS === 'ios') {
-              nanoid = require('nanoid/non-secure')
-            } else {
-              nanoid = require('nanoid')
-            }
             urlKey = nanoid(24)
             const url = 'https://telegram.me/milestone_login_bot?start=' + urlKey
             this.props.navigation.navigate('UserLoadingScreen', { urlKey: urlKey })

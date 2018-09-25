@@ -10,22 +10,22 @@ function _getReplies (requester, postHash) {
 
 function getReplies (postHash) {
   return (dispatch, getState) => {
-    const requester = getState().walletReducer.walletAddress
+    const requester = getState().profileReducer.profile.actor
     dispatch(_getReplies(requester, postHash))
   }
 }
 
-function _fetchUserMilstoneData (postHash, userAddress) {
+function _fetchUserMilstoneData (postHash, actor) {
   return {
     type: 'FETCH_USER_MILESTONE_DATA',
-    payload: forum.fetchUserMilstoneData(postHash, userAddress)
+    payload: forum.fetchUserMilstoneData(postHash, actor)
   }
 }
 
 function fetchUserMilstoneData (postHash) {
   return (dispatch, getState) => {
-    const userAddress = getState().walletReducer.walletAddress
-    dispatch(_fetchUserMilstoneData(postHash, userAddress))
+    const actor = getState().profileReducer.profile.actor
+    dispatch(_fetchUserMilstoneData(postHash, actor))
   }
 }
 
@@ -76,7 +76,7 @@ function _updatePostRewards (actor, boardId, postHash, value) {
 }
 function updatePostRewards (boardId, postHash, value) {
   return (dispatch, getState) => {
-    const actor = getState().walletReducer.walletAddress
+    const actor = getState().profileReducer.profile.actor
     dispatch(_updatePostRewards(actor, boardId, postHash, value))
   }
 }

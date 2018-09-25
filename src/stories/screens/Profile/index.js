@@ -12,7 +12,7 @@ export default class Profile extends Component {
   }
 
   render () {
-    const { userName, photoUrl, level } = this.props.profile
+    const { username, photoUrl, level } = this.props.profile
     return (
       <ScrollView style={{
         backgroundColor: ventureum.primaryColor,
@@ -27,7 +27,7 @@ export default class Profile extends Component {
             <View style={styles.nameAndAvatar}>
               <Thumbnail square source={photoUrl === '' ? { uri: 'https://placeimg.com/120/120/any' } : photoUrl} />
               <Text style={styles.name}>
-                {userName}
+                {username}
               </Text>
               <View style={styles.lvBadge}>
                 <Text style={styles.lvText}>

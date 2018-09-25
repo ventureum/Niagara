@@ -219,7 +219,7 @@ export default class CommentCard extends React.Component {
                   fontSize: 14
                 }}
               >
-                {'@' + post.actorAddrAbbre + ' replied:'}
+                {'@' + post.username + ' replied:'}
               </Text>
               <Text style={{ fontSize: 12, color: '#aaa' }}>
                 {moment.utc(post.time).fromNow()}

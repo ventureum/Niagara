@@ -4,7 +4,7 @@ const INITIAL_FETCH_SIZE = 20
 
 function getInitialChatHistory (postHash) {
   return (dispatch, getState) => {
-    const requester = getState().walletReducer.walletAddress
+    const requester = getState().profileReducer.profile.actor
     dispatch(_getInitialChatHistory(
       requester,
       postHash
@@ -40,7 +40,7 @@ function _fetchLatestChat (requester, postHash, latestUUID) {
 function fetchLatestChat (postHash) {
   return (dispatch, getState) => {
     const latestUUID = getState().chatPageReducer.latestUUID
-    const requester = getState().walletReducer.walletAddress
+    const requester = getState().profileReducer.profile.actor
     dispatch(_fetchLatestChat(
       requester,
       postHash,
@@ -65,7 +65,7 @@ function _fetchEalierChat (requester, postHash, earliestUUID) {
 function fetchEalierChat (postHash) {
   return (dispatch, getState) => {
     const earliestUUID = getState().chatPageReducer.earliestUUID
-    const requester = getState().walletReducer.walletAddress
+    const requester = getState().profileReducer.profile.actor
     dispatch(_fetchEalierChat(
       requester,
       postHash,
@@ -82,7 +82,7 @@ function _updatePostRewards (actor, boardId, postHash, value) {
 }
 function updatePostRewards (boardId, postHash, value) {
   return (dispatch, getState) => {
-    const actor = getState().walletReducer.walletAddress
+    const actor = getState().profileReducer.profile.actor
     dispatch(_updatePostRewards(actor, boardId, postHash, value))
   }
 }

@@ -244,7 +244,7 @@ export default class FeedCard extends React.Component {
                   fontSize: 14
                 }}
               >
-                {'@' + post.actorAddrAbbre}
+                {'@' + post.username}
               </Text>
               <Text style={{ fontSize: 13, color: '#aaa' }}>
                 {moment.utc(post.time).fromNow()}

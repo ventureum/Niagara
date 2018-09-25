@@ -182,15 +182,9 @@ function batchReadFeedsByBoardId (requester, feed, id_lt = null, id_gt = null, s
       }
       const { post, postVoteCountInfo, requestorVoteCountInfo } = pResult[i].data
       offChainPostDetails.push({
-        postHash: post.postHash,
-        actor: post.actor,
-        rewards: post.rewards,
-        repliesLength: post.repliesLength,
-        postType: post.postType,
-        content: post.content,
+        ...post,
         postVoteCountInfo,
-        requestorVoteCountInfo,
-        actorAddrAbbre: WalletUtils.getAddrAbbre(post.actor)
+        requestorVoteCountInfo
       })
     }
 
@@ -493,11 +487,11 @@ function getVoteCostEstimate (requestor, postHash) {
   })
 }
 
-function registerUser (UUID, userName, telegramId, getUserData) {
+function registerUser (UUID, username, telegramId, getUserData) {
   return new Promise(async (resolve, reject) => {
     const request = {
       actor: UUID,
-      userName: userName,
+      username: username,
       UserType: 'USER',
       telegramId: telegramId
     }
