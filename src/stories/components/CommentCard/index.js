@@ -144,8 +144,7 @@ export default class CommentCard extends React.Component {
       type: 'undo',
       onClose: (reason) => {
         if (reason === 'timeout') {
-          this.props.updatePostRewards(
-            this.props.boardID,
+          this.props.voteFeedPost(
             post.postHash,
             this.state.action
           )

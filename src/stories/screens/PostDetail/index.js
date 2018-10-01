@@ -29,7 +29,7 @@ export default class PostDetail extends Component {
     return (
       <CommentCard
         post={item}
-        updatePostRewards={this.props.updatePostRewards}
+        voteFeedPost={this.props.voteFeedPost}
         getVoteCostEstimate={this.props.getVoteCostEstimate}
         fetchingVoteCost={this.props.fetchingVoteCost}
         voteInfo={this.props.voteInfo}
@@ -83,7 +83,7 @@ export default class PostDetail extends Component {
         >
           <FeedCard
             post={post}
-            updatePostRewards={this.props.updatePostRewards}
+            voteFeedPost={this.props.voteFeedPost}
             getVoteCostEstimate={this.props.getVoteCostEstimate}
             fetchingVoteCost={this.props.fetchingVoteCost}
             voteInfo={this.props.voteInfo}

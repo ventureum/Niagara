@@ -83,7 +83,7 @@ function batchReadFeedsByBoardId (requester, feed, id_lt = null, id_gt = null, s
       toFeedTokenApi
     )
     if (!response.data.ok) {
-      reject(response.data.message)
+      return reject(response.data.message)
     }
     // get feed data from Stream API
     const targetFeed = client.feed(feedSlug[0], feedSlug[1], response.data.feedToken)
@@ -129,7 +129,7 @@ function batchReadFeedsByBoardId (requester, feed, id_lt = null, id_gt = null, s
       receiveBuffer = await forum.methods.getBatchPosts(onChainPosts).call()
       onChainPostData = onChainPostData.concat(receiveBuffer)
       if (onChainPosts.length !== onChainPostData.length * 7) {
-        reject(new Error('On-Chain data does not match.'))
+        return reject(new Error('On-Chain data does not match.'))
       }
       let onChainPostMeta = []
 
@@ -174,11 +174,11 @@ function batchReadFeedsByBoardId (requester, feed, id_lt = null, id_gt = null, s
     }))
 
     if (pResult.length !== offChainPosts.length) {
-      reject(new Error('Off-Chain data does not match.'))
+      return reject(new Error('Off-Chain data does not match.'))
     }
     for (let i = 0; i < pResult.length; i++) {
       if (!pResult[i].data.ok) {
-        reject(pResult[i])
+        return reject(pResult[i])
       }
       const { post, postVoteCountInfo, requestorVoteCountInfo } = pResult[i].data
       offChainPostDetails.push({
@@ -252,7 +252,7 @@ function newOnChainPost (content, boardId, parentHash, postType, newContentToIPF
   return new Promise(async (resolve, reject) => {
     const enoughBalance = await checkBalanceForTx()
     if (!enoughBalance) {
-      reject(new Error('You do not have enough ethers'))
+      return reject(new Error('You do not have enough ethers'))
     }
     // prepare data for IPFS post
     const buf = Buffer.from(JSON.stringify(content))
@@ -413,11 +413,10 @@ function executePutOption (postHash, numToken, milestoneTokenAddress, numVtxFeeT
   })
 }
 
-function updatePostRewards (actor, boardId, postHash, value) {
+function voteFeedPost (actor, postHash, value) {
   return new Promise(async (resolve, reject) => {
     const toDataBase = {
       actor,
-      boardId,
       postHash,
       value
     }
@@ -508,6 +507,144 @@ function registerUser (UUID, username, telegramId, getUserData) {
   })
 }
 
+function getBatchPosts (postHashes) {
+  return new Promise(async (resolve, reject) => {
+    const request = {
+      postHashes: postHashes
+    }
+    const result = await axios.post(
+      `${Config.FEED_END_POINT}/get-batch-posts`,
+      request
+    )
+    if (result.data.ok) {
+      resolve(result.data.posts)
+    } else {
+      reject(new Error('batch posts failed.'))
+    }
+  })
+}
+
+function getRecentPosts (actor) {
+  return new Promise(async (resolve, reject) => {
+    // get recent posts
+    let request = {
+      actor: actor,
+      type: getPostTypeHash('POST')
+    }
+    const recentPostsRequest = await axios.post(
+      `${Config.FEED_END_POINT}/get-recent-posts`,
+      request
+    )
+    if (recentPostsRequest.data.ok) {
+      if (recentPostsRequest.data.recentPosts === null) {
+        return resolve([])
+      }
+      const recentPosts = recentPostsRequest.data.recentPosts
+      let postHashes = []
+      let mergeList = []
+      recentPosts.forEach((post) => {
+        postHashes.push(post.postHash)
+        mergeList.push({
+          deltaMilestonePoints: post.deltaMilestonePoints,
+          createdAt: post.createdAt
+        })
+      })
+      const postDetails = await getBatchPosts(postHashes)
+      mergeList = mergeList.map((post, i) => {
+        return ({
+          ...post,
+          content: postDetails[i].content,
+          postOwnerUsername: postDetails[i].username
+        })
+      })
+      resolve(mergeList)
+    } else {
+      reject(recentPostsRequest.message.ErrorInfo)
+    }
+  })
+}
+
+function getRecentComments (actor) {
+  return new Promise(async (resolve, reject) => {
+    // get recent Comments
+    let request = {
+      actor: actor,
+      type: getPostTypeHash('COMMENT')
+    }
+    const recentCommentsRequest = await axios.post(
+      `${Config.FEED_END_POINT}/get-recent-posts`,
+      request
+    )
+    if (recentCommentsRequest.data.ok) {
+      if (recentCommentsRequest.data.recentPosts === null) {
+        return resolve([])
+      }
+      const recentComments = recentCommentsRequest.data.recentPosts
+      let postHashes = []
+      let mergeList = []
+      recentComments.forEach((post) => {
+        postHashes.push(post.postHash)
+        mergeList.push({
+          deltaMilestonePoints: post.deltaMilestonePoints,
+          createdAt: post.createdAt
+        })
+      })
+      const postDetails = await getBatchPosts(postHashes)
+      mergeList = mergeList.map((post, i) => {
+        return ({
+          ...post,
+          content: postDetails[i].content,
+          postOwnerUsername: postDetails[i].username
+        })
+      })
+      resolve(mergeList)
+    } else {
+      reject(recentCommentsRequest.message.ErrorInfo)
+    }
+  })
+}
+
+function getRecentVotes (actor) {
+  return new Promise(async (resolve, reject) => {
+    // get recent Votes
+    let request = {
+      actor: actor
+    }
+    const recentVotesRequest = await axios.post(
+      `${Config.FEED_END_POINT}/get-recent-votes`,
+      request
+    )
+    if (recentVotesRequest.data.ok) {
+      if (recentVotesRequest.data.recentVotes === null) {
+        return resolve([])
+      }
+      const recentVotes = recentVotesRequest.data.recentVotes
+      let postHashes = []
+      let mergeList = []
+      recentVotes.forEach((post) => {
+        postHashes.push(post.postHash)
+        mergeList.push({
+          voteType: post.voteType,
+          deltaMilestonePoints: post.deltaMilestonePoints,
+          createdAt: post.createdAt
+        })
+      })
+      const postDetails = await getBatchPosts(postHashes)
+      mergeList = mergeList.map((post, i) => {
+        const newItem = {
+          ...post,
+          content: postDetails[i].content,
+          postOwnerUsername: postDetails[i].username
+        }
+        return newItem
+      })
+      resolve(mergeList)
+    } else {
+      reject(recentVotesRequest.message.ErrorInfo)
+    }
+  })
+}
+
 export {
   batchReadFeedsByBoardId,
   checkBalanceForTx,
@@ -517,10 +654,13 @@ export {
   fetchUserMilstoneData,
   purchasePutOption,
   executePutOption,
-  updatePostRewards,
+  voteFeedPost,
   fetchProfile,
   refuel,
   client,
   getVoteCostEstimate,
-  registerUser
+  registerUser,
+  getRecentPosts,
+  getRecentComments,
+  getRecentVotes
 }

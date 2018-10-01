@@ -3,74 +3,69 @@ import { Container, Header, Left, Right, Button, Icon, Body, Title, ListItem, Ta
 import { View, Text, ScrollView } from 'react-native'
 import ventureum from '../../../theme/variables/ventureum'
 import styles from './styles'
+let moment = require('moment')
 
 export default class Transfer extends Component {
-  renderActivityList = () => {
-    return (
-      <ScrollView>
-        <Tabs>
-          <Tab heading='VOTING'>
-            {this.renderContentList('VOTING')}
-          </Tab>
-          <Tab heading='POST'>
-            {this.renderContentList('POST')}
-          </Tab>
-          <Tab heading='REPLY'>
-            {this.renderContentList('REPLY')}
-          </Tab>
-        </Tabs>
-      </ScrollView>
-    )
-  }
-
-  generateListItems = (typeName) => {
+  renderRecentVotes = (recentVotes) => {
     let listItems = []
-    let type = ''
-    let randomNames = ['santi', 'Barli', 'Tim', 'Lucas', 'Ven']
-    let randomSubtitle = [
-      'In today\'s net-savvy world it has become common for any',
-      'Gaza is like any place in the world',
-      'I often think about how close our starting',
-      'Atef Abu Saif had one of the formative experiences',
-      'During the 2014 conflict, writing the journal'
-    ]
-    for (let i = 0; i < 30; i++) {
-      const Gain = Math.round((Math.random() * 100) + 1)
-      const binaryRandom = Math.round((Math.random() * 1) + 1)
-      const nameIndex = Math.round((Math.random() * 4))
-      const subIndex = Math.round((Math.random() * 4))
-      switch (typeName) {
-        case 'VOTING':
-          type = binaryRandom === 1 ? 'Upvoted' : 'Downvoted'
-          break
-        case 'POST':
-          type = 'Posted'
-          break
-        default:
-          type = 'Replied'
-          break
-      }
+    recentVotes.forEach((vote, i) => {
       listItems.push(
         <View key={i} style={styles.listItemContainer}>
           <View style={styles.actionInfoContainer}>
             <View style={styles.listItemLeft}>
-              <Text style={styles.listItemTitle}>{type} a post from @{randomNames[nameIndex]}</Text>
-              <Text style={styles.listItemSubTitle}>{randomSubtitle[subIndex]}</Text>
+              <Text style={styles.listItemTitle}>Voted a post from @{vote.postOwnerUsername}</Text>
+              <Text style={styles.listItemSubTitle}>{vote.content.subtitle}</Text>
             </View>
             <View style={styles.listItemRight}>
-              <Text style={styles.listItemTitle}>+{Gain}</Text>
+              <Text style={styles.listItemTitle}>{vote.deltaMilestonePoints}</Text>
             </View>
           </View>
           <Text style={styles.date}>
-            2018-08-07
+            {moment(vote.createdAt).format('MMMM Do YYYY')}
           </Text>
         </View>
       )
-    }
-    return listItems
+    })
+    return (
+      <ScrollView>
+        <List>
+          <ListItem itemHeader first style={{
+            justifyContent: 'space-between',
+            paddingLeft: ventureum.basicPadding * 2,
+            paddingRight: ventureum.basicPadding * 2
+          }}>
+            <Text>VOTES</Text>
+            <Text>MSP</Text>
+          </ListItem>
+          {listItems.length === 0
+            ? <Text style={{alignSelf: 'center'}}>No recent votes were found.</Text>
+            : listItems
+          }
+        </List >
+      </ScrollView>
+    )
   }
 
-  renderContentList = (typeName, data) => {
+  renderRecentPosts = (recentPosts) => {
+    let listItems = []
+    recentPosts.forEach((post, i) => {
+      listItems.push(
+        <View key={i} style={styles.listItemContainer}>
+          <View style={styles.actionInfoContainer}>
+            <View style={styles.listItemLeft}>
+              <Text style={styles.listItemTitle}>Made a post @{post.postOwnerUsername}</Text>
+              <Text style={styles.listItemSubTitle}>{post.content.subtitle}</Text>
+            </View>
+            <View style={styles.listItemRight}>
+              <Text style={styles.listItemTitle}>{post.deltaMilestonePoints}</Text>
+            </View>
+          </View>
+          <Text style={styles.date}>
+            {post.createdAt}
+          </Text>
+        </View>
+      )
+    })
     return (
       <List>
         <ListItem itemHeader first style={{
@@ -78,15 +73,56 @@ export default class Transfer extends Component {
           paddingLeft: ventureum.basicPadding * 2,
           paddingRight: ventureum.basicPadding * 2
         }}>
-          <Text>{typeName}</Text>
+          <Text>POSTS</Text>
           <Text>MSP</Text>
         </ListItem>
-        {this.generateListItems(typeName)}
-      </List>
+        {listItems.length === 0
+          ? <Text style={{alignSelf: 'center'}}>No recent posts were found.</Text>
+          : listItems
+        }
+      </List >
     )
   }
 
+  renderRecentComments = (recentComments) => {
+    let listItems = []
+    recentComments.forEach((comment, i) => {
+      listItems.push(
+        <View key={i} style={styles.listItemContainer}>
+          <View style={styles.actionInfoContainer}>
+            <View style={styles.listItemLeft}>
+              <Text style={styles.listItemTitle}>Commented a post from @{comment.postOwnerUsername}</Text>
+              <Text style={styles.listItemSubTitle}>{comment.content.subtitle}</Text>
+            </View>
+            <View style={styles.listItemRight}>
+              <Text style={styles.listItemTitle}>{comment.deltaMilestonePoints}</Text>
+            </View>
+          </View>
+          <Text style={styles.date}>
+            {comment.createdAt}
+          </Text>
+        </View>
+      )
+    })
+    return (
+      <List>
+        <ListItem itemHeader first style={{
+          justifyContent: 'space-between',
+          paddingLeft: ventureum.basicPadding * 2,
+          paddingRight: ventureum.basicPadding * 2
+        }}>
+          <Text>REPLIES</Text>
+          <Text>MSP</Text>
+        </ListItem>
+        {listItems.length === 0
+          ? <Text style={{alignSelf: 'center'}}>No recent replies were found.</Text>
+          : listItems
+        }
+      </List >
+    )
+  }
   render () {
+    const { recentPosts, recentComments, recentVotes } = this.props
     return (
       <Container>
         <Header hasTabs>
@@ -100,7 +136,17 @@ export default class Transfer extends Component {
           </Body>
           <Right />
         </Header >
-        {this.renderActivityList()}
+        <Tabs>
+          <Tab heading='VOTES'>
+            {this.renderRecentVotes(recentVotes)}
+          </Tab>
+          <Tab heading='POSTS'>
+            {this.renderRecentPosts(recentPosts)}
+          </Tab>
+          <Tab heading='REPLIES'>
+            {this.renderRecentComments(recentComments)}
+          </Tab>
+        </Tabs>
       </Container>
     )
   }

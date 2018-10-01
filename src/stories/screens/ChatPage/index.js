@@ -122,9 +122,8 @@ export default class ChatPage extends Component {
     }
   }
 
-  updatePostRewards = (postHash, action) => {
-    const { boardHash } = this.props
-    this.props.updatePostRewards(boardHash, postHash, action)
+  voteFeedPost = (postHash, action) => {
+    this.props.voteFeedPost(postHash, action)
   }
 
   renderMessage = (props) => {
@@ -135,7 +134,7 @@ export default class ChatPage extends Component {
     )
   }
 
-  inMessageVoteAction= (postHash, action) => {
+  inMessageVoteAction = (postHash, action) => {
     this.props.getVoteCostEstimate(postHash)
     this.setState({
       confirmModalVisible: !this.state.confirmModalVisible,
@@ -181,14 +180,14 @@ export default class ChatPage extends Component {
           renderCustomView={this.renderCustomView}
           renderMessage={this.renderMessage}
           getVoteCostEstimate={this.props.getVoteCostEstimate}
-          updatePostRewards={this.updatePostRewards}
+          voteFeedPost={this.voteFeedPost}
           inMessageVoteAction={this.inMessageVoteAction}
         />
         <ConfirmationModel
           modalVisible={this.state.confirmModalVisible}
           toggleModal={this.toggleConfirmationModal}
           onAction={() => {
-            this.updatePostRewards(this.state.targetMessageHash, this.state.action)
+            this.voteFeedPost(this.state.targetMessageHash, this.state.action)
           }}
           fetchingVoteCost={fetchingVoteCost}
           voteInfo={voteInfo}

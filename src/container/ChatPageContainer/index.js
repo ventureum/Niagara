@@ -10,7 +10,7 @@ import {
   fetchLatestChat,
   clearChat,
   fetchEalierChat,
-  updatePostRewards
+  voteFeedPost
 } from './actions'
 
 class ChatPageContainer extends Component {
@@ -65,12 +65,12 @@ class ChatPageContainer extends Component {
         chatContent={this.props.chatContent}
         post={this.props.post}
         newPost={this.props.newPost}
-        userAddress={this.props.userAddress}
+        username={this.props.username}
         boardHash={this.props.boardHash}
         chatContentLoading={this.props.chatContentLoading}
         fetchEalierChat={this.props.fetchEalierChat}
         reachEarliestChat={this.props.reachEarliestChat}
-        updatePostRewards={this.props.updatePostRewards}
+        voteFeedPost={this.props.voteFeedPost}
         navigation={this.props.navigation}
         getVoteCostEstimate={this.props.getVoteCostEstimate}
         fetchingVoteCost={this.props.fetchingVoteCost}
@@ -86,7 +86,7 @@ const mapDispatchToProps = (dispatch) => ({
   getInitialChatHistory: (postHash) => dispatch(getInitialChatHistory(postHash)),
   fetchLatestChat: (postHash) => dispatch(fetchLatestChat(postHash)),
   fetchEalierChat: (postHash) => dispatch(fetchEalierChat(postHash)),
-  updatePostRewards: (boardId, postHash, value) => dispatch(updatePostRewards(boardId, postHash, value)),
+  voteFeedPost: (postHash, value) => dispatch(voteFeedPost(postHash, value)),
   clearChat: () => dispatch(clearChat()),
   getVoteCostEstimate: (postHash) => dispatch(getVoteCostEstimate(postHash))
 })
@@ -95,7 +95,7 @@ const mapStateToProps = state => ({
   chatContent: state.chatPageReducer.chatContent,
   chatContentLoading: state.chatPageReducer.chatContentLoading,
   reachEarliestChat: state.chatPageReducer.reachEarliestChat,
-  userAddress: state.walletReducer.walletAddress,
+  username: state.profileReducer.profile.username,
   boardHash: state.discoverReducer.boardHash,
   fetchingVoteCost: state.discoverReducer.fetchingVoteCost,
   voteInfo: state.discoverReducer.voteInfo,

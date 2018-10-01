@@ -5,8 +5,7 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'stretch',
     paddingVertical: ventureum.basicPadding * 2,
-    paddingHorizontal: ventureum.basicPadding * 2,
-    flex: 1
+    paddingHorizontal: ventureum.basicPadding * 2
   },
   actionInfoContainer: {
     flexDirection: 'row',

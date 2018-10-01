@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PostDetail from '../../stories/screens/PostDetail'
-import { getReplies, fetchUserMilstoneData, processPutOption, clearPostDetail, updatePostRewards } from './actions'
+import { getReplies, fetchUserMilstoneData, processPutOption, clearPostDetail, voteFeedPost } from './actions'
 import { getVoteCostEstimate } from '../DiscoverContainer/actions'
 
 class PostDetailContainer extends Component {
@@ -27,7 +27,7 @@ class PostDetailContainer extends Component {
         getReplies={this.props.getReplies}
         milestoneDataLoading={this.props.milestoneDataLoading}
         fetchUserMilstoneData={this.props.fetchUserMilstoneData}
-        updatePostRewards={this.props.updatePostRewards}
+        voteFeedPost={this.props.voteFeedPost}
         getVoteCostEstimate={this.props.getVoteCostEstimate}
         fetchingVoteCost={this.props.fetchingVoteCost}
         voteInfo={this.props.voteInfo}
@@ -57,7 +57,7 @@ const mapDispatchToProps = (dispatch) => ({
   processPutOption: (postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action, refreshCallback) =>
     dispatch(processPutOption(postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action, refreshCallback)),
   clearPostDetail: () => dispatch(clearPostDetail()),
-  updatePostRewards: (boardId, postHash, value) => dispatch(updatePostRewards(boardId, postHash, value)),
+  voteFeedPost: (postHash, value) => dispatch(voteFeedPost(postHash, value)),
   getVoteCostEstimate: (postHash) => dispatch(getVoteCostEstimate(postHash))
 })
 

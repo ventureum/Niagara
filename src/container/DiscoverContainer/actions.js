@@ -87,16 +87,16 @@ function newPost (content, boardId, parentHash, postType, destination) {
   }
 }
 
-function _updatePostRewards (actor, boardId, postHash, value) {
+function _voteFeedPost (actor, postHash, action) {
   return {
-    type: 'UPDATE_POST_REWARDS',
-    payload: forum.updatePostRewards(actor, boardId, postHash, value)
+    type: 'VOTE_FEED_POST',
+    payload: forum.voteFeedPost(actor, postHash, action)
   }
 }
-function updatePostRewards (boardId, postHash, value) {
+function voteFeedPost (postHash, action) {
   return (dispatch, getState) => {
     const actor = getState().profileReducer.profile.actor
-    dispatch(_updatePostRewards(actor, boardId, postHash, value))
+    dispatch(_voteFeedPost(actor, postHash, action))
   }
 }
 
@@ -126,7 +126,7 @@ export {
   getMorePosts,
   switchBoard,
   newPost,
-  updatePostRewards,
+  voteFeedPost,
   getVoteCostEstimate,
   resetErrorMessage
 }
