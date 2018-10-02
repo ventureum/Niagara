@@ -5,6 +5,7 @@ import chunk from 'lodash/chunk'
 import range from 'lodash/range'
 import Text from '../Text'
 import BackButton from './BackButton'
+import ventureum from '../../../theme/variables/ventureum'
 
 const styles = StyleSheet.create({
   keyboardRow: {
@@ -20,7 +21,7 @@ const styles = StyleSheet.create({
     fontSize: 40
   },
   keyboardText: {
-    color: '#fff',
+    color: ventureum.lightSecondaryColor,
     fontSize: 40,
     textAlign: 'center'
   }

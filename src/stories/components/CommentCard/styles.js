@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native'
+import ventureum from '../../../theme/variables/ventureum'
 
 const styles = StyleSheet.create({
   card: {
@@ -32,18 +33,53 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    alignItems: 'center'
   },
   commentContainer: {
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'flex-start',
     flexWrap: 'wrap',
-    paddingTop: 7,
-    paddingRight: 10
+    paddingRight: ventureum.basicPadding
   },
   authorText: {
     fontSize: 17
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingLeft: ventureum.basicPadding,
+    paddingRight: ventureum.basicPadding,
+    alignItems: 'center'
+  },
+  footerVoteInfo: {
+    flex: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingRight: ventureum.basicPadding
+  },
+  footerRewardInfo: {
+    flex: 1,
+    borderLeftWidth: StyleSheet.hairlineWidth,
+    borderColor: ventureum.borderColor,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: ventureum.basicPadding
+  },
+  votingButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around'
+  },
+  footerIconStyle: {
+    fontSize: 18
+  },
+  badgeCount: {
+    fontSize: 14,
+    paddingLeft: ventureum.basicPadding
   }
 })
 

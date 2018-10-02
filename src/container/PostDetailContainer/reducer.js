@@ -1,4 +1,5 @@
 const initialState = {
+  currentParentPostHash: '',
   replies: [],
   loading: false,
   errorMessage: '',
@@ -53,7 +54,10 @@ export default function (state = initialState, action) {
     }
   }
   if (action.type === 'CLEAR_POST_DETAIL') {
-    return initialState
+    return {
+      ...initialState,
+      currentParentPostHash: state.currentParentPostHash
+    }
   }
 
   if (action.type === 'PROCESS_PUT_OPTION_FULFILLED') {
@@ -76,5 +80,42 @@ export default function (state = initialState, action) {
     }
   }
 
+  if (action.type === 'UPDATE_POST_REWARDS_FULFILLED') {
+    const { voteInfo } = action.payload.data
+    return {
+      ...state,
+      loading: false,
+      replies: state.replies.map(
+        (reply) => {
+          return (reply.postHash === voteInfo.postHash ? {
+            ...reply,
+            postVoteCountInfo: voteInfo.postVoteCountInfo,
+            requestorVoteCountInfo: voteInfo.requestorVoteCountInfo
+          } : reply
+          )
+        }
+      )
+    }
+  }
+  if (action.type === 'UPDATE_POST_REWARDS_PENDING') {
+    return {
+      ...state,
+      loading: true
+    }
+  }
+  if (action.type === 'UPDATE_POST_REWARDS_REJECTED') {
+    return {
+      ...state,
+      loading: false,
+      errorMessage: action.payload
+    }
+  }
+
+  if (action.type === 'SET_CURRENT_PARENT_POST') {
+    return {
+      ...state,
+      currentParentPostHash: action.payload
+    }
+  }
   return state
 }

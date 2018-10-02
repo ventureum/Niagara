@@ -1,6 +1,5 @@
-import { Platform } from 'react-native'
+import { Platform, StyleSheet } from 'react-native'
 import ventureum from '../../../theme/variables/ventureum'
-import { StyleSheet } from 'react-native'
 
 export default {
   modalContainer: {

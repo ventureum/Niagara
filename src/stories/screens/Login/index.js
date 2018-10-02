@@ -1,53 +1,56 @@
 import * as React from 'react'
-import { Image, SafeAreaView } from 'react-native'
+import {
+  Image,
+  SafeAreaView,
+  Linking
+} from 'react-native'
 import { Button, Text, View } from 'native-base'
 import logo from './images/logo.png'
-import LinearGradient from 'react-native-linear-gradient'
-
 import styles from './styles'
-export interface Props {
-  navigation: any;
-  pinCode: string;
-  walletAddress: string;
-}
+import ventureum from '../../../theme/variables/ventureum'
 
 class Login extends React.Component<Props, State> {
-  componentDidMount () {
-    if (this.props.pinCode && this.props.walletAddress) {
-      this.props.navigation.navigate('PinCode')
-    }
-  }
-
-  componentWillReceiveProps (newProps) {
-    if (newProps.pinCode && newProps.walletAddress) {
-      this.props.navigation.navigate('PinCode')
-    }
+  renderLoginOptions = () => {
+    return (
+      <View padder>
+        <Button block onPress={
+          () => {
+            var nanoid = require('nanoid/non-secure')
+            let urlKey = 'key'
+            urlKey = nanoid(24)
+            const url = 'https://telegram.me/milestone_login_bot?start=' + urlKey
+            this.props.navigation.navigate('UserLoadingScreen', { urlKey: urlKey })
+            Linking.canOpenURL(url).then(supported => {
+              if (supported) {
+                Linking.openURL(url)
+              } else {
+                console.log("Don't know how to open URI: " + url)
+              }
+            })
+          }}>
+          <Text style={{
+            fontWeight: ventureum.bold
+          }} primaryColor>LOG IN WITH TELEGRAM</Text>
+        </Button>
+      </View>
+    )
   }
 
   render () {
     return (
-      <LinearGradient colors={['#090909', '#181724']} style={styles.background}>
+      <View style={styles.background}>
         <SafeAreaView style={styles.container}>
           <View style={styles.logoContainer}>
             <Image source={logo} style={styles.logo} resizeMode='contain' />
+            <View padder>
+              <Text style={styles.appName}>Milestone</Text>
+            </View>
           </View>
           <View style={styles.buttonsContainer}>
-            <View padder>
-              <Button block onPress={() => this.props.navigation.navigate('CreateWallet')}>
-                <Text primaryColor>Create wallet</Text>
-              </Button>
-            </View>
-            <View padder>
-              <Button block onPress={() => this.props.navigation.navigate('CreateWallet', {
-                recoverMode: true
-              })
-              }>
-                <Text primaryColor>Recover wallet</Text>
-              </Button>
-            </View>
+            {this.renderLoginOptions()}
           </View>
         </SafeAreaView>
-      </LinearGradient>
+      </View>
     )
   }
 }

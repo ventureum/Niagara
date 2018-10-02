@@ -1,11 +1,12 @@
 import { StyleSheet } from 'react-native'
+import ventureum from '../../../theme/variables/ventureum'
 
 const styles = StyleSheet.create({
   card: {
     paddingTop: 20,
     paddingBottom: 5,
-    paddingLeft: 15,
-    paddingRight: 15,
+    paddingLeft: ventureum.basicPadding * 2,
+    paddingRight: ventureum.basicPadding * 2,
     borderBottomColor: '#bbb',
     borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'column',
@@ -13,12 +14,14 @@ const styles = StyleSheet.create({
   },
   cardFooter: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 0
+    justifyContent: 'space-between',
+    paddingLeft: ventureum.basicPadding,
+    paddingRight: ventureum.basicPadding,
+    alignItems: 'center'
   },
   badgeCount: {
-    fontSize: 12,
-    paddingLeft: 5
+    fontSize: 14,
+    paddingLeft: ventureum.basicPadding
   },
   footerIcons: {
     flexDirection: 'row',
@@ -33,6 +36,44 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     color: 'black'
+  },
+  footerVoteInfo: {
+    flex: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingRight: ventureum.basicPadding
+  },
+  footerRewardInfo: {
+    flex: 2,
+    borderLeftWidth: StyleSheet.hairlineWidth,
+    borderRightWidth: StyleSheet.hairlineWidth,
+    borderColor: ventureum.borderColor,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: ventureum.basicPadding
+  },
+  footerReplyInfo: {
+    flex: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingLeft: ventureum.basicPadding
+  },
+  replyButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  votingButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around'
+  },
+  footerIconStyle: {
+    fontSize: 18
   }
 })
 

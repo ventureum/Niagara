@@ -24,6 +24,8 @@ import tcr from '../../../../services/tcr'
 import { BigNumber } from 'bignumber.js'
 import update from 'immutability-helper'
 import styles from './styles'
+import ventureum from '../../../../theme/variables/ventureum'
+
 export interface Props {
   navigation: any;
   list: any;
@@ -218,7 +220,7 @@ class Vote extends React.Component<Props, State> {
                 <ListItem style={[styles.option, styles.withOutBorder, styles.withPadding]}
                   onPress={() => { this.setState({voteOption: true}) }}
                   selected={this.state.voteOption}>
-                  <Text>Support</Text>
+                  <Text style={{color: 'black'}}>Support</Text>
                   <Right>
                     <Radio onPress={() => { this.setState({voteOption: true}) }} selectedColor={'#5cb85c'} selected={this.state.voteOption} />
                   </Right>
@@ -226,7 +228,7 @@ class Vote extends React.Component<Props, State> {
                 <ListItem style={[styles.optionWithBorder, styles.withPadding]}
                   onPress={() => { this.setState({voteOption: false}) }}
                   selected={!this.state.voteOption}>
-                  <Text>Against</Text>
+                  <Text style={{color: 'black'}}>Against</Text>
                   <Right>
                     <Radio onPress={() => { this.setState({voteOption: false}) }} selectedColor={'#5cb85c'} selected={!this.state.voteOption} />
                   </Right>
@@ -265,26 +267,29 @@ class Vote extends React.Component<Props, State> {
                 <Right>
                   {item.inProgress &&
                     <Button
+                      block
                       disabled={item.processing}
                       onPress={() => { this.setModalVisible(true, item) }}>
-                      <Text style={styles.wide}>Vote</Text>
-                      {item.processing && <Spinner style={styles.spin} size='small' color='white' />}
+                      {!item.processing && <Text style={styles.wide}>Vote</Text>}
+                      {item.processing && <Spinner style={styles.spin} size='small' color={ventureum.secondaryColor} />}
                     </Button>
                   }
                   {!item.inProgress && item.canBeWhitelisted &&
                     <Button
+                      block
                       disabled={item.processing}
                       onPress={() => { this.whitelist(item) }}>
-                      <Text style={styles.wide}>Whitelist</Text>
-                      {item.processing && <Spinner style={styles.spin} size='small' color='white' />}
+                      {!item.processing && <Text style={styles.wide}>Whitelist</Text>}
+                      {item.processing && <Spinner style={styles.spin} size='small' color={ventureum.secondaryColor} />}
                     </Button>
                   }
                   {!item.inProgress && !item.canBeWhitelisted &&
                     <Button
+                      block
                       disabled={item.processing}
                       onPress={() => { this.delist(item) }}>
-                      <Text style={styles.wide}>Delist</Text>
-                      {item.processing && <Spinner style={styles.spin} size='small' color='white' />}
+                      {!item.processing && <Text style={styles.wide}>Delist</Text>}
+                      {item.processing && <Spinner style={styles.spin} size='small' color={ventureum.secondaryColor} />}
                     </Button>
                   }
                 </Right>

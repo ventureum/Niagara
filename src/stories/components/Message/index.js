@@ -2,11 +2,16 @@ import React from 'react'
 import {
   View,
   StyleSheet,
-  Text
+  Text,
+  TouchableOpacity
 } from 'react-native'
+import { Icon } from 'native-base'
 import { DOWN_VOTE, UP_VOTE } from '../../../utils/constants'
 import { Avatar, Day, utils, Bubble } from 'react-native-gifted-chat'
-import MessageVoteButton from '../../components/MessageVoteButton'
+import ventureum from '../../../theme/variables/ventureum'
+
+let numeral = require('numeral')
+const FORMAT = '0[.]0a'
 
 const { isSameUser, isSameDay } = utils
 
@@ -28,7 +33,18 @@ const styles = {
       marginLeft: 0,
       marginRight: 8
     }
-  })
+  }),
+  voteButton: {
+    paddingVertical: 2,
+    paddingHorizontal: 5,
+    borderWidth: 1,
+    borderRadius: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    marginHorizontal: 5,
+    marginVertical: 2
+  }
 }
 export default class Message extends React.Component {
   getInnerComponentProps () {
@@ -68,8 +84,10 @@ export default class Message extends React.Component {
   }
 
   renderReward () {
-    const { currentMessage, position } = this.props
-    if (currentMessage.rewards !== 0) {
+    const { position } = this.props
+    const { currentMessage } = this.props
+    if (currentMessage.postVoteCountInfo.totalVoteCount !== 0) {
+      const { postVoteCountInfo, requestorVoteCountInfo } = currentMessage
       return (
         <View style={{
           alignSelf: position === 'left' ? 'flex-start' : 'flex-end',
@@ -77,19 +95,43 @@ export default class Message extends React.Component {
           justifyContent: 'space-around',
           alignItems: 'center'
         }}>
-          <MessageVoteButton
-            onPress={() => {
-              this.props.updatePostRewards(currentMessage.postHash, UP_VOTE)
+          <TouchableOpacity
+            style={{
+              ...styles.voteButton,
+              backgroundColor: requestorVoteCountInfo.upvoteCount !== 0 ? ventureum.lightSecondaryColor : undefined
             }}
-            type='up' />
+            onPress={() => {
+              this.props.inMessageVoteAction(currentMessage.postHash, UP_VOTE)
+            }}
+          >
+            <Icon
+              name='thumbs-o-up'
+              type='FontAwesome'
+              style={{ fontSize: 14 }}
+            >
+              {numeral(postVoteCountInfo.upvoteCount).format(FORMAT)}
+            </Icon>
+          </TouchableOpacity>
           <Text>
-            ${currentMessage.rewards}
+            ${numeral(currentMessage.rewards).format(FORMAT)}
           </Text>
-          <MessageVoteButton
-            onPress={() => {
-              this.props.updatePostRewards(currentMessage.postHash, DOWN_VOTE)
+          <TouchableOpacity
+            style={{
+              ...styles.voteButton,
+              backgroundColor: requestorVoteCountInfo.downvoteCount !== 0 ? ventureum.lightErrorColor : undefined
             }}
-            type='down' />
+            onPress={() => {
+              this.props.inMessageVoteAction(currentMessage.postHash, DOWN_VOTE)
+            }}
+          >
+            <Icon
+              name='thumbs-o-down'
+              type='FontAwesome'
+              style={{ fontSize: 14 }}
+            >
+              {numeral(postVoteCountInfo.downvoteCount).format(FORMAT)}
+            </Icon>
+          </TouchableOpacity>
         </View>
       )
     }
@@ -97,18 +139,23 @@ export default class Message extends React.Component {
   }
 
   render () {
-    const sameUser = isSameUser(this.props.currentMessage, this.props.nextMessage)
+    const {
+      currentMessage,
+      nextMessage,
+      position
+    } = this.props
+    const sameUser = isSameUser(currentMessage, nextMessage)
     return (
       <View>
         {this.renderDay()}
         <View
           style={[
-            styles[this.props.position].container,
-            { marginBottom: sameUser ? 2 : 10 }
+            styles[position].container,
+            { marginBottom: sameUser ? 7 : 13 }
           ]
           }
         >
-          {this.props.position === 'left' ? this.renderAvatar() : null}
+          {position === 'left' ? this.renderAvatar() : null}
           <View style={{
             flexDirection: 'column'
           }}
@@ -116,7 +163,7 @@ export default class Message extends React.Component {
             {this.renderBubble()}
             {this.renderReward()}
           </View>
-          {this.props.position === 'right' ? this.renderAvatar() : null}
+          {position === 'right' ? this.renderAvatar() : null}
         </View>
       </View>
     )

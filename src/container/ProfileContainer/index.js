@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Profile from '../../stories/screens/Profile'
 import { connect } from 'react-redux'
 import walletUtils from '../../utils/wallet'
-import { updateReputation } from './actions'
+import { fetchProfile } from './actions'
 
 class ProfileContainer extends Component {
   constructor (props) {
@@ -10,24 +10,34 @@ class ProfileContainer extends Component {
     const avatar = walletUtils.getAvatar()
     this.state = ({ avatar })
   }
+
+  componentWillMount () {
+    this.props.fetchProfile()
+  }
+
   render () {
     return (
       <Profile
         navigation={this.props.navigation}
         avatar={this.state.avatar}
-        reputation={this.props.reputation}
-        updateReputation={this.props.updateReputation}
+        profile={this.props.profile}
+        fetchProfile={this.props.fetchProfile}
       />
     )
   }
 }
 
 const mapStateToProps = (state) => ({
-  reputation: state.profileReducer.reputation
+  profile: state.profileReducer.profile
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  updateReputation: () => dispatch(updateReputation())
+  fetchProfile: () => dispatch(fetchProfile())
 })
+
+ProfileContainer.defaultProps = {
+  profile: {},
+  fetchProfile: () => {}
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfileContainer)

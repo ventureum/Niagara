@@ -4,14 +4,18 @@ import { processContent } from '../../../utils/content'
 import WalletUtils from '../../../utils/wallet'
 import { DOWN_VOTE, UP_VOTE } from '../../../utils/constants'
 import Message from '../../components/Message'
-import { Header, Container, Content, Left, Body, Right, Button, Icon, Title } from 'native-base'
+import { Header, Container, Left, Body, Right, Button, Icon, Title } from 'native-base'
+import ConfirmationModel from '../../components/ConfirmationModal'
 let moment = require('moment')
 
 export default class ChatPage extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      messages: []
+      messages: [],
+      confirmModalVisible: false,
+      action: 0,
+      targetMessageHash: ''
     }
   }
 
@@ -31,13 +35,24 @@ export default class ChatPage extends Component {
               avatar: 'https://placeimg.com/140/140/any'
             },
             postHash: chatContent[i].postHash,
-            rewards: chatContent[i].rewards
+            rewards: chatContent[i].rewards,
+            postVoteCountInfo: chatContent[i].postVoteCountInfo,
+            requestorVoteCountInfo: chatContent[i].requestorVoteCountInfo,
+            fetchingVoteCost: nextProps.fetchingVoteCost,
+            voteInfo: nextProps.voteInfo,
+            voteInfoError: nextProps.voteInfoError
           }
         )
       }
       this.setState({ messages: messages }, () => {
       })
     }
+  }
+
+  toggleConfirmationModal = () => {
+    this.setState({
+      confirmModalVisible: !this.state.confirmModalVisible
+    })
   }
 
   onSend = (messages = []) => {
@@ -87,10 +102,20 @@ export default class ChatPage extends Component {
       (buttonIndex) => {
         switch (buttonIndex) {
           case 0:
-            this.updatePostRewards(message.postHash, UP_VOTE)
+            this.props.getVoteCostEstimate(message.postHash)
+            this.setState({
+              confirmModalVisible: !this.state.confirmModalVisible,
+              action: UP_VOTE,
+              targetMessageHash: message.postHash
+            })
             break
           case 1:
-            this.updatePostRewards(message.postHash, DOWN_VOTE)
+            this.props.getVoteCostEstimate(message.postHash)
+            this.setState({
+              confirmModalVisible: !this.state.confirmModalVisible,
+              action: DOWN_VOTE,
+              targetMessageHash: message.postHash
+            })
             break
         }
       })
@@ -106,12 +131,25 @@ export default class ChatPage extends Component {
     return (
       <Message
         {...props}
-        updatePostRewards={this.updatePostRewards}
       />
     )
   }
 
+  inMessageVoteAction= (postHash, action) => {
+    this.props.getVoteCostEstimate(postHash)
+    this.setState({
+      confirmModalVisible: !this.state.confirmModalVisible,
+      action: action,
+      targetMessageHash: postHash
+    })
+  }
+
   render () {
+    const {
+      fetchingVoteCost,
+      voteInfo,
+      voteInfoError
+    } = this.props
     return (
       <Container>
         <Header>
@@ -142,6 +180,24 @@ export default class ChatPage extends Component {
           onLongPress={this.onLongPress}
           renderCustomView={this.renderCustomView}
           renderMessage={this.renderMessage}
+          getVoteCostEstimate={this.props.getVoteCostEstimate}
+          updatePostRewards={this.updatePostRewards}
+          inMessageVoteAction={this.inMessageVoteAction}
+        />
+        <ConfirmationModel
+          modalVisible={this.state.confirmModalVisible}
+          toggleModal={this.toggleConfirmationModal}
+          onAction={() => {
+            this.updatePostRewards(this.state.targetMessageHash, this.state.action)
+          }}
+          fetchingVoteCost={fetchingVoteCost}
+          voteInfo={voteInfo}
+          voteInfoError={voteInfoError}
+          getVoteCostEstimate={
+            (postHash) => {
+              this.props.getVoteCostEstimate(postHash)
+            }
+          }
         />
       </Container>
 

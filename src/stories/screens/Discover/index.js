@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
-import { FlatList, RefreshControl, View, Platform } from 'react-native'
+import { FlatList, RefreshControl, View, Platform, Alert } from 'react-native'
 import { Container, Body, Header, Left, Right, Button, Icon, Title, Text, Content, Fab } from 'native-base'
 import FeedCardBasic from '../../components/FeedCardBasic'
-import WalletUtils from '../../../utils/wallet'
 import Search from '../../../utils/search.js'
 import SpecialPostCard from '../../components/SpecialPostCard'
 import { BOARD_ALL_HASH } from '../../../utils/constants.js'
@@ -25,16 +24,17 @@ export default class Discover extends Component {
   }
 
   onRenderItem = ({ item }) => {
-    item = {
-      ...item,
-      actor: WalletUtils.getAddrAbbre(item.actor),
-      avatar: WalletUtils.getAvatar(item.actor)
-    }
     return (
       <FeedCardBasic post={item}
         navigation={this.props.navigation}
         updatePostRewards={this.props.updatePostRewards}
         boardID={this.props.boardHash}
+        getVoteCostEstimate={this.props.getVoteCostEstimate}
+        fetchingVoteCost={this.props.fetchingVoteCost}
+        voteInfo={this.props.voteInfo}
+        voteInfoError={this.props.voteInfoError}
+        setCurrentParentPost={this.props.setCurrentParentPost}
+        loading={this.props.loading}
       />
     )
   }
@@ -55,6 +55,16 @@ export default class Discover extends Component {
   }
 
   render () {
+    if (this.props.errorMessage !== '') {
+      Alert.alert(
+        'Failed',
+        this.props.errorMessage,
+        [
+          { text: 'OK', onPress: () => this.props.resetErrorMessage() }
+        ],
+        { cancelable: false }
+      )
+    }
     return (
       <Container>
         <Header >
@@ -93,7 +103,7 @@ export default class Discover extends Component {
               <SpecialPostCard type='Audits' />
               <SpecialPostCard type='Airdrops' />
             </View>)
-          : (<View />)}
+          : null}
         {
           this.props.posts.length === 0
             ? <Content contentContainerStyle={{ flex: 1, justifyContent: 'center', flexDirection: 'row', alignItems: 'center' }}

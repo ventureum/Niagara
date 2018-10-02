@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Image, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import range from 'lodash/range'
-import emptyCircle from './images/emptyCircle.png'
-import filledCircle from './images/filledCircle.png'
+import { Icon } from 'native-base'
+import ventureum from '../../../theme/variables/ventureum'
 
 const styles = StyleSheet.create({
   dotsContainer: {
@@ -13,9 +13,9 @@ const styles = StyleSheet.create({
     paddingVertical: 15
   },
   dot: {
-    height: 20,
-    width: 20,
-    marginHorizontal: 10
+    fontSize: 30,
+    color: ventureum.lightSecondaryColor,
+    paddingHorizontal: ventureum.basicPadding
   }
 })
 
@@ -28,10 +28,10 @@ export default class PinIndicator extends Component {
     return (
       <View style={styles.dotsContainer}>
         {range(0, this.props.length).map(n => (
-          <Image source={filledCircle} style={styles.dot} key={n} />
+          <Icon name='circle' type='FontAwesome' style={styles.dot} key={n} />
         ))}
         {range(0, 4 - this.props.length).map(n => (
-          <Image source={emptyCircle} style={styles.dot} key={n} />
+          <Icon name='circle-o' type='FontAwesome' style={styles.dot} key={n} />
         ))}
       </View>
     )

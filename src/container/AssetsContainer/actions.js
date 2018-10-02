@@ -22,12 +22,6 @@ function refreshTokens () {
   }
 }
 
-function initTokens () {
-  return {
-    type: 'INIT_TOKENS'
-  }
-}
-
 function addTokenTransaction (receipt: any) {
   return dispatch => {
     dispatch({
@@ -47,4 +41,4 @@ function refreshLogs (tokenIdx: number, url: string) {
   }
 }
 
-export { refreshTokens, initTokens, addTokenTransaction, refreshLogs }
+export { refreshTokens, addTokenTransaction, refreshLogs }

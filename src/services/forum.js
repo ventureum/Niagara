@@ -4,7 +4,7 @@ import axios from 'axios'
 import bs58 from 'bs58'
 
 const stream = require('getstream')
-const client = stream.connect(Config.STREAM_API_KEY, null, 39296)
+const client = stream.connect(Config.STREAM_API_KEY, null, Config.STREAM_APP_ID)
 const GAS_PRICE = '20000000000'
 const MINIMUM_BALANCE = 10000000000000000
 const GAS_LIMIT = '6500000'
@@ -68,7 +68,7 @@ function getBytes32FromMultiash (multihash) {
     API. size must satisfy: 0 < size <= 10
   @return return a array of post details
 */
-function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
+function batchReadFeedsByBoardId (requester, feed, id_lt = null, id_gt = null, size) {
   return new Promise(async (resolve, reject) => {
     // get feed token from lamda API
     const feedSlug = feed.split(':')
@@ -95,6 +95,7 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
     } else if (id_lt === null && id_gt !== null) {
       feedData = await targetFeed.get({ limit: size, id_gt: id_gt })
     }
+
     // build the arrays of post hash from feed data
     let postMap = new Map()
     let onChainPosts = []
@@ -127,7 +128,7 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
       }
       receiveBuffer = await forum.methods.getBatchPosts(onChainPosts).call()
       onChainPostData = onChainPostData.concat(receiveBuffer)
-      if (onChainPosts.length !== onChainPostData.length * 7){
+      if (onChainPosts.length !== onChainPostData.length * 7) {
         reject(new Error('On-Chain data does not match.'))
       }
       let onChainPostMeta = []
@@ -144,7 +145,8 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
             actor: '0x' + onChainPostData[i + 3].substr(26, 40),
             rewards: (web3.utils.toBN(onChainPostData[i + 4]).div(base).toNumber()) / (10 ** 2),
             repliesLength: web3.utils.toDecimal(onChainPostData[i + 5]),
-            postType: typeMap.get(onChainPostData[i + 6].slice(0, 10))
+            postType: typeMap.get(onChainPostData[i + 6].slice(0, 10)),
+            actorAddrAbbre: WalletUtils.getAddrAbbre('0x' + onChainPostData[i + 3].substr(26, 40))
           })
         } else {
           break
@@ -158,29 +160,31 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
     }
 
     let offChainPostDetails = []
+
     const pResult = await Promise.all(offChainPosts.map((postHash) => {
       return axios.post(
         `${Config.FEED_END_POINT}/get-feed-post`,
         {
           'postHash': postHash,
+          'requestor': requester,
           'getStreamApiKey': Config.STREAM_API_KEY,
           'getStreamApiSecret': Config.STREAM_API_SECRET
         }
       )
     }))
 
-    if (pResult.length!== offChainPosts.length){
+    if (pResult.length !== offChainPosts.length) {
       reject(new Error('Off-Chain data does not match.'))
     }
     for (let i = 0; i < pResult.length; i++) {
-      const { post } = pResult[i].data
+      if (!pResult[i].data.ok) {
+        reject(pResult[i])
+      }
+      const { post, postVoteCountInfo, requestorVoteCountInfo } = pResult[i].data
       offChainPostDetails.push({
-        postHash: post.postHash,
-        actor: post.actor,
-        rewards: post.rewards,
-        repliesLength: post.repliesLength,
-        postType: post.postType,
-        content: post.content
+        ...post,
+        postVoteCountInfo,
+        requestorVoteCountInfo
       })
     }
 
@@ -202,6 +206,7 @@ function batchReadFeedsByBoardId (feed, id_lt = null, id_gt = null, size = 10) {
         })
       }
     }
+
     resolve(postDetails)
   })
 }
@@ -420,6 +425,7 @@ function updatePostRewards (actor, boardId, postHash, value) {
       `${Config.FEED_END_POINT}/feed-upvote`,
       toDataBase
     )
+
     if (result.data.ok) {
       resolve(result)
     } else {
@@ -428,21 +434,21 @@ function updatePostRewards (actor, boardId, postHash, value) {
   })
 }
 
-function getReputation (userAddress) {
+function fetchProfile (actor) {
   return new Promise(async (resolve, reject) => {
     const result = await axios.post(
-      `${Config.FEED_END_POINT}/get-reputations`,
-      { UserAddress: userAddress }
+      `${Config.FEED_END_POINT}/get-profile`,
+      { actor: actor }
     )
     if (result.data.ok) {
-      resolve(result.data.reputations)
+      resolve(result.data)
     } else {
       reject(result.data.message)
     }
   })
 }
 
-function refuelReputation (userAddress, reputations, refreshProfile) {
+function refuel (userAddress, reputations, refreshProfile) {
   return new Promise(async (resolve, reject) => {
     const result = await axios.post(
       `${Config.FEED_END_POINT}/refuel-reputations`,
@@ -460,6 +466,48 @@ function refuelReputation (userAddress, reputations, refreshProfile) {
   })
 }
 
+function getVoteCostEstimate (requestor, postHash) {
+  const QUERY = 0
+  return new Promise(async (resolve, reject) => {
+    const toDataBase = {
+      actor: requestor,
+      postHash,
+      value: QUERY
+    }
+    const result = await axios.post(
+      `${Config.FEED_END_POINT}/feed-upvote`,
+      toDataBase
+    )
+
+    if (result.data.ok) {
+      resolve(result.data.voteInfo)
+    } else {
+      reject(result)
+    }
+  })
+}
+
+function registerUser (UUID, username, telegramId, getUserData) {
+  return new Promise(async (resolve, reject) => {
+    const request = {
+      actor: UUID,
+      username: username,
+      UserType: 'USER',
+      telegramId: telegramId
+    }
+    const result = await axios.post(
+      `${Config.FEED_END_POINT}/profile`,
+      request
+    )
+    if (result.data.ok) {
+      getUserData()
+      resolve(result.data.ok)
+    } else {
+      reject(result)
+    }
+  })
+}
+
 export {
   batchReadFeedsByBoardId,
   checkBalanceForTx,
@@ -470,7 +518,9 @@ export {
   purchasePutOption,
   executePutOption,
   updatePostRewards,
-  getReputation,
-  refuelReputation,
-  client
+  fetchProfile,
+  refuel,
+  client,
+  getVoteCostEstimate,
+  registerUser
 }

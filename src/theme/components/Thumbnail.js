@@ -1,13 +1,14 @@
 import variable from './../variables/platform'
+import ventureum from '../variables/ventureum'
 
 export default (variables = variable) => {
   const thumbnailTheme = {
     '.square': {
-      borderRadius: 0,
+      borderRadius: ventureum.borderRadiusBase * 2,
       '.small': {
         width: 36,
         height: 36,
-        borderRadius: 0
+        borderRadius: ventureum.borderRadiusBase
       },
       '.large': {
         width: 80,

@@ -23,7 +23,7 @@ export default {
   badgePadding: platform === 'ios' ? 3 : 0,
 
   // Button
-  btnFontFamily: platform === 'ios' ? 'System' : 'Roboto_medium',
+  btnFontFamily: ventureum.fontFamily,
   btnDisabledBg: '#b5b5b5',
   btnDisabledClr: '#f1f1f1',
 
@@ -117,7 +117,7 @@ export default {
   brandSidebar: '#252932',
 
   // Font
-  fontFamily: platform === 'ios' ? 'System' : 'Roboto',
+  fontFamily: ventureum.fontFamily,
   fontSizeBase: 14,
 
   get fontSizeH1 () {
@@ -144,11 +144,11 @@ export default {
 
   // Tab
   tabDefaultBg: ventureum.primaryColor,
-  topTabBarTextColor: ventureum.textOnPrimary,
+  topTabBarTextColor: ventureum.subTextOnPrimary,
   topTabBarActiveTextColor: ventureum.secondaryColor,
-  topTabActiveBgColor: ventureum.primaryColor,
-  topTabBarBorderColor: ventureum.primaryColor,
-  topTabBarActiveBorderColor: ventureum.primaryColor,
+  topTabActiveBgColor: ventureum.secondaryColor,
+  topTabBarBorderColor: ventureum.secondaryColor,
+  topTabBarActiveBorderColor: ventureum.secondaryColor,
 
   // Header
   toolbarBtnColor: ventureum.secondaryColor,
@@ -242,7 +242,7 @@ export default {
   inverseSpinnerColor: '#1A191B',
 
   // Tabs
-  tabBgColor: ventureum.primaryColor,
+  tabBgColor: ventureum.secondaryColor,
   tabFontSize: 15,
   tabTextColor: ventureum.textOnPrimary,
 
@@ -252,13 +252,13 @@ export default {
   noteFontSize: 14,
 
   // Title
-  titleFontfamily: platform === 'ios' ? 'System' : 'Roboto_medium',
+  titleFontfamily: ventureum.fontFamily,
   titleFontSize: platform === 'ios' ? 17 : 19,
   subTitleFontSize: platform === 'ios' ? 12 : 14,
   subtitleColor: platform === 'ios' ? '#8e8e93' : '#FFF',
 
   // New Variable
-  titleFontColor: ventureum.textOnPrimary,
+  titleFontColor: ventureum.secondaryColor,
 
   // Other
   borderRadiusBase: platform === 'ios' ? 5 : 2,

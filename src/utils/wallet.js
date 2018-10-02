@@ -1,7 +1,7 @@
 import Config from 'react-native-config'
 import Web3 from 'web3'
 import { store } from '../boot/configureStore.js'
-
+import { Platform } from 'react-native'
 import { ERC20_ABI } from './contracts/ERC20.js'
 import TCRRegistry from './contracts/Registry'
 import Token from './contracts/VetXToken'
@@ -29,7 +29,7 @@ export default class WalletUtils {
     @param newTransaction A callback function to be called when a new transaction
       is sent but before receipt is issued
   */
-  static async sendTransaction(receiverAddress, tokenSymbol, tokenAddress, amount, gasLimit = 500000, newTransaction) {
+  static async sendTransaction (receiverAddress, tokenSymbol, tokenAddress, amount, gasLimit = 500000, newTransaction) {
     const { walletReducer } = store.getState()
 
     const _web3 = this.getWeb3Instance()
@@ -53,11 +53,13 @@ export default class WalletUtils {
         gas: gasLimit
       })
     }
+
     promise.on('transactionHash', (hash) => {
       newTransaction(hash)
     }).on('error', (error) => {
+      console.log(error)
       Toast.show({
-        text: error,
+        text: 'Error in sending the transaction.',
         position: 'center',
         buttonText: 'Okay',
         type: 'danger',
@@ -77,12 +79,12 @@ export default class WalletUtils {
   /*
    * Reads an Web3 wallet instance from Redux store
    */
-  static getWallet() {
+  static getWallet () {
     const { walletReducer } = store.getState()
     return walletReducer
   }
 
-  static getWeb3HTTPProvider() {
+  static getWeb3HTTPProvider () {
     switch (store.getState().network) {
       case 'ropsten':
         return new Web3.providers.HttpProvider(
@@ -101,6 +103,13 @@ export default class WalletUtils {
           `https://mainnet.infura.io/${Config.INFURA_API_KEY}`
         )
       default:
+        // For iOS
+        if (Platform.OS === 'ios') {
+          return new Web3.providers.HttpProvider(
+            'http://127.0.0.1:8545'
+          )
+        }
+        // For Android
         return new Web3.providers.HttpProvider(
           'http://10.0.2.2:8545'
         )
@@ -110,12 +119,10 @@ export default class WalletUtils {
   /**
    * Returns a web3 instance with the user's wallet
    */
-  static getWeb3Instance() {
+  static getWeb3Instance () {
     if (!this.web3) {
       const wallet = this.getWallet()
-
       this.web3 = new Web3(this.getWeb3HTTPProvider())
-
       this.web3.eth.accounts.wallet.add({
         privateKey: wallet.privateKey,
         address: wallet.walletAddress
@@ -130,7 +137,7 @@ export default class WalletUtils {
    *
    * @param {Object} token
    */
-  static getBalance({ address, symbol, decimals }) {
+  static getBalance ({ address, symbol, decimals }) {
     if (symbol === 'ETH') {
       return this.getEthBalance()
     }
@@ -141,7 +148,7 @@ export default class WalletUtils {
   /**
    * Get the user's wallet ETH balance
    */
-  static getEthBalance() {
+  static getEthBalance () {
     const { walletReducer } = store.getState()
 
     const _web3 = this.getWeb3Instance()
@@ -163,7 +170,7 @@ export default class WalletUtils {
    * @param {String} contractAddress
    * @param {Number} decimals
    */
-  static getERC20Balance(contractAddress, decimals) {
+  static getERC20Balance (contractAddress, decimals) {
     const { walletReducer } = store.getState()
 
     return new Promise((resolve, reject) => {
@@ -183,7 +190,7 @@ export default class WalletUtils {
     Return a web3 contract object of the ERC20 instance
     @param {String} addressof the ERC20 contract
   */
-  static getERC20Instance(address) {
+  static getERC20Instance (address) {
     const _web3 = this.getWeb3Instance()
     const account = this.getWallet().walletAddress
     return new _web3.eth.Contract(ERC20_ABI, address, { from: account, gas: 500000 })
@@ -194,7 +201,7 @@ export default class WalletUtils {
     @param {String} Name of the contract
     @dev Intended to be used only with Ventureum product
   */
-  static async getContractInstance(name) {
+  static async getContractInstance (name) {
     const _web3 = this.getWeb3Instance()
     const networkId = await _web3.eth.net.getId()
     const account = this.getWallet().walletAddress
@@ -220,7 +227,7 @@ export default class WalletUtils {
   /*
     generate user avatar by its address
   */
-  static getAvatar(address = '') {
+  static getAvatar (address = '') {
     let identiconData
     if (address.length !== 0) {
       if (address.length < 42) {
@@ -237,20 +244,20 @@ export default class WalletUtils {
   /*
     generate the abbreviation of user address
   */
-  static getAddrAbbre(address) {
+  static getAddrAbbre (address) {
     return address.slice(0, 8) + '...' + address.slice(-6)
   }
 
   /*
      Load a list of erc20 tokens
    */
-  static loadTokens() {
+  static loadTokens () {
     this.tokens = tokenData.tokens
 
     // Modify the following token info for testing
     this.tokens.push({
       'symbol': 'VTX',
-      'address': '0xdd998c0a031d4a46ec520ecfcbf4ee5ca9ae2cd0',
+      'address': '0xce11c2df65aaa6a1b15596da6f9d26c6e78fff50',
       'decimals': 18,
       'name': 'VetX Token'
     })
@@ -273,7 +280,7 @@ export default class WalletUtils {
      @returns {(Object | Array)} (array of) token data
      including address, symbol, name, decimals, etc
    */
-  static getToken(symbol, address) {
+  static getToken (symbol, address) {
     if (address && this.addressToToken[address]) {
       return this.tokens[this.addressToToken[address]]
     } else if (this.symbolToToken[symbol]) {

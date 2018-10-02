@@ -83,7 +83,7 @@ export default (variables = variable) => {
       padding: variables.listItemPadding,
       paddingLeft: variables.listItemPadding + 5,
       paddingTop: platform === 'ios' ? variables.listItemPadding + 25 : undefined,
-      paddingBottom: platform === 'android' ? variables.listItemPadding + 20 : undefined,
+      paddingBottom: platform === 'android' ? variables.listItemPadding : undefined,
       flexDirection: 'row',
       borderColor: variables.listBorderColor,
       'NativeBase.Text': {
