@@ -645,6 +645,21 @@ function getRecentVotes (actor) {
   })
 }
 
+async function getAllReplies (requester, postHash) {
+  const feed = 'comment:' + postHash
+  let replies = await batchReadFeedsByBoardId(requester, feed, null, null, 50)
+  if (replies.length !== 0) {
+    replies = await Promise.all(replies.map(async (reply) => {
+      const subRelies = await getAllReplies(requester, reply.postHash)
+      return {
+        ...reply,
+        replies: subRelies
+      }
+    }))
+  }
+  return replies
+}
+
 export {
   batchReadFeedsByBoardId,
   checkBalanceForTx,
@@ -662,5 +677,6 @@ export {
   registerUser,
   getRecentPosts,
   getRecentComments,
-  getRecentVotes
+  getRecentVotes,
+  getAllReplies
 }

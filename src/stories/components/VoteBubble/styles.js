@@ -5,8 +5,6 @@ const styles = {
   voteBubble: {
     backgroundColor: 'white',
     position: 'absolute',
-    top: y - 16,
-    left: x - 36,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: null,

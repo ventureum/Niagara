@@ -54,10 +54,7 @@ export default function (state = initialState, action) {
     }
   }
   if (action.type === 'CLEAR_POST_DETAIL') {
-    return {
-      ...initialState,
-      currentParentPostHash: state.currentParentPostHash
-    }
+    return initialState
   }
 
   if (action.type === 'PROCESS_PUT_OPTION_FULFILLED') {

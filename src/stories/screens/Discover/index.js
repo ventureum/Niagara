@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
-import { FlatList, RefreshControl, View, Platform, Alert, Modal, TouchableWithoutFeedback } from 'react-native'
-import { Container, Body, Header, Left, Right, Button, Icon, Title, Text, Content, Fab, Tabs, Tab } from 'native-base'
-import FeedCardBasic from '../../components/FeedCardBasic'
+import { Platform, Alert } from 'react-native'
+import { Container, Body, Header, Left, Right, Button, Icon, Fab, Tabs, Tab } from 'native-base'
 import Search from '../../../utils/search.js'
 import ventureum from '../../../theme/variables/ventureum'
 import PopularTab from './Popular'
@@ -35,6 +34,10 @@ export default class Discover extends Component {
 
   onVoteAction = (postHash, action) => {
     this.props.voteFeedPost(postHash, action)
+  }
+
+  toPostDetail = (post) => {
+    this.props.navigation.navigate('PostDetail', { post })
   }
 
   render () {
@@ -76,18 +79,24 @@ export default class Discover extends Component {
             <PopularTab
               posts={posts}
               onVoteAction={this.onVoteAction}
+              loading={this.props.loading}
+              toPostDetail={this.toPostDetail}
             />
           </Tab>
           <Tab heading='NEW'>
             <NewTab
               posts={posts}
               onVoteAction={this.onVoteAction}
+              loading={this.props.loading}
+              toPostDetail={this.toPostDetail}
             />
           </Tab>
           <Tab heading='GROUPS'>
             <GroupsTab
               posts={posts}
               onVoteAction={this.onVoteAction}
+              loading={this.props.loading}
+              toPostDetail={this.toPostDetail}
             />
           </Tab>
         </Tabs>

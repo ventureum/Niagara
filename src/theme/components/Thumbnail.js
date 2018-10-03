@@ -32,6 +32,14 @@ export default (variables = variable) => {
         borderRadius: 0
       }
     },
+    '.tiny': {
+      width: 16,
+      height: 16,
+      borderRadius: 40,
+      '.square': {
+        borderRadius: 0
+      }
+    },
     width: 56,
     height: 56,
     borderRadius: 28

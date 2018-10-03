@@ -58,7 +58,6 @@ export default class UserLoadingScreen extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    console.log(nextProps)
     if (nextProps.userLoaded) {
       this.props.navigation.navigate('Main')
       return false

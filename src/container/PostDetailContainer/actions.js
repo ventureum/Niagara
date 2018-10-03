@@ -4,7 +4,7 @@ import { newTransaction } from '../TransactionContainer/actions'
 function _getReplies (requester, postHash) {
   return {
     type: 'GET_REPLIES',
-    payload: forum.batchReadFeedsByBoardId(requester, 'comment:' + postHash)
+    payload: forum.getAllReplies(requester, postHash)
   }
 }
 

@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
-import { View, FlatList } from 'react-native'
+import { View, FlatList, Dimensions, ActivityIndicator } from 'react-native'
 import { Text, Content } from 'native-base'
 import FeedCardV3 from '../../../components/FeedCardV3'
 import VideoFeedCard from '../../../components/VideoFeedCard'
 import styles from './styles'
+import ventureum from '../../../../theme/variables/ventureum'
+const { height, width } = Dimensions.get('screen')
 
 export default class PopularTab extends Component {
   onVoteAction = (postHash, action) => {
@@ -24,6 +26,7 @@ export default class PopularTab extends Component {
               <VideoFeedCard post={item}
                 onVoteAction={this.onVoteAction}
                 url={url}
+                toPostDetail={this.props.toPostDetail}
               />
             )
           }
@@ -33,6 +36,7 @@ export default class PopularTab extends Component {
     return (
       <FeedCardV3 post={item}
         onVoteAction={this.onVoteAction}
+        toPostDetail={this.props.toPostDetail}
       />
     )
   }
@@ -61,6 +65,16 @@ export default class PopularTab extends Component {
             }}
           />
         }
+        <ActivityIndicator
+          color={ventureum.secondaryColor}
+          style={{
+            position: 'absolute',
+            top: height / 10,
+            left: (width / 2) - 16
+          }}
+          size='large'
+          animating={this.props.loading}
+        />
       </View>
     )
   }

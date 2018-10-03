@@ -49,7 +49,9 @@ export default class FeedCardV3 extends Component {
     return (
       <View style={styles.card} >
         <TouchableWithoutFeedback
-          onPress={() => { console.log('Touched') }}
+          onPress={() => {
+            this.props.toPostDetail(post)
+          }}
         >
           <View style={styles.top}>
             <Text style={styles.titleText}>{post.content.title}</Text>

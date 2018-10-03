@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import PostDetail from '../../stories/screens/PostDetail'
+import PostDetailV2 from '../../stories/screens/PostDetailV2'
 import { getReplies, fetchUserMilstoneData, processPutOption, clearPostDetail, voteFeedPost } from './actions'
-import { getVoteCostEstimate } from '../DiscoverContainer/actions'
+import { getVoteCostEstimate, newPost } from '../DiscoverContainer/actions'
 
 class PostDetailContainer extends Component {
   componentWillMount () {
-    const { post } = this.props
+    const post = this.props.navigation.getParam('post', 'null')
     this.props.clearPostDetail()
     this.props.getReplies(post.postHash)
     if (post.postType === 'MILESTONE') {
@@ -15,10 +15,11 @@ class PostDetailContainer extends Component {
   }
 
   render () {
+    const post = this.props.navigation.getParam('post', 'null')
     return (
-      <PostDetail
+      <PostDetailV2
         navigation={this.props.navigation}
-        post={this.props.post}
+        post={post}
         replies={this.props.replies}
         loading={this.props.loading}
         errorMessage={this.props.errorMessage}
@@ -32,6 +33,8 @@ class PostDetailContainer extends Component {
         fetchingVoteCost={this.props.fetchingVoteCost}
         voteInfo={this.props.voteInfo}
         voteInfoError={this.props.voteInfoError}
+        newPost={this.props.newPost}
+        boardHash={this.props.boardHash}
       />
     )
   }
@@ -46,9 +49,7 @@ const mapStateToProps = state => ({
   fetchingVoteCost: state.discoverReducer.fetchingVoteCost,
   voteInfo: state.discoverReducer.voteInfo,
   voteInfoError: state.discoverReducer.voteInfoError,
-  post: state.discoverReducer.posts.find((post) => {
-    return post.postHash === state.postDetailReducer.currentParentPostHash
-  })
+  boardHash: state.discoverReducer.boardHash
 })
 
 const mapDispatchToProps = (dispatch) => ({
@@ -58,7 +59,8 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(processPutOption(postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action, refreshCallback)),
   clearPostDetail: () => dispatch(clearPostDetail()),
   voteFeedPost: (postHash, value) => dispatch(voteFeedPost(postHash, value)),
-  getVoteCostEstimate: (postHash) => dispatch(getVoteCostEstimate(postHash))
+  getVoteCostEstimate: (postHash) => dispatch(getVoteCostEstimate(postHash)),
+  newPost: (content, boardId, parentHash, postType, destination) => dispatch(newPost(content, boardId, parentHash, postType, destination))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(PostDetailContainer)

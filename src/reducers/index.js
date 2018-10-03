@@ -8,9 +8,9 @@ import discoverReducer from '../container/DiscoverContainer/reducer'
 import transactionReducer from '../container/TransactionContainer/reducer'
 import sendPageReducer from '../container/SendPageContainer/reducer'
 import network from '../container/NetworkContainer/reducer'
-import postDetailReducer from '../container/PostDetailContainer/reducer'
 import profileReducer from '../container/ProfileContainer/reducer'
 import chatPageReducer from '../container/ChatPageContainer/reducer'
+import postDetailReducer from '../container/PostDetailContainer/reducer'
 
 export default combineReducers({
   form: formReducer,
@@ -21,7 +21,7 @@ export default combineReducers({
   transactionReducer,
   sendPageReducer,
   network,
-  postDetailReducer,
   profileReducer,
-  chatPageReducer
+  chatPageReducer,
+  postDetailReducer
 })
