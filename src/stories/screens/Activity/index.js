@@ -61,7 +61,7 @@ export default class Transfer extends Component {
             </View>
           </View>
           <Text style={styles.date}>
-            {post.createdAt}
+            {moment(post.createdAt).format('MMMM Do YYYY')}
           </Text>
         </View>
       )
@@ -99,7 +99,7 @@ export default class Transfer extends Component {
             </View>
           </View>
           <Text style={styles.date}>
-            {comment.createdAt}
+            {moment(comment.createdAt).format('MMMM Do YYYY')}
           </Text>
         </View>
       )

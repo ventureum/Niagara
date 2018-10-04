@@ -529,7 +529,7 @@ function getRecentPosts (actor) {
     // get recent posts
     let request = {
       actor: actor,
-      type: getPostTypeHash('POST')
+      typeHash: getPostTypeHash('POST')
     }
     const recentPostsRequest = await axios.post(
       `${Config.FEED_END_POINT}/get-recent-posts`,
@@ -569,7 +569,7 @@ function getRecentComments (actor) {
     // get recent Comments
     let request = {
       actor: actor,
-      type: getPostTypeHash('COMMENT')
+      typeHash: getPostTypeHash('COMMENT')
     }
     const recentCommentsRequest = await axios.post(
       `${Config.FEED_END_POINT}/get-recent-posts`,
