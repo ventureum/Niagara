@@ -3,9 +3,9 @@ const initialState = {
   errorMessage: '',
   profile: null,
   userLoaded: false,
-  recentComments: {},
-  recentPosts: {},
-  recentVotes: {}
+  recentComments: [],
+  recentPosts: [],
+  recentVotes: []
 }
 
 export default function (state = initialState, action) {
