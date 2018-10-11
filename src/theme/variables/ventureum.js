@@ -25,6 +25,9 @@ export default {
   subTextOnPrimary: '#a7a7a7',
   textOnSecondary: '#ffffff',
 
+  // Icon Color
+  defaultIconColor: '#a8a8a8',
+
   // Border
   borderColor: '#878787',
   borderWidth: StyleSheet.hairlineWidth,

@@ -95,7 +95,7 @@ export default function (state = initialState, action) {
     return initialState
   }
 
-  if (action.type === 'UPDATE_POST_REWARDS_FULFILLED') {
+  if (action.type === 'VOTE_FEED_POST_FULFILLED') {
     const { voteInfo } = action.payload.data
     return {
       ...state,
@@ -112,13 +112,13 @@ export default function (state = initialState, action) {
       )
     }
   }
-  if (action.type === 'UPDATE_POST_REWARDS_PENDING') {
+  if (action.type === 'VOTE_FEED_POST_PENDING') {
     return {
       ...state,
       loading: true
     }
   }
-  if (action.type === 'UPDATE_POST_REWARDS_REJECTED') {
+  if (action.type === 'VOTE_FEED_POST_REJECTED') {
     return {
       ...state,
       loading: false,

@@ -7,7 +7,7 @@ import {
   getMorePosts,
   switchBoard,
   newPost,
-  updatePostRewards,
+  voteFeedPost,
   getVoteCostEstimate,
   resetErrorMessage
 } from './actions'
@@ -30,7 +30,7 @@ class DiscoverContainer extends Component {
         boardName={this.props.boardName}
         newPost={this.props.newPost}
         errorMessage={this.props.errorMessage}
-        updatePostRewards={this.props.updatePostRewards}
+        voteFeedPost={this.props.voteFeedPost}
         getVoteCostEstimate={this.props.getVoteCostEstimate}
         fetchingVoteCost={this.props.fetchingVoteCost}
         voteInfo={this.props.voteInfo}
@@ -58,7 +58,7 @@ const mapDispatchToProps = (dispatch) => ({
   getMorePosts: (boardHash) => dispatch(getMorePosts('board', boardHash)),
   switchBoard: (boardHash, boardName) => dispatch(switchBoard(boardHash, boardName)),
   newPost: (content, boardId, parentHash, postType, destination) => dispatch(newPost(content, boardId, parentHash, postType, destination)),
-  updatePostRewards: (boardId, postHash, value) => dispatch(updatePostRewards(boardId, postHash, value)),
+  voteFeedPost: (postHash, value) => dispatch(voteFeedPost(postHash, value)),
   getVoteCostEstimate: (postHash) => dispatch(getVoteCostEstimate(postHash)),
   setCurrentParentPost: (post) => dispatch(setCurrentParentPost(post)),
   resetErrorMessage: () => dispatch(resetErrorMessage())

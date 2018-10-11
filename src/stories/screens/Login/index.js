@@ -9,7 +9,7 @@ import logo from './images/logo.png'
 import styles from './styles'
 import ventureum from '../../../theme/variables/ventureum'
 
-class Login extends React.Component<Props, State> {
+class Login extends React.Component {
   renderLoginOptions = () => {
     return (
       <View padder>

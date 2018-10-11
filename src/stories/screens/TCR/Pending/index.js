@@ -6,8 +6,7 @@ import {
   ListItem
 } from 'native-base'
 import { RefreshControl } from 'react-native'
-import WalletUtils from '../../../../utils/wallet'
-import styles from './styles'
+
 export interface Props {
   navigation: any;
   list: any;

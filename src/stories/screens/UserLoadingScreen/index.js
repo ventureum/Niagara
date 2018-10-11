@@ -25,8 +25,6 @@ export default class UserLoadingScreen extends Component {
   checkLogIn = () => {
     var loopId = setInterval(async () => {
       try {
-        console.log(this.props.userLoaded)
-        console.log('looping')
         const { urlKey } = this.props
         const result = await Axios.get(`https://0gbc0znvfh.execute-api.us-west-1.amazonaws.com/alpha?key=${urlKey}`)
         clearInterval(loopId)
@@ -60,7 +58,6 @@ export default class UserLoadingScreen extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    console.log(nextProps)
     if (nextProps.userLoaded) {
       this.props.navigation.navigate('Main')
       return false

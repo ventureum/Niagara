@@ -2,7 +2,9 @@ import React, { Component } from 'react'
 import Profile from '../../stories/screens/Profile'
 import { connect } from 'react-redux'
 import walletUtils from '../../utils/wallet'
-import { fetchProfile } from './actions'
+import {
+  fetchProfile
+} from './actions'
 
 class ProfileContainer extends Component {
   constructor (props) {

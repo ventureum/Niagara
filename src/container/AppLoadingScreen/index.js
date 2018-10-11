@@ -1,8 +1,8 @@
-import React, { Component } from 'react'
+import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 
-class AppLoadingScreen extends Component {
+class AppLoadingScreen extends React.Component {
   static propTypes = {
     userLoaded: PropTypes.bool
   };

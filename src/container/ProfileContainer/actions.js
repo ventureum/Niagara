@@ -60,4 +60,52 @@ function setActor (actor) {
   }
 }
 
-export { fetchProfile, refuel, registerUser }
+function _getRecentVotes (actor) {
+  return {
+    type: 'GET_RECENT_VOTES',
+    payload: forum.getRecentVotes(actor)
+  }
+}
+
+function getRecentVotes () {
+  return (dispatch, getState) => {
+    const actor = getState().profileReducer.profile.actor
+    dispatch(_getRecentVotes(actor))
+  }
+}
+
+function _getRecentComments (actor) {
+  return {
+    type: 'GET_RECENT_COMMENTS',
+    payload: forum.getRecentComments(actor)
+  }
+}
+
+function getRecentComments () {
+  return (dispatch, getState) => {
+    const actor = getState().profileReducer.profile.actor
+    dispatch(_getRecentComments(actor))
+  }
+}
+
+function _getRecentPosts (actor) {
+  return {
+    type: 'GET_RECENT_POSTS',
+    payload: forum.getRecentPosts(actor)
+  }
+}
+
+function getRecentPosts () {
+  return (dispatch, getState) => {
+    const actor = getState().profileReducer.profile.actor
+    dispatch(_getRecentPosts(actor))
+  }
+}
+export {
+  fetchProfile,
+  refuel,
+  registerUser,
+  getRecentVotes,
+  getRecentComments,
+  getRecentPosts
+}
