@@ -30,7 +30,7 @@ const styles: any = StyleSheet.create({
     fontWeight: ventureum.bold,
     fontSize: 32,
     marginTop: ventureum.basicPadding * 3
-  },
+  }
 
 })
 export default styles

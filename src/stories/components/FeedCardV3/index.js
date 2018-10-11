@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Text, Thumbnail, Icon } from 'native-base'
-import { View, TouchableWithoutFeedback, TouchableOpacity } from 'react-native'
+import { View, TouchableWithoutFeedback } from 'react-native'
 import styles from './styles'
 import ventureum from '../../../theme/variables/ventureum'
 

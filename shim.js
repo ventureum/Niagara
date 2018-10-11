@@ -19,12 +19,12 @@ process.browser = false
 if (typeof Buffer === 'undefined') global.Buffer = require('buffer').Buffer
 
 // global.location = global.location || { port: 80 }
-const isDev = typeof __DEV__ === 'boolean' && __DEV__
+const isDev = typeof __DEV__ === 'boolean' && __DEV__ // eslint-disable-line
 
 Object.assign(process.env, { NODE_ENV: isDev ? 'development' : 'production' })
 
 if (typeof localStorage !== 'undefined') {
-  localStorage.debug = isDev ? '*' : ''
+  localStorage.debug = isDev ? '*' : '' // eslint-disable-line
 }
 
 // crypto is loaded first, so it can populate global.crypto

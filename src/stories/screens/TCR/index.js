@@ -15,7 +15,6 @@ import Whitelisted from './Whitelisted'
 import Vote from './Vote'
 import Pending from './Pending'
 
-import styles from './styles'
 export interface Props {
   navigation: any;
   list: any;

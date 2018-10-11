@@ -5,7 +5,9 @@ import { Text } from 'native-base'
 export default class GroupsTab extends Component {
   render () {
     return (
-      null
+      <View>
+        <Text>Popular</Text>
+      </View>
     )
   }
 }

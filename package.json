@@ -109,7 +109,8 @@
       "describe",
       "jest",
       "expect"
-    ]
+    ],
+    "ignore": ["flow-typed/*"]
   },
   "rnpm": {
     "assets": [

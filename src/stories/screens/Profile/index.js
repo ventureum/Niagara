@@ -1,10 +1,8 @@
 import React, { Component } from 'react'
-import { Tab, Tabs, Text, Header, ListItem, Left, Icon, Right, Button, Thumbnail, List } from 'native-base'
-import { View, TouchableOpacity, ScrollView, Animated } from 'react-native'
+import { Text, Header, ListItem, Left, Icon, Right, Thumbnail, List } from 'native-base'
+import { View, ScrollView } from 'react-native'
 import styles from './styles'
 import ventureum from '../../../theme/variables/ventureum'
-
-const MAX_USER_INFO_HEIGHT = 150
 
 export default class Profile extends Component {
   onRefresh = () => {

@@ -88,11 +88,11 @@ function batchReadFeedsByBoardId (requester, feed, id_lt = null, id_gt = null, s
     // get feed data from Stream API
     const targetFeed = client.feed(feedSlug[0], feedSlug[1], response.data.feedToken)
     let feedData
-    if (id_lt === null && id_gt === null) {
+    if (id_lt === null && id_gt === null) { // eslint-disable-line
       feedData = await targetFeed.get({ limit: size })
-    } else if (id_lt !== null && id_gt === null) {
+    } else if (id_lt !== null && id_gt === null) { // eslint-disable-line
       feedData = await targetFeed.get({ limit: size, id_lt: id_lt })
-    } else if (id_lt === null && id_gt !== null) {
+    } else if (id_lt === null && id_gt !== null) { // eslint-disable-line
       feedData = await targetFeed.get({ limit: size, id_gt: id_gt })
     }
 
