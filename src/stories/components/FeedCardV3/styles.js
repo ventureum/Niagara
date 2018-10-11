@@ -35,16 +35,6 @@ const styles = {
     paddingVertical: ventureum.basicPadding,
     marginTop: ventureum.basicPadding
   },
-  voteButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: ventureum.basicPadding * 2
-  },
-  voteText: {
-    color: ventureum.lightSecondaryColor,
-    fontSize: ventureum.componentTitleFontSize,
-    fontWeight: ventureum.medium
-  },
   userNameText: {
     color: ventureum.textOnPrimary,
     fontSize: ventureum.paragraphFontSize,
@@ -66,6 +56,23 @@ const styles = {
     fontSize: ventureum.paragraphFontSize,
     fontWeight: ventureum.normal,
     marginBottom: ventureum.basicPadding
+  },
+  iconStyle: {
+    fontSize: 18,
+    color: ventureum.defaultIconColor,
+    marginLeft: ventureum.basicPadding * 3
+  },
+  iconContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginLeft: ventureum.basicPadding,
+    marginRight: ventureum.basicPadding
+  },
+  iconText: {
+    fontSize: 14,
+    color: ventureum.subTextOnPrimary,
+    marginLeft: ventureum.basicPadding,
+    fontWeight: ventureum.medium
   }
 }
 

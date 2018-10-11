@@ -20,7 +20,7 @@ const styles = {
   },
   iconStyle: {
     fontSize: 22,
-    color: ventureum.subTextOnPrimary
+    color: ventureum.defaultIconColor
   },
   iconContainer: {
     flexDirection: 'row',
@@ -46,6 +46,18 @@ const styles = {
     color: '#a8a8a8',
     fontSize: ventureum.subTextFontSize,
     marginLeft: ventureum.basicPadding
+  },
+  commentDivider: {
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    height: 40,
+    marginLeft: ventureum.basicPadding * 2,
+    marginBottom: ventureum.basicPadding
+  },
+  commentDividerText: {
+    fontSize: 12,
+    color: '#333333',
+    fontWeight: ventureum.bold
   }
 }
 

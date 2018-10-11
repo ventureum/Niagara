@@ -22,6 +22,17 @@ export default class PostDetail extends Component {
     })
   }
 
+  commentDivider = () => {
+    const { repliesLength } = this.props.post
+    return (
+      <View style={styles.commentDivider}>
+        <Text style={styles.commentDividerText}>
+          Comments({repliesLength})
+        </Text>
+      </View>
+    )
+  }
+
   flattenList = (List) => {
     let newList = []
     List.forEach(item => {
@@ -87,6 +98,7 @@ export default class PostDetail extends Component {
           <ArticleDetailsCard
             post={item}
           />
+          {this.commentDivider()}
         </View>
       )
     }
@@ -156,8 +168,8 @@ export default class PostDetail extends Component {
         >
           <Icon
             style={styles.iconStyle}
-            type='MaterialCommunityIcons'
-            name='comment-text-outline'
+            type='MaterialIcons'
+            name='comment'
           />
           <Text style={styles.iconText}>{repliesLength}</Text>
         </TouchableOpacity>

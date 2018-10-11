@@ -13,7 +13,9 @@ const styles = {
   container: {
     flexWrap: 'wrap',
     paddingTop: ventureum.basicPadding,
-    flexDirection: 'column'
+    flexDirection: 'column',
+    borderBottomColor: '#e9e9e9',
+    borderBottomWidth: ventureum.borderWidth
   },
   header: {
     flexWrap: 'wrap',
