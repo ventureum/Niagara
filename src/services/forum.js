@@ -660,6 +660,30 @@ async function getAllReplies (requester, postHash) {
   return replies
 }
 
+function getTargetPost (requester, postHash) {
+  return new Promise(async (resolve, reject) => {
+    const result = await axios.post(
+      `${Config.FEED_END_POINT}/get-feed-post`,
+      {
+        'postHash': postHash,
+        'requestor': requester,
+        'getStreamApiKey': Config.STREAM_API_KEY,
+        'getStreamApiSecret': Config.STREAM_API_SECRET
+      }
+    )
+    if (result.data.ok) {
+      const { post, postVoteCountInfo, requestorVoteCountInfo } = result.data
+      resolve({
+        ...post,
+        postVoteCountInfo,
+        requestorVoteCountInfo
+      })
+    } else {
+      reject(result.data.message)
+    }
+  })
+}
+
 export {
   batchReadFeedsByBoardId,
   checkBalanceForTx,
@@ -678,5 +702,6 @@ export {
   getRecentPosts,
   getRecentComments,
   getRecentVotes,
-  getAllReplies
+  getAllReplies,
+  getTargetPost
 }

@@ -116,8 +116,8 @@ export default class PostDetail extends Component {
     )
   }
 
-  renderFooter = () => {
-    const { postVoteCountInfo, repliesLength, requestorVoteCountInfo } = this.props.post
+  renderFooter = (post) => {
+    const { postVoteCountInfo, repliesLength, requestorVoteCountInfo } = post
     return (
       <View style={styles.footer}>
         <TouchableOpacity
@@ -201,7 +201,7 @@ export default class PostDetail extends Component {
 
   onRefresh = () => {
     const { post } = this.props
-    this.props.getReplies(post.postHash)
+    this.props.refreshViewingPost(post.postHash)
   }
 
   render () {
@@ -227,7 +227,7 @@ export default class PostDetail extends Component {
             />
           }
         />
-        {this.renderFooter()}
+        {this.renderFooter(post)}
         <ReplyModal
           modalVisible={this.state.modalVisible}
           toggleReplyModal={this.toggleReplyModal}

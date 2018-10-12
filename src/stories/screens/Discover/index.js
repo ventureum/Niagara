@@ -37,6 +37,7 @@ export default class Discover extends Component {
   }
 
   toPostDetail = (post) => {
+    this.props.setCurrentParentPostHash(post.postHash)
     this.props.navigation.navigate('PostDetail', { post })
   }
 

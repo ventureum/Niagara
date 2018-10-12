@@ -165,5 +165,34 @@ export default function (state: any = initialState, action: Function) {
     }
   }
 
+  if (action.type === 'UPDATE_TARGET_POST_PENDING') {
+    return {
+      ...state,
+      loading: true
+    }
+  }
+  if (action.type === 'UPDATE_TARGET_POST_FULFILLED') {
+    return {
+      ...state,
+      loading: false,
+      posts: state.posts.map(post => {
+        if (post.postHash === action.payload.postHash) {
+          return {
+            ...action.payload,
+            id: post.id,
+            time: post.time,
+            source: post.source
+          }
+        }
+        return post
+      })
+    }
+  }
+  if (action.type === 'UPDATE_TARGET_POST_REJECTED') {
+    return {
+      ...state,
+      loading: false
+    }
+  }
   return state
 }

@@ -120,6 +120,20 @@ function resetErrorMessage () {
   }
 }
 
+function _updateTargetPost (requester, postHash) {
+  return {
+    type: 'UPDATE_TARGET_POST',
+    payload: forum.getTargetPost(requester, postHash)
+  }
+}
+
+function updateTargetPost (postHash) {
+  return (dispatch, getState) => {
+    const requester = getState().profileReducer.profile.actor
+    dispatch(_updateTargetPost(requester, postHash))
+  }
+}
+
 export {
   refreshPosts,
   setTokens,
@@ -128,5 +142,6 @@ export {
   newPost,
   voteFeedPost,
   getVoteCostEstimate,
-  resetErrorMessage
+  resetErrorMessage,
+  updateTargetPost
 }
