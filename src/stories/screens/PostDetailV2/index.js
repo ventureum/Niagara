@@ -11,6 +11,7 @@ import ventureum from '../../../theme/variables/ventureum'
 import ArticleDetailsCard from '../../components/ArticleDetailsCard'
 import ReplyModal from '../../components/ReplyModal'
 import { processContent } from '../../../utils/content'
+import { UP_VOTE, DOWN_VOTE } from '../../../utils/constants'
 import styles from './styles'
 
 export default class PostDetail extends Component {
@@ -20,6 +21,10 @@ export default class PostDetail extends Component {
       modalVisible: false,
       replyingTo: this.props.post
     })
+  }
+
+  onVoteAction = (postHash, action) => {
+    this.props.voteFeedPost(postHash, action)
   }
 
   commentDivider = () => {
@@ -97,6 +102,7 @@ export default class PostDetail extends Component {
           </Header>
           <ArticleDetailsCard
             post={item}
+            onVoteAction={this.onVoteAction}
           />
           {this.commentDivider()}
         </View>
@@ -112,6 +118,7 @@ export default class PostDetail extends Component {
         voteInfoError={this.props.voteInfoError}
         loading={this.props.loading}
         onReplyPress={this.onReplyToComment}
+        onVoteAction={this.onVoteAction}
       />
     )
   }
@@ -131,34 +138,44 @@ export default class PostDetail extends Component {
         >
           <Text style={styles.commentPlaceHolder}>Add comment</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => { }}
-          style={styles.iconContainer}
+        <TouchableOpacity
+          onPress={() => {
+            this.onVoteAction(post.postHash, UP_VOTE)
+          }}
         >
-          <Icon
-            style={{
-              fontSize: 24,
-              color: requestorVoteCountInfo.upvoteCount === 0
-                ? ventureum.defaultIconColor
-                : ventureum.lightSecondaryColor
-            }}
-            type='Ionicons'
-            name='md-thumbs-up'
-          />
-          <Text style={styles.iconText}>{postVoteCountInfo.upvoteCount}</Text>
+          <View style={styles.iconContainer}>
+            <Icon
+              style={{
+                fontSize: 24,
+                color: requestorVoteCountInfo.upvoteCount === 0
+                  ? ventureum.defaultIconColor
+                  : ventureum.lightSecondaryColor
+              }}
+              type='Ionicons'
+              name='md-thumbs-up'
+            />
+            <Text style={styles.iconText}>{postVoteCountInfo.upvoteCount}</Text>
+          </View>
+
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => { }}
+        <TouchableOpacity
+          onPress={() => {
+            this.onVoteAction(post.postHash, DOWN_VOTE)
+          }}
           style={styles.iconContainer}>
-          <Icon
-            style={{
-              fontSize: 24,
-              color: requestorVoteCountInfo.downvoteCount === 0
-                ? ventureum.defaultIconColor
-                : ventureum.lightSecondaryColor
-            }}
-            type='Ionicons'
-            name='md-thumbs-down'
-          />
-          <Text style={styles.iconText}>{postVoteCountInfo.downvoteCount}</Text>
+          <View style={styles.iconContainer}>
+            <Icon
+              style={{
+                fontSize: 24,
+                color: requestorVoteCountInfo.downvoteCount === 0
+                  ? ventureum.defaultIconColor
+                  : ventureum.lightSecondaryColor
+              }}
+              type='Ionicons'
+              name='md-thumbs-down'
+            />
+            <Text style={styles.iconText}>{postVoteCountInfo.downvoteCount}</Text>
+          </View>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconContainer}
