@@ -191,7 +191,8 @@ export default function (state: any = initialState, action: Function) {
   if (action.type === 'UPDATE_TARGET_POST_REJECTED') {
     return {
       ...state,
-      loading: false
+      loading: false,
+      errorMessage: action.payload.errorCode
     }
   }
   return state
