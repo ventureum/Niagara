@@ -67,20 +67,22 @@ export default class Transfer extends Component {
       )
     })
     return (
-      <List>
-        <ListItem itemHeader first style={{
-          justifyContent: 'space-between',
-          paddingLeft: ventureum.basicPadding * 2,
-          paddingRight: ventureum.basicPadding * 2
-        }}>
-          <Text>POSTS</Text>
-          <Text>MSP</Text>
-        </ListItem>
-        {listItems.length === 0
-          ? <Text style={{alignSelf: 'center'}}>No recent posts were found.</Text>
-          : listItems
-        }
-      </List >
+      <ScrollView>
+        <List>
+          <ListItem itemHeader first style={{
+            justifyContent: 'space-between',
+            paddingLeft: ventureum.basicPadding * 2,
+            paddingRight: ventureum.basicPadding * 2
+          }}>
+            <Text>POSTS</Text>
+            <Text>MSP</Text>
+          </ListItem>
+          {listItems.length === 0
+            ? <Text style={{alignSelf: 'center'}}>No recent posts were found.</Text>
+            : listItems
+          }
+        </List >
+      </ScrollView>
     )
   }
 
@@ -105,20 +107,22 @@ export default class Transfer extends Component {
       )
     })
     return (
-      <List>
-        <ListItem itemHeader first style={{
-          justifyContent: 'space-between',
-          paddingLeft: ventureum.basicPadding * 2,
-          paddingRight: ventureum.basicPadding * 2
-        }}>
-          <Text>REPLIES</Text>
-          <Text>MSP</Text>
-        </ListItem>
-        {listItems.length === 0
-          ? <Text style={{alignSelf: 'center'}}>No recent replies were found.</Text>
-          : listItems
-        }
-      </List >
+      <ScrollView>
+        <List>
+          <ListItem itemHeader first style={{
+            justifyContent: 'space-between',
+            paddingLeft: ventureum.basicPadding * 2,
+            paddingRight: ventureum.basicPadding * 2
+          }}>
+            <Text>REPLIES</Text>
+            <Text>MSP</Text>
+          </ListItem>
+          {listItems.length === 0
+            ? <Text style={{alignSelf: 'center'}}>No recent replies were found.</Text>
+            : listItems
+          }
+        </List >
+      </ScrollView>
     )
   }
   render () {
