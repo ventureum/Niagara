@@ -8,12 +8,13 @@ const initialState = {
   lastUUID: '',
   loading: false,
   errorMessage: '',
-  fetchingVoteCost: false,
-  voteInfo: null,
-  voteInfoError: null
+  currentParentPostHash: '',
+  replies: [],
+  milestoneData: {},
+  milestoneDataLoading: false
 }
 
-export default function (state: any = initialState, action: Function) {
+export default function (state = initialState, action) {
   if (action.type === 'REFRESH_POSTS_FULFILLED') {
     const length = action.payload.length
     if (length === 0) {
@@ -71,15 +72,6 @@ export default function (state: any = initialState, action: Function) {
     )
   }
 
-  if (action.type === 'SWITCH_BOARD') {
-    return {
-      ...state,
-      boardHash: action.meta.boardHash,
-      boardName: action.meta.boardName,
-      posts: []
-    }
-  }
-
   if (action.type === 'NEW_POST_PENDING') {
     return {
       ...state,
@@ -135,29 +127,6 @@ export default function (state: any = initialState, action: Function) {
     }
   }
 
-  if (action.type === 'GET_VOTE_COST_ESTIMATE_FULFILLED') {
-    return {
-      ...state,
-      fetchingVoteCost: false,
-      voteInfo: action.payload,
-      voteInfoError: null
-    }
-  }
-  if (action.type === 'GET_VOTE_COST_ESTIMATE_PENDING') {
-    return {
-      ...state,
-      fetchingVoteCost: true,
-      voteInfoError: null
-    }
-  }
-  if (action.type === 'GET_VOTE_COST_ESTIMATE_REJECTED') {
-    return {
-      ...state,
-      fetchingVoteCost: false,
-      voteInfoError: action.payload.data.message.errorCode
-    }
-  }
-
   if (action.type === 'RESET_ERROR_MESSAGE') {
     return {
       ...state,
@@ -191,6 +160,117 @@ export default function (state: any = initialState, action: Function) {
       ...state,
       loading: false,
       errorMessage: action.payload.errorCode
+    }
+  }
+
+  if (action.type === 'GET_REPLIES_PENDING') {
+    return {
+      ...state,
+      loading: true,
+      errorMessage: ''
+    }
+  }
+  if (action.type === 'GET_REPLIES_FULFILLED') {
+    return {
+      ...state,
+      loading: false,
+      replies: action.payload,
+      errorMessage: ''
+    }
+  }
+  if (action.type === 'GET_REPLIES_REJECTED') {
+    return {
+      ...state,
+      loading: false,
+      errorMessage: action.payload
+    }
+  }
+
+  if (action.type === 'FETCH_USER_MILESTONE_DATA_FULFILLED') {
+    return {
+      ...state,
+      milestoneDataLoading: false,
+      errorMessage: '',
+      milestoneData: action.payload
+    }
+  }
+  if (action.type === 'FETCH_USER_MILESTONE_DATA_PENDING') {
+    return {
+      ...state,
+      milestoneDataLoading: true,
+      errorMessage: ''
+    }
+  }
+  if (action.type === 'FETCH_USER_MILESTONE_DATA_REJECTED') {
+    return {
+      ...state,
+      milestoneDataLoading: false,
+      errorMessage: action.payload
+    }
+  }
+  if (action.type === 'CLEAR_POST_DETAIL') {
+    return {
+      ...state,
+      replies: [],
+      currentParentPostHash: state.currentParentPostHash
+    }
+  }
+
+  if (action.type === 'PROCESS_PUT_OPTION_FULFILLED') {
+    return {
+      ...state,
+      milestoneDataLoading: false
+    }
+  }
+  if (action.type === 'PROCESS_PUT_OPTION_PENDING') {
+    return {
+      ...state,
+      milestoneDataLoading: true
+    }
+  }
+  if (action.type === 'PROCESS_PUT_OPTION_REJECTED') {
+    return {
+      ...state,
+      milestoneDataLoading: false,
+      errorMessage: action.payload
+    }
+  }
+
+  if (action.type === 'VOTE_FEED_REPLY_FULFILLED') {
+    const { voteInfo } = action.payload.data
+    return {
+      ...state,
+      loading: false,
+      replies: state.replies.map(
+        (reply) => {
+          return (reply.postHash === voteInfo.postHash ? {
+            ...reply,
+            postVoteCountInfo: voteInfo.postVoteCountInfo,
+            requestorVoteCountInfo: voteInfo.requestorVoteCountInfo
+          } : reply
+          )
+        }
+      )
+    }
+  }
+  if (action.type === 'VOTE_FEED_REPLY_PENDING') {
+    return {
+      ...state,
+      loading: true
+    }
+  }
+  if (action.type === 'VOTE_FEED_REPLY_REJECTED') {
+    return {
+      ...state,
+      loading: false,
+      errorMessage: action.payload
+    }
+  }
+
+  if (action.type === 'SET_CURRENT_PARENT_POST_HASH') {
+    return {
+      ...state,
+      currentParentPostHash: action.payload
     }
   }
   return state

@@ -7,9 +7,11 @@ import {
   processPutOption,
   clearPostDetail,
   voteFeedPost,
-  refreshViewingPost
-} from './actions'
-import { getVoteCostEstimate, newPost } from '../DiscoverContainer/actions'
+  refreshViewingPost,
+  getVoteCostEstimate,
+  newPost,
+  voteFeedReply
+} from '../../actions'
 
 class PostDetailContainer extends Component {
   componentWillMount () {
@@ -36,10 +38,7 @@ class PostDetailContainer extends Component {
         milestoneDataLoading={this.props.milestoneDataLoading}
         fetchUserMilstoneData={this.props.fetchUserMilstoneData}
         voteFeedPost={this.props.voteFeedPost}
-        getVoteCostEstimate={this.props.getVoteCostEstimate}
-        fetchingVoteCost={this.props.fetchingVoteCost}
-        voteInfo={this.props.voteInfo}
-        voteInfoError={this.props.voteInfoError}
+        voteFeedReply={this.props.voteFeedReply}
         newPost={this.props.newPost}
         boardHash={this.props.boardHash}
         refreshViewingPost={this.props.refreshViewingPost}
@@ -48,18 +47,15 @@ class PostDetailContainer extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  replies: state.postDetailReducer.replies,
-  loading: state.postDetailReducer.loading,
-  errorMessage: state.postDetailReducer.errorMessage,
-  milestoneData: state.postDetailReducer.milestoneData,
-  milestoneDataLoading: state.postDetailReducer.milestoneDataLoading,
-  fetchingVoteCost: state.discoverReducer.fetchingVoteCost,
-  voteInfo: state.discoverReducer.voteInfo,
-  voteInfoError: state.discoverReducer.voteInfoError,
-  boardHash: state.discoverReducer.boardHash,
-  post: state.discoverReducer.posts.find((post) => {
-    return post.postHash === state.postDetailReducer.currentParentPostHash
+const mapStateToProps = ({ forumReducer }) => ({
+  replies: forumReducer.replies,
+  loading: forumReducer.loading,
+  errorMessage: forumReducer.errorMessage,
+  milestoneData: forumReducer.milestoneData,
+  milestoneDataLoading: forumReducer.milestoneDataLoading,
+  boardHash: forumReducer.boardHash,
+  post: forumReducer.posts.find((post) => {
+    return post.postHash === forumReducer.currentParentPostHash
   })
 })
 
@@ -70,6 +66,7 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(processPutOption(postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action, refreshCallback)),
   clearPostDetail: () => dispatch(clearPostDetail()),
   voteFeedPost: (postHash, value) => dispatch(voteFeedPost(postHash, value)),
+  voteFeedReply: (postHash, value) => dispatch(voteFeedReply(postHash, value)),
   getVoteCostEstimate: (postHash) => dispatch(getVoteCostEstimate(postHash)),
   newPost: (content, boardId, parentHash, postType, destination) => dispatch(newPost(content, boardId, parentHash, postType, destination)),
   refreshViewingPost: (postHash) => dispatch(refreshViewingPost(postHash))

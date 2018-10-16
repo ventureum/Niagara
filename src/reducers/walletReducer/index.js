@@ -4,7 +4,7 @@ const initialState = {
   privateKey: ''
 }
 
-export default function (state: any = initialState, action: Function) {
+export default function (state = initialState, action) {
   if (action.type === 'SET_PIN_CODE') {
     return {
       ...state,

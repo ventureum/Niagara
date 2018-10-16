@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import walletUtils from '../../utils/wallet'
 import {
   fetchProfile
-} from './actions'
+} from '../../actions'
 
 class ProfileContainer extends Component {
   constructor (props) {

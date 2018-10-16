@@ -17,7 +17,7 @@ const initialState = {
   totalVal: 0
 }
 
-export default function (state: any = initialState, action: Function) {
+export default function (state = initialState, action) {
   if (action.type === 'REFRESH_TOKENS_PENDING') {
     return {
       ...state,

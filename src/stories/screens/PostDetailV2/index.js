@@ -25,7 +25,11 @@ export default class PostDetail extends Component {
   }
 
   onVoteAction = (postHash, action) => {
-    this.props.voteFeedPost(postHash, action)
+    if (postHash === this.props.post.postHash) {
+      this.props.voteFeedPost(postHash, action)
+    } else {
+      this.props.voteFeedReply(postHash, action)
+    }
   }
 
   commentDivider = () => {

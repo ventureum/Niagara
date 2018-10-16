@@ -5,7 +5,7 @@ import {
   getRecentComments,
   getRecentPosts,
   getRecentVotes
-} from '../ProfileContainer/actions'
+} from '../../actions'
 class ActivityPageContainer extends Component {
   componentWillMount () {
     this.props.getRecentComments()

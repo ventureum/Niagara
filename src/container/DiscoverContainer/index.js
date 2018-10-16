@@ -1,16 +1,15 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Discover from '../../stories/screens/Discover'
-import { setCurrentParentPostHash } from '../PostDetailContainer/actions'
 import {
   refreshPosts,
   getMorePosts,
   switchBoard,
   newPost,
   voteFeedPost,
-  getVoteCostEstimate,
-  resetErrorMessage
-} from './actions'
+  resetErrorMessage,
+  setCurrentParentPostHash
+} from '../../actions'
 
 class DiscoverContainer extends Component {
   constructor (props) {
@@ -43,14 +42,11 @@ class DiscoverContainer extends Component {
 }
 
 const mapStateToProps = state => ({
-  posts: state.discoverReducer.posts,
-  loading: state.discoverReducer.loading,
-  boardHash: state.discoverReducer.boardHash,
-  boardName: state.discoverReducer.boardName,
-  errorMessage: state.discoverReducer.errorMessage,
-  fetchingVoteCost: state.discoverReducer.fetchingVoteCost,
-  voteInfo: state.discoverReducer.voteInfo,
-  voteInfoError: state.discoverReducer.voteInfoError
+  posts: state.forumReducer.posts,
+  loading: state.forumReducer.loading,
+  boardHash: state.forumReducer.boardHash,
+  boardName: state.forumReducer.boardName,
+  errorMessage: state.forumReducer.errorMessage
 })
 
 const mapDispatchToProps = (dispatch) => ({
@@ -59,7 +55,6 @@ const mapDispatchToProps = (dispatch) => ({
   switchBoard: (boardHash, boardName) => dispatch(switchBoard(boardHash, boardName)),
   newPost: (content, boardId, parentHash, postType, destination) => dispatch(newPost(content, boardId, parentHash, postType, destination)),
   voteFeedPost: (postHash, value) => dispatch(voteFeedPost(postHash, value)),
-  getVoteCostEstimate: (postHash) => dispatch(getVoteCostEstimate(postHash)),
   setCurrentParentPostHash: (postHash) => dispatch(setCurrentParentPostHash(postHash)),
   resetErrorMessage: () => dispatch(resetErrorMessage())
 })

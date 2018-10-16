@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import TokenToggle from '../../stories/screens/TokenToggle'
-import { addToken, removeToken } from './actions.js'
+import { addToken, removeToken } from '../../actions'
 
 class TokenToggleContainer extends React.Component {
   render () {

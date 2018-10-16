@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import NewPost from '../../stories/screens/NewPost'
 import WalletUtils from '../../utils/wallet'
-import { newPost } from '../DiscoverContainer/actions'
+import { newPost } from '../../actions'
 import { connect } from 'react-redux'
 
 class NewPostContainer extends Component {

@@ -1,11 +1,35 @@
 import update from 'immutability-helper'
 let moment = require('moment')
+
 const initialState = {
   transactions: [],
-  loading: false
+  loading: false,
+  errorMessage: ''
 }
 
 export default function reducer (state = initialState, action) {
+  if (action.type === 'SEND_TRANSACTION_PENDING') {
+    return {
+      ...state,
+      loading: true,
+      errorMessage: ''
+    }
+  }
+  if (action.type === 'SEND_TRANSACTION_FULFILLED') {
+    return {
+      ...state,
+      loading: true,
+      errorMessage: ''
+    }
+  }
+  if (action.type === 'SEND_TRANSACTION_REJECTED') {
+    return {
+      ...state,
+      loading: true,
+      errorMessage: action.payload
+    }
+  }
+
   if (action.type === 'NEW_TRANSACTION') {
     return (
       update(

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Reply from '../../stories/screens/Reply'
-import { newPost } from '../DiscoverContainer/actions'
+import { newPost } from '../../actions'
 
 class ReplyContainer extends Component {
   constructor (props) {
@@ -26,9 +26,9 @@ class ReplyContainer extends Component {
 }
 
 const mapStateToProps = state => ({
-  loading: state.discoverReducer.loading,
-  errorMessage: state.discoverReducer.errorMessage,
-  boardHash: state.discoverReducer.boardHash
+  loading: state.forumReducer.loading,
+  errorMessage: state.forumReducer.errorMessage,
+  boardHash: state.forumReducer.boardHash
 })
 
 const mapDispatchToProps = (dispatch) => ({

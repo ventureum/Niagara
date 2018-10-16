@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Container } from 'native-base'
 import SendPage from '../../stories/screens/SendPage'
 import { connect } from 'react-redux'
-import {sendTransaction} from './actions'
+import { sendTransaction } from '../../actions'
 
 class SendPageContainer extends Component {
   constructor (props) {
@@ -31,10 +31,11 @@ class SendPageContainer extends Component {
 
 const mapStateToProps = (state) => ({
   tokens: state.assetsReducer.tokens,
-  loading: state.sendPageReducer.loading
+  loading: state.transactionReducer.loading
 })
 const mapDispatchToProps = (dispatch) => ({
-  sendTransaction: (receiverAddress, tokenSymbol, tokenAddress, amount) => dispatch(sendTransaction(receiverAddress, tokenSymbol, tokenAddress, amount))
+  sendTransaction: (receiverAddress, tokenSymbol, tokenAddress, amount) =>
+    dispatch(sendTransaction(receiverAddress, tokenSymbol, tokenAddress, amount))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SendPageContainer)
