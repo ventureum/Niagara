@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Discover from '../../stories/screens/Discover'
-import { setCurrentParentPost } from '../PostDetailContainer/actions'
+import { setCurrentParentPostHash } from '../PostDetailContainer/actions'
 import {
   refreshPosts,
   getMorePosts,
@@ -35,7 +35,7 @@ class DiscoverContainer extends Component {
         fetchingVoteCost={this.props.fetchingVoteCost}
         voteInfo={this.props.voteInfo}
         voteInfoError={this.props.voteInfoError}
-        setCurrentParentPost={this.props.setCurrentParentPost}
+        setCurrentParentPostHash={this.props.setCurrentParentPostHash}
         resetErrorMessage={this.props.resetErrorMessage}
       />
     )
@@ -60,7 +60,7 @@ const mapDispatchToProps = (dispatch) => ({
   newPost: (content, boardId, parentHash, postType, destination) => dispatch(newPost(content, boardId, parentHash, postType, destination)),
   voteFeedPost: (postHash, value) => dispatch(voteFeedPost(postHash, value)),
   getVoteCostEstimate: (postHash) => dispatch(getVoteCostEstimate(postHash)),
-  setCurrentParentPost: (post) => dispatch(setCurrentParentPost(post)),
+  setCurrentParentPostHash: (postHash) => dispatch(setCurrentParentPostHash(postHash)),
   resetErrorMessage: () => dispatch(resetErrorMessage())
 })
 

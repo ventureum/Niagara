@@ -1,5 +1,6 @@
 import * as forum from '../../services/forum'
 import { newTransaction } from '../TransactionContainer/actions'
+import { updateTargetPost } from '../DiscoverContainer/actions'
 
 function _getReplies (requester, postHash) {
   return {
@@ -87,11 +88,28 @@ function clearPostDetail () {
   }
 }
 
-function setCurrentParentPost (post) {
+function setCurrentParentPostHash (postHash) {
   return {
-    type: 'SET_CURRENT_PARENT_POST',
-    payload: post
+    type: 'SET_CURRENT_PARENT_POST_HASH',
+    payload: postHash
   }
 }
 
-export { getReplies, fetchUserMilstoneData, processPutOption, clearPostDetail, voteFeedPost, setCurrentParentPost }
+function refreshViewingPost () {
+  return (dispatch, getState) => {
+    const requester = getState().profileReducer.profile.actor
+    const postHash = getState().postDetailReducer.currentParentPostHash
+    dispatch(_getReplies(requester, postHash))
+    dispatch(updateTargetPost(postHash))
+  }
+}
+
+export {
+  getReplies,
+  fetchUserMilstoneData,
+  processPutOption,
+  clearPostDetail,
+  voteFeedPost,
+  setCurrentParentPostHash,
+  refreshViewingPost
+}

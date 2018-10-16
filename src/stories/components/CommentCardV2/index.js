@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { View, TouchableOpacity } from 'react-native'
 import { Text, Thumbnail, Icon, ActionSheet } from 'native-base'
+import { DOWN_VOTE, UP_VOTE } from '../../../utils/constants'
+import ventureum from '../../../theme/variables/ventureum'
 import styles from './styles'
 let moment = require('moment')
 const options = [
@@ -10,6 +12,7 @@ const options = [
 export default class CommentCardV2 extends Component {
   render () {
     const { post } = this.props
+    const {requestorVoteCountInfo} = post
     const { downvoteCount, upvoteCount } = post.postVoteCountInfo
     return (
       <View style={styles.container}>
@@ -27,23 +30,43 @@ export default class CommentCardV2 extends Component {
           </Text>
         </View>
         <View style={styles.footer}>
-          <TouchableOpacity style={styles.buttonContainer}>
-            <Icon type='Ionicons'
-              name='md-thumbs-up'
-              style={styles.icon}
-            />
-            <Text style={styles.iconText}>
-              {upvoteCount}
-            </Text>
+          <TouchableOpacity
+            onPress={() => {
+              this.props.onVoteAction(post.postHash, UP_VOTE)
+            }}>
+            <View style={styles.buttonContainer}>
+              <Icon type='Ionicons'
+                name='md-thumbs-up'
+                style={{
+                  ...styles.icon,
+                  color: requestorVoteCountInfo.upvoteCount === 0
+                    ? ventureum.defaultIconColor
+                    : ventureum.lightSecondaryColor
+                }}
+              />
+              <Text style={styles.iconText}>
+                {upvoteCount}
+              </Text>
+            </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonContainer}>
-            <Icon type='Ionicons'
-              name='md-thumbs-down'
-              style={styles.icon}
-            />
-            <Text style={styles.iconText}>
-              {downvoteCount}
-            </Text>
+          <TouchableOpacity
+            onPress={() => {
+              this.props.onVoteAction(post.postHash, DOWN_VOTE)
+            }}>
+            <View style={styles.buttonContainer}>
+              <Icon type='Ionicons'
+                name='md-thumbs-down'
+                style={{
+                  ...styles.icon,
+                  color: requestorVoteCountInfo.downvoteCount === 0
+                    ? ventureum.defaultIconColor
+                    : ventureum.lightSecondaryColor
+                }}
+              />
+              <Text style={styles.iconText}>
+                {downvoteCount}
+              </Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity
             style={{

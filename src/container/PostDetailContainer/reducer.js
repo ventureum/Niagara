@@ -54,7 +54,10 @@ export default function (state = initialState, action) {
     }
   }
   if (action.type === 'CLEAR_POST_DETAIL') {
-    return initialState
+    return {
+      ...initialState,
+      currentParentPostHash: state.currentParentPostHash
+    }
   }
 
   if (action.type === 'PROCESS_PUT_OPTION_FULFILLED') {
@@ -108,7 +111,7 @@ export default function (state = initialState, action) {
     }
   }
 
-  if (action.type === 'SET_CURRENT_PARENT_POST') {
+  if (action.type === 'SET_CURRENT_PARENT_POST_HASH') {
     return {
       ...state,
       currentParentPostHash: action.payload

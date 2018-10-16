@@ -11,6 +11,7 @@ import ventureum from '../../../theme/variables/ventureum'
 import ArticleDetailsCard from '../../components/ArticleDetailsCard'
 import ReplyModal from '../../components/ReplyModal'
 import { processContent } from '../../../utils/content'
+import { UP_VOTE, DOWN_VOTE } from '../../../utils/constants'
 import styles from './styles'
 
 export default class PostDetail extends Component {
@@ -20,6 +21,10 @@ export default class PostDetail extends Component {
       modalVisible: false,
       replyingTo: this.props.post
     })
+  }
+
+  onVoteAction = (postHash, action) => {
+    this.props.voteFeedPost(postHash, action)
   }
 
   commentDivider = () => {
@@ -97,10 +102,12 @@ export default class PostDetail extends Component {
           </Header>
           <ArticleDetailsCard
             post={item}
+            onVoteAction={this.onVoteAction}
           />
-          {this.commentDivider()}
         </View>
       )
+    } else if (item.commentDivider) {
+      return this.commentDivider()
     }
     return (
       <CommentCardV2
@@ -112,12 +119,13 @@ export default class PostDetail extends Component {
         voteInfoError={this.props.voteInfoError}
         loading={this.props.loading}
         onReplyPress={this.onReplyToComment}
+        onVoteAction={this.onVoteAction}
       />
     )
   }
 
-  renderFooter = () => {
-    const { postVoteCountInfo, repliesLength, requestorVoteCountInfo } = this.props.post
+  renderFooter = (post) => {
+    const { postVoteCountInfo, repliesLength, requestorVoteCountInfo } = post
     return (
       <View style={styles.footer}>
         <TouchableOpacity
@@ -131,53 +139,63 @@ export default class PostDetail extends Component {
         >
           <Text style={styles.commentPlaceHolder}>Add comment</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => { }}
-          style={styles.iconContainer}
+        <TouchableOpacity
+          onPress={() => {
+            this.onVoteAction(post.postHash, UP_VOTE)
+          }}
         >
-          <Icon
-            style={{
-              fontSize: 24,
-              color: requestorVoteCountInfo.upvoteCount === 0
-                ? ventureum.defaultIconColor
-                : ventureum.lightSecondaryColor
-            }}
-            type='Ionicons'
-            name='md-thumbs-up'
-          />
-          <Text style={styles.iconText}>{postVoteCountInfo.upvoteCount}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => { }}
-          style={styles.iconContainer}>
-          <Icon
-            style={{
-              fontSize: 24,
-              color: requestorVoteCountInfo.downvoteCount === 0
-                ? ventureum.defaultIconColor
-                : ventureum.lightSecondaryColor
-            }}
-            type='Ionicons'
-            name='md-thumbs-down'
-          />
-          <Text style={styles.iconText}>{postVoteCountInfo.downvoteCount}</Text>
+          <View style={styles.iconContainer}>
+            <Icon
+              style={{
+                fontSize: 20,
+                color: requestorVoteCountInfo.upvoteCount === 0
+                  ? ventureum.defaultIconColor
+                  : ventureum.lightSecondaryColor
+              }}
+              type='Ionicons'
+              name='md-thumbs-up'
+            />
+            <Text style={styles.iconText}>{postVoteCountInfo.upvoteCount}</Text>
+          </View>
+
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.iconContainer}
+          onPress={() => {
+            this.onVoteAction(post.postHash, DOWN_VOTE)
+          }}>
+          <View style={styles.iconContainer}>
+            <Icon
+              style={{
+                fontSize: 20,
+                color: requestorVoteCountInfo.downvoteCount === 0
+                  ? ventureum.defaultIconColor
+                  : ventureum.lightSecondaryColor
+              }}
+              type='Ionicons'
+              name='md-thumbs-down'
+            />
+            <Text style={styles.iconText}>{postVoteCountInfo.downvoteCount}</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
           onPress={() => {
             this.scrollToComment()
           }}
         >
-          <Icon
-            style={styles.iconStyle}
-            type='MaterialIcons'
-            name='comment'
-          />
-          <Text style={styles.iconText}>{repliesLength}</Text>
+          <View style={styles.iconContainer}>
+            <Icon
+              style={styles.iconStyle}
+              type='MaterialIcons'
+              name='comment'
+            />
+            <Text style={styles.iconText}>{repliesLength}</Text>
+          </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => { }}
           style={styles.iconContainer}
         >
           <Icon
-            style={{ ...styles.iconStyle, marginLeft: 12 }}
+            style={styles.iconStyle}
             type='Ionicons'
             name='md-more'
           />
@@ -201,7 +219,7 @@ export default class PostDetail extends Component {
 
   onRefresh = () => {
     const { post } = this.props
-    this.props.getReplies(post.postHash)
+    this.props.refreshViewingPost(post.postHash)
   }
 
   render () {
@@ -209,7 +227,8 @@ export default class PostDetail extends Component {
     const repliesCopy = JSON.parse(JSON.stringify(replies))
     const repliesReversed = repliesCopy.reverse()
     let flattenReplies = this.flattenList(repliesReversed)
-    const mergedList = [post, ...flattenReplies]
+    const commentDivider = { commentDivider: true, id: '-200' }
+    const mergedList = [post, commentDivider, ...flattenReplies]
     return (
       <Container>
         <FlatList
@@ -227,7 +246,7 @@ export default class PostDetail extends Component {
             />
           }
         />
-        {this.renderFooter()}
+        {this.renderFooter(post)}
         <ReplyModal
           modalVisible={this.state.modalVisible}
           toggleReplyModal={this.toggleReplyModal}
