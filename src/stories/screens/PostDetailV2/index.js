@@ -104,9 +104,10 @@ export default class PostDetail extends Component {
             post={item}
             onVoteAction={this.onVoteAction}
           />
-          {this.commentDivider()}
         </View>
       )
+    } else if (item.commentDivider) {
+      return this.commentDivider()
     }
     return (
       <CommentCardV2
@@ -226,7 +227,8 @@ export default class PostDetail extends Component {
     const repliesCopy = JSON.parse(JSON.stringify(replies))
     const repliesReversed = repliesCopy.reverse()
     let flattenReplies = this.flattenList(repliesReversed)
-    const mergedList = [post, ...flattenReplies]
+    const commentDivider = { commentDivider: true, id: '-200' }
+    const mergedList = [post, commentDivider, ...flattenReplies]
     return (
       <Container>
         <FlatList
