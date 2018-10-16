@@ -178,10 +178,8 @@ export default function (state: any = initialState, action: Function) {
       posts: state.posts.map(post => {
         if (post.postHash === action.payload.postHash) {
           return {
-            ...action.payload,
-            id: post.id,
-            time: post.time,
-            source: post.source
+            ...post,
+            ...action.payload
           }
         }
         return post

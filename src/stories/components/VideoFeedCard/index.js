@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Text, Thumbnail, Icon } from 'native-base'
-import { View } from 'react-native'
+import { View, TouchableWithoutFeedback } from 'react-native'
 import styles from './styles'
 import ventureum from '../../../theme/variables/ventureum'
 import WebView from 'react-native-android-fullscreen-webview-video'
@@ -14,13 +14,19 @@ export default class VideoFeedCard extends Component {
     const videoID = url.substring(offset)
     return (
       <View style={styles.card} >
-        <View style={styles.top}>
-          <WebView
-            source={{ uri: `https://www.youtube.com/embed/${videoID}?autoplay=0?controls=0?modestbranding=1'` }}
-            style={{ alignSelf: 'stretch', height: 300 }}
-          />
-          <Text style={styles.titleText}>{post.content.title}</Text>
-        </View>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            this.props.toPostDetail(post)
+          }}
+        >
+          <View style={styles.top}>
+            <WebView
+              source={{ uri: `https://www.youtube.com/embed/${videoID}?autoplay=0?controls=0?modestbranding=1'` }}
+              style={{ alignSelf: 'stretch', height: 300 }}
+            />
+            <Text style={styles.titleText}>{post.content.title}</Text>
+          </View>
+        </TouchableWithoutFeedback>
         <View style={styles.bottom}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Thumbnail small rounded source={post.photoUrl === ''
