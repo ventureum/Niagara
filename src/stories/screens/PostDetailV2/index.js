@@ -146,7 +146,7 @@ export default class PostDetail extends Component {
           <View style={styles.iconContainer}>
             <Icon
               style={{
-                fontSize: 24,
+                fontSize: 20,
                 color: requestorVoteCountInfo.upvoteCount === 0
                   ? ventureum.defaultIconColor
                   : ventureum.lightSecondaryColor
@@ -161,12 +161,11 @@ export default class PostDetail extends Component {
         <TouchableOpacity
           onPress={() => {
             this.onVoteAction(post.postHash, DOWN_VOTE)
-          }}
-          style={styles.iconContainer}>
+          }}>
           <View style={styles.iconContainer}>
             <Icon
               style={{
-                fontSize: 24,
+                fontSize: 20,
                 color: requestorVoteCountInfo.downvoteCount === 0
                   ? ventureum.defaultIconColor
                   : ventureum.lightSecondaryColor
@@ -178,23 +177,24 @@ export default class PostDetail extends Component {
           </View>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.iconContainer}
           onPress={() => {
             this.scrollToComment()
           }}
         >
-          <Icon
-            style={styles.iconStyle}
-            type='MaterialIcons'
-            name='comment'
-          />
-          <Text style={styles.iconText}>{repliesLength}</Text>
+          <View style={styles.iconContainer}>
+            <Icon
+              style={styles.iconStyle}
+              type='MaterialIcons'
+              name='comment'
+            />
+            <Text style={styles.iconText}>{repliesLength}</Text>
+          </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => { }}
           style={styles.iconContainer}
         >
           <Icon
-            style={{ ...styles.iconStyle, marginLeft: 12 }}
+            style={styles.iconStyle}
             type='Ionicons'
             name='md-more'
           />

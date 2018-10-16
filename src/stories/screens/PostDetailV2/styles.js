@@ -16,10 +16,11 @@ const styles = {
     flexDirection: 'row',
     alignItems: 'center',
     borderTopColor: '#e9e9e9',
+    justifyContent: 'flex-end',
     borderTopWidth: ventureum.borderWidth
   },
   iconStyle: {
-    fontSize: 22,
+    fontSize: 20,
     color: ventureum.defaultIconColor
   },
   iconContainer: {
@@ -39,7 +40,7 @@ const styles = {
     paddingVertical: ventureum.basicPadding,
     backgroundColor: '#fafafa',
     marginRight: ventureum.basicPadding,
-    marginLeft: ventureum.basicPadding * 2,
+    marginLeft: ventureum.basicPadding,
     flex: 1
   },
   commentPlaceHolder: {
