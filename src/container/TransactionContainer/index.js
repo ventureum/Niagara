@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Transaction from '../../stories/screens/Transaction'
-import { newTransaction, updateTransactionStatus } from './actions'
+import { newTransaction, updateTransactionStatus } from '../../actions'
 
 class TransactionContainer extends Component {
   render () {

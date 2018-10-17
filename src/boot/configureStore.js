@@ -19,7 +19,7 @@ const persistConfig = {
   key: 'Milestone',
   version: 1,
   storage,
-  blacklist: ['discoverReducer', 'sendPageReducer', 'postDetailReducer']
+  blacklist: ['forumReducer']
 }
 
 var store = null

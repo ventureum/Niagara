@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import ChatPage from '../../stories/screens/ChatPage'
-import { newPost, getVoteCostEstimate } from '../DiscoverContainer/actions'
+import { newPost, getVoteCostEstimate } from '../../actions'
 import { connect } from 'react-redux'
 import Config from 'react-native-config'
 import axios from 'axios'
@@ -96,12 +96,12 @@ const mapStateToProps = state => ({
   chatContentLoading: state.chatPageReducer.chatContentLoading,
   reachEarliestChat: state.chatPageReducer.reachEarliestChat,
   username: state.profileReducer.profile.username,
-  boardHash: state.discoverReducer.boardHash,
-  fetchingVoteCost: state.discoverReducer.fetchingVoteCost,
-  voteInfo: state.discoverReducer.voteInfo,
-  voteInfoError: state.discoverReducer.voteInfoError,
-  post: state.discoverReducer.posts.find((post) => {
-    return post.postHash === state.postDetailReducer.currentParentPostHash
+  boardHash: state.forumReducer.boardHash,
+  fetchingVoteCost: state.forumReducer.fetchingVoteCost,
+  voteInfo: state.forumReducer.voteInfo,
+  voteInfoError: state.forumReducer.voteInfoError,
+  post: state.forumReducer.posts.find((post) => {
+    return post.postHash === state.forumReducer.currentParentPostHash
   })
 })
 

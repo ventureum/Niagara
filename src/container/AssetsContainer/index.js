@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import Assets from '../../stories/screens/Assets'
-import { refreshTokens } from './actions'
+import { refreshTokens } from '../../actions'
 
 class AssetsContainer extends React.Component {
   componentWillMount () {

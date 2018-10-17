@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import walletUtils from '../../utils/wallet'
-import { refuel } from '../ProfileContainer/actions'
+import { refuel } from '../../actions'
 import Refuel from '../../stories/screens/Refuel'
 
 class RefuelContainer extends Component {

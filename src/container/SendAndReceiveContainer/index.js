@@ -3,7 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import SendAndReceive from '../../stories/screens/SendAndReceive'
 import WalletUtils from '../../utils/wallet.js'
-import { refreshLogs } from '../AssetsContainer/actions'
+import { refreshLogs } from '../../actions'
 
 const BLOCKS_IN_THREE_MONTH = 518400
 const NUMBER_OF_TX_TO_FETCH = 20

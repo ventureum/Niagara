@@ -9,6 +9,7 @@ import {
 import CommentCardV2 from '../../components/CommentCardV2'
 import ventureum from '../../../theme/variables/ventureum'
 import ArticleDetailsCard from '../../components/ArticleDetailsCard'
+import VideoDetailsCard from '../../components/VideoDetailsCard'
 import ReplyModal from '../../components/ReplyModal'
 import { processContent } from '../../../utils/content'
 import { UP_VOTE, DOWN_VOTE } from '../../../utils/constants'
@@ -24,7 +25,11 @@ export default class PostDetail extends Component {
   }
 
   onVoteAction = (postHash, action) => {
-    this.props.voteFeedPost(postHash, action)
+    if (postHash === this.props.post.postHash) {
+      this.props.voteFeedPost(postHash, action)
+    } else {
+      this.props.voteFeedReply(postHash, action)
+    }
   }
 
   commentDivider = () => {
@@ -86,20 +91,49 @@ export default class PostDetail extends Component {
     }
   }
 
+  renderHeader = () => {
+    return (
+      <Header>
+        <Left>
+          <Button transparent onPress={() => this.props.navigation.goBack()}>
+            <Icon name='arrow-back' />
+          </Button>
+        </Left>
+        <Body />
+        <Right />
+      </Header>
+    )
+  }
+
   onRenderItem = ({ item }) => {
     const parentPost = this.props.post
     if (item.postHash === parentPost.postHash) {
+      if (item.content.meta !== undefined) {
+        const { meta } = item.content
+        const metaObject = JSON.parse(meta)
+        for (let i = 0; i < metaObject.length; i++) {
+          if (metaObject[i].type === 'url') {
+            const offset = metaObject[i].offset - 3
+            const length = metaObject[i].length
+            const url = item.content.text.substring(offset, offset + length)
+            if (url.indexOf('youtube') !== -1) {
+              return (
+                <View>
+                  {this.renderHeader()}
+                  <VideoDetailsCard
+                    post={item}
+                    onVoteAction={this.onVoteAction}
+                    url={url}
+                  />
+                </View>
+              )
+            }
+          }
+        }
+      }
       return (
         <View>
-          <Header>
-            <Left>
-              <Button transparent onPress={() => this.props.navigation.goBack()}>
-                <Icon name='arrow-back' />
-              </Button>
-            </Left>
-            <Body />
-            <Right />
-          </Header>
+          {this.renderHeader()}
           <ArticleDetailsCard
             post={item}
             onVoteAction={this.onVoteAction}

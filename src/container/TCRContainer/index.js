@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import TCR from '../../stories/screens/TCR'
-import { fetchList, delisted, whitelisted, voted } from './actions'
+import { fetchList, delisted, whitelisted, voted } from '../../actions'
 import tcr from '../../services/tcr'
 import { store } from '../../boot/configureStore'
 export interface Props {

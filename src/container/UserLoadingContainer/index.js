@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { setWalletAddress, setPrivateKey } from '../CreateWalletContainer/actions'
-import { registerUser } from '../ProfileContainer/actions'
+import { setWalletAddress, setPrivateKey, registerUser } from '../../actions'
 import UserLoadingScreen from '../../stories/screens/UserLoadingScreen'
 
 class UserLoadingContainer extends Component {
