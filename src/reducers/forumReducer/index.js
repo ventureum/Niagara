@@ -4,11 +4,16 @@ import { BOARD_ALL_HASH } from '../../utils/constants.js'
 const initialState = {
   boardHash: BOARD_ALL_HASH,
   boardName: 'All',
-  posts: [],
+  newPosts: [],
+  homePosts: [],
+  popularPosts: [],
   lastUUID: '',
+  newPostsLoading: false,
+  homePostsLoading: false,
+  popularPostsLoading: false,
   loading: false,
   errorMessage: '',
-  currentParentPostHash: '',
+  currentParentPost: {},
   replies: [],
   milestoneData: {},
   milestoneDataLoading: false
@@ -17,39 +22,43 @@ const initialState = {
 export default function (state = initialState, action) {
   if (action.type === 'REFRESH_POSTS_FULFILLED') {
     const length = action.payload.length
+    const { targetArray } = action.meta
     if (length === 0) {
       return {
         ...state,
-        loading: false,
-        posts: [],
+        [`${targetArray}Loading`]: false,
+        [targetArray]: [],
         errorMessage: ''
       }
     }
     return {
       ...state,
-      posts: action.payload,
+      [targetArray]: action.payload,
       lastUUID: action.payload[length - 1].id,
-      loading: false,
+      [`${targetArray}Loading`]: false,
       errorMessage: ''
     }
   }
 
   if (action.type === 'REFRESH_POSTS_PENDING') {
+    const { targetArray } = action.meta
     return {
       ...state,
-      loading: true,
+      [`${targetArray}Loading`]: true,
       errorMessage: ''
     }
   }
   if (action.type === 'REFRESH_POSTS_REJECTED') {
+    const { targetArray } = action.meta
     return {
       ...state,
-      loading: false,
+      [`${targetArray}Loading`]: false,
       errorMessage: action.payload.data.message.errorCode
     }
   }
   if (action.type === 'GET_MORE_POSTS_FULFILLED') {
     const length = action.payload.length
+    const { targetArray } = action.meta
     if (length === 0) {
       return {
         ...state,
@@ -62,7 +71,7 @@ export default function (state = initialState, action) {
         update(
           update(
             state,
-            { posts: { $push: action.payload } }
+            { [targetArray]: { $push: action.payload } }
           ),
           { lastUUID: { $set: action.payload[length - 1].id } }
         ),
@@ -96,11 +105,12 @@ export default function (state = initialState, action) {
     }
   }
   if (action.type === 'VOTE_FEED_POST_FULFILLED') {
-    const {voteInfo} = action.payload.data
+    const { voteInfo } = action.payload.data
+    const { targetArray } = state.currentParentPost
     return {
       ...state,
       loading: false,
-      posts: state.posts.map(
+      [targetArray]: state[targetArray].map(
         (post, i) => {
           return (post.postHash === voteInfo.postHash ? {
             ...post,
@@ -141,10 +151,11 @@ export default function (state = initialState, action) {
     }
   }
   if (action.type === 'UPDATE_TARGET_POST_FULFILLED') {
+    const { targetArray } = action.meta
     return {
       ...state,
       loading: false,
-      posts: state.posts.map(post => {
+      [targetArray]: state[targetArray].map(post => {
         if (post.postHash === action.payload.postHash) {
           return {
             ...post,
@@ -212,7 +223,7 @@ export default function (state = initialState, action) {
     return {
       ...state,
       replies: [],
-      currentParentPostHash: state.currentParentPostHash
+      currentParentPost: state.currentParentPost
     }
   }
 
@@ -267,10 +278,10 @@ export default function (state = initialState, action) {
     }
   }
 
-  if (action.type === 'SET_CURRENT_PARENT_POST_HASH') {
+  if (action.type === 'SET_CURRENT_PARENT_POST') {
     return {
       ...state,
-      currentParentPostHash: action.payload
+      currentParentPost: action.payload
     }
   }
   return state

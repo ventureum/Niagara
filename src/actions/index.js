@@ -4,6 +4,7 @@ import { shake128 } from 'js-sha3'
 import axios from 'axios'
 
 const DEFAULT_GAS_LIMIT = 500000
+const FETCHING_SIZE = 30
 
 export function listIsLoading (bool) {
   return {
@@ -140,32 +141,49 @@ export function refreshLogs (tokenIdx, url) {
   }
 }
 
-export function refreshPosts (feedSlug, feedId) {
+export function refreshPosts (feedSlug, feedId, targetArray, ranking) {
   return (dispatch, getState) => {
     const requester = getState().profileReducer.profile.actor
-    dispatch(_refreshPosts(requester, feedSlug, feedId))
+    dispatch(_refreshPosts(requester, feedSlug, feedId, targetArray, ranking))
   }
 }
 
-export function _refreshPosts (requester, feedSlug, feedId) {
+export function _refreshPosts (requester, feedSlug, feedId, targetArray, ranking) {
   return {
     type: 'REFRESH_POSTS',
-    payload: forum.batchReadFeedsByBoardId(requester, feedSlug + ':' + feedId)
+    payload: forum.batchReadFeedsByBoardId(
+      requester,
+      feedSlug + ':' + feedId,
+      null,
+      null,
+      FETCHING_SIZE,
+      ranking
+    ),
+    meta: {
+      targetArray: targetArray
+    }
   }
 }
 
-export function _getMorePosts (requester, feedSlug, feedId, lastUUID) {
+export function _getMorePosts (requester, feedSlug, feedId, lastUUID, targetArray, ranking) {
   return {
     type: 'GET_MORE_POSTS',
-    payload: forum.batchReadFeedsByBoardId(requester, feedSlug + ':' + feedId, lastUUID)
+    payload: forum.batchReadFeedsByBoardId(
+      requester,
+      feedSlug + ':' + feedId,
+      lastUUID
+    ),
+    meta: {
+      targetArray: targetArray
+    }
   }
 }
 
-export function getMorePosts (feedSlug, feedId) {
+export function getMorePosts (feedSlug, feedId, targetArray, ranking) {
   return (dispatch, getState) => {
     const lastUUID = getState().forumReducer.lastUUID
     const requester = getState().profileReducer.profile.actor
-    dispatch(_getMorePosts(requester, feedSlug, feedId, lastUUID))
+    dispatch(_getMorePosts(requester, feedSlug, feedId, lastUUID, targetArray, ranking))
   }
 }
 
@@ -276,17 +294,20 @@ export function resetErrorMessage () {
   }
 }
 
-export function _updateTargetPost (requester, postHash) {
+export function _updateTargetPost (requester, postHash, targetArray) {
   return {
     type: 'UPDATE_TARGET_POST',
-    payload: forum.getTargetPost(requester, postHash)
+    payload: forum.getTargetPost(requester, postHash),
+    meta: {
+      targetArray: targetArray
+    }
   }
 }
 
-export function updateTargetPost (postHash) {
+export function updateTargetPost (postHash, targetArray) {
   return (dispatch, getState) => {
     const requester = getState().profileReducer.profile.actor
-    dispatch(_updateTargetPost(requester, postHash))
+    dispatch(_updateTargetPost(requester, postHash, targetArray))
   }
 }
 export function _getReplies (requester, postHash) {
@@ -362,19 +383,19 @@ export function clearPostDetail () {
   }
 }
 
-export function setCurrentParentPostHash (postHash) {
+export function setCurrentParentPost (postHash, targetArray) {
   return {
-    type: 'SET_CURRENT_PARENT_POST_HASH',
-    payload: postHash
+    type: 'SET_CURRENT_PARENT_POST',
+    payload: { postHash, targetArray }
   }
 }
 
 export function refreshViewingPost () {
   return (dispatch, getState) => {
     const requester = getState().profileReducer.profile.actor
-    const postHash = getState().forumReducer.currentParentPostHash
-    dispatch(_getReplies(requester, postHash))
-    dispatch(updateTargetPost(postHash))
+    const post = getState().forumReducer.currentParentPost
+    dispatch(_getReplies(requester, post.postHash))
+    dispatch(updateTargetPost(post.postHash, post.targetArray))
   }
 }
 

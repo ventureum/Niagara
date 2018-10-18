@@ -54,8 +54,8 @@ const mapStateToProps = ({ forumReducer }) => ({
   milestoneData: forumReducer.milestoneData,
   milestoneDataLoading: forumReducer.milestoneDataLoading,
   boardHash: forumReducer.boardHash,
-  post: forumReducer.posts.find((post) => {
-    return post.postHash === forumReducer.currentParentPostHash
+  post: forumReducer[forumReducer.currentParentPost.targetArray].find((post) => {
+    return post.postHash === forumReducer.currentParentPost.postHash
   })
 })
 

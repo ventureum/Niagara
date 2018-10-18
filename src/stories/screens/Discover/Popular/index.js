@@ -12,6 +12,10 @@ export default class PopularTab extends Component {
     this.props.onVoteAction(postHash, action)
   }
 
+  toPostDetail = (post) => {
+    this.props.toPostDetail(post, 'popularPosts')
+  }
+
   onRenderItem = ({ item }) => {
     if (item.content.meta !== undefined) {
       const { meta } = item.content
@@ -26,7 +30,7 @@ export default class PopularTab extends Component {
               <VideoFeedCard post={item}
                 onVoteAction={this.onVoteAction}
                 url={url}
-                toPostDetail={this.props.toPostDetail}
+                toPostDetail={this.toPostDetail}
               />
             )
           }
@@ -36,7 +40,7 @@ export default class PopularTab extends Component {
     return (
       <FeedCardV3 post={item}
         onVoteAction={this.onVoteAction}
-        toPostDetail={this.props.toPostDetail}
+        toPostDetail={this.toPostDetail}
       />
     )
   }

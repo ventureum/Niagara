@@ -68,7 +68,7 @@ function getBytes32FromMultiash (multihash) {
     API. size must satisfy: 0 < size <= 10
   @return return a array of post details
 */
-function batchReadFeedsByBoardId (requester, feed, id_lt = null, id_gt = null, size) {
+function batchReadFeedsByBoardId (requester, feed, id_lt = null, id_gt = null, size, ranking) {
   return new Promise(async (resolve, reject) => {
     // get feed token from lamda API
     const feedSlug = feed.split(':')
@@ -89,7 +89,7 @@ function batchReadFeedsByBoardId (requester, feed, id_lt = null, id_gt = null, s
     const targetFeed = client.feed(feedSlug[0], feedSlug[1], response.data.feedToken)
     let feedData
     if (id_lt === null && id_gt === null) { // eslint-disable-line
-      feedData = await targetFeed.get({ limit: size })
+      feedData = await targetFeed.get({ limit: size, ranking: ranking })
     } else if (id_lt !== null && id_gt === null) { // eslint-disable-line
       feedData = await targetFeed.get({ limit: size, id_lt: id_lt })
     } else if (id_lt === null && id_gt !== null) { // eslint-disable-line
@@ -195,14 +195,16 @@ function batchReadFeedsByBoardId (requester, feed, id_lt = null, id_gt = null, s
           ...onChainPostDetails[postMap.get(i)],
           id: feedData.results[i].id,
           time: feedData.results[i].time,
-          source: feedData.results[i].source
+          source: feedData.results[i].source,
+          rewards: feedData.results.rewards
         })
       } else {
         postDetails.push({
           ...offChainPostDetails[postMap.get(i)],
           id: feedData.results[i].id,
           time: feedData.results[i].time,
-          source: feedData.results[i].source
+          source: feedData.results[i].source,
+          rewards: feedData.results.rewards
         })
       }
     }

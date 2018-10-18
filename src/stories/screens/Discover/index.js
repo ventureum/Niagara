@@ -11,10 +11,7 @@ console.ignoredYellowBox = ['Setting a timer']
 
 export default class Discover extends Component {
   onRefresh = () => {
-    this.props.refreshPosts(this.props.boardHash)
-    // if (this.flatListRef && this.props.posts.length !== 0) {
-    //   this.flatListRef.scrollToIndex({ animated: true, index: 0 })
-    // }
+    this.props.refreshPosts()
   }
 
   toSearchPage = () => {
@@ -28,17 +25,17 @@ export default class Discover extends Component {
     this.props.navigation.navigate('NewPost', { boardHash: this.props.boardHash })
   }
 
-  getMorePosts = () => {
-    this.props.getMorePosts(this.props.boardHash)
-  }
+  // getMorePosts = () => {
+  //   this.props.getMorePosts(this.props.boardHash, 'popularPosts')
+  // }
 
   onVoteAction = (postHash, action) => {
     this.props.voteFeedPost(postHash, action)
   }
 
-  toPostDetail = (post) => {
-    this.props.setCurrentParentPostHash(post.postHash)
-    this.props.navigation.navigate('PostDetail', { post })
+  toPostDetail = (post, targetArray) => {
+    this.props.setCurrentParentPost(post.postHash, targetArray)
+    this.props.navigation.navigate('PostDetail')
   }
 
   render () {
@@ -52,7 +49,7 @@ export default class Discover extends Component {
         { cancelable: false }
       )
     }
-    const { posts } = this.props
+    const { newPosts, popularPosts } = this.props
     return (
       <Container>
         <Header >
@@ -78,23 +75,23 @@ export default class Discover extends Component {
         <Tabs>
           <Tab heading='POPULAR'>
             <PopularTab
-              posts={posts}
+              posts={popularPosts}
               onVoteAction={this.onVoteAction}
-              loading={this.props.loading}
+              loading={this.props.popularPostsLoading}
               toPostDetail={this.toPostDetail}
             />
           </Tab>
           <Tab heading='NEW'>
             <NewTab
-              posts={posts}
+              posts={newPosts}
               onVoteAction={this.onVoteAction}
-              loading={this.props.loading}
+              loading={this.props.newPostsLoading}
               toPostDetail={this.toPostDetail}
             />
           </Tab>
           <Tab heading='GROUPS'>
             <GroupsTab
-              posts={posts}
+              posts={popularPosts}
               onVoteAction={this.onVoteAction}
               loading={this.props.loading}
               toPostDetail={this.toPostDetail}
