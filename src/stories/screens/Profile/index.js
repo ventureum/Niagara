@@ -74,6 +74,16 @@ export default class Profile extends Component {
               </Right>
             </ListItem>
             <ListItem noBorder onPress={() => {
+              this.props.navigation.navigate('Assets')
+            }}>
+              <Left>
+                <Text>Wallet</Text>
+              </Left>
+              <Right>
+                <Icon name='chevron-right' type='Entypo' />
+              </Right>
+            </ListItem>
+            <ListItem noBorder onPress={() => {
               this.props.navigation.navigate('ActivityPage')
             }}>
               <Left>
@@ -83,9 +93,9 @@ export default class Profile extends Component {
                 <Icon name='chevron-right' type='Entypo' />
               </Right>
             </ListItem>
-            <ListItem noBorder>
+            <ListItem noBorder >
               <Left>
-                <Text>Account</Text>
+                <Text>Account Settings</Text>
               </Left>
               <Right>
                 <Icon name='chevron-right' type='Entypo' />
@@ -93,15 +103,7 @@ export default class Profile extends Component {
             </ListItem>
             <ListItem noBorder >
               <Left>
-                <Text>Notification</Text>
-              </Left>
-              <Right>
-                <Icon name='chevron-right' type='Entypo' />
-              </Right>
-            </ListItem>
-            <ListItem noBorder >
-              <Left>
-                <Text>privacy</Text>
+                <Text>Notification Settings</Text>
               </Left>
               <Right>
                 <Icon name='chevron-right' type='Entypo' />

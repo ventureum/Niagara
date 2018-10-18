@@ -69,7 +69,8 @@ const MainNavigator = createStackNavigator(
     TransferPage: { screen: TransferPage },
     ActivityPage: { screen: ActivityPage },
     Transaction: { screen: Transaction },
-    Refuel: { screen: Refuel }
+    Refuel: { screen: Refuel },
+    Assets: { screen: AssetsContainer }
   },
   {
     initialRouteName: 'HomeTab',
