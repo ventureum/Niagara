@@ -274,7 +274,7 @@ export default function (state = initialState, action) {
     return {
       ...state,
       loading: false,
-      errorMessage: action.payload
+      errorMessage: action.payload.data.message.errorCode
     }
   }
 
