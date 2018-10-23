@@ -22,11 +22,15 @@ export default class Discover extends Component {
   }
 
   toNewPost = () => {
-    this.props.navigation.navigate('NewPost', { boardHash: this.props.boardHash })
+    this.props.navigation.navigate('NewPost', { boardId: this.props.boardId })
+  }
+
+  toBoardDetail = (boardId) => {
+    this.props.navigation.navigate('BoardDetail', { boardId: boardId })
   }
 
   // getMorePosts = () => {
-  //   this.props.getMorePosts(this.props.boardHash, 'popularPosts')
+  //   this.props.getMorePosts(this.props.boardId, 'popularPosts')
   // }
 
   onVoteAction = (postHash, action) => {
@@ -91,10 +95,9 @@ export default class Discover extends Component {
           </Tab>
           <Tab heading='GROUPS'>
             <GroupsTab
-              posts={popularPosts}
-              onVoteAction={this.onVoteAction}
-              loading={this.props.loading}
-              toPostDetail={this.toPostDetail}
+              loading={this.props.groupsLoading}
+              userFollowing={this.props.userFollowing}
+              toBoardDetail={this.toBoardDetail}
             />
           </Tab>
         </Tabs>

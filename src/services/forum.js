@@ -2,6 +2,7 @@ import Config from 'react-native-config'
 import WalletUtils from '../utils/wallet'
 import axios from 'axios'
 import bs58 from 'bs58'
+import initials from 'initials'
 
 const stream = require('getstream')
 const client = stream.connect(Config.STREAM_API_KEY, null, Config.STREAM_APP_ID)
@@ -19,6 +20,10 @@ const boardMap = new Map()
 boardMap.set(
   '0xfafe9e798792a4c59a71bf36c7082fa92c3849ffe26f8d2cf81f5f4da4e115ad',
   'MilestoneChatbot Test'
+)
+boardMap.set(
+  '0xc6c260628ca29dfacadb60c8bb41d15dadc0dbc133680f7322b1a1008739b64f',
+  'All'
 )
 
 /*
@@ -149,8 +154,6 @@ async function getFeedDataFromGetStream (feed, id_lt = null, id_gt = null, size,
     } else if (id_lt === null && id_gt !== null) { // eslint-disable-line
     feedData = await targetFeed.get({ limit: size, id_gt: id_gt })
   }
-  const following = await targetFeed.following()
-  console.log(`${feedSlug} follwing:`, following)
   return feedData
 }
 
@@ -759,15 +762,18 @@ async function getUserFollowing (actor) {
   // get feed data from Stream API
   const targetFeed = client.feed('user', actor, response.data.feedToken)
   const following = await targetFeed.following()
-  console.log(`${actor} follwing:`, following)
 
   const result = following.results.map(item => {
     const boardId = item.target_id.split(':')[1]
+    const boardName = boardMap.get(boardId)
     return {
       boardId: boardId,
-      boardName: boardMap.get(boardId)
+      boardName: boardName,
+      nameInitials: initials(boardName)
     }
   })
+  console.log(`${actor} follwing:`, result)
+
   return result
 }
 export {

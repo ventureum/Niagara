@@ -66,7 +66,7 @@ class ChatPageContainer extends Component {
         post={this.props.post}
         newPost={this.props.newPost}
         username={this.props.username}
-        boardHash={this.props.boardHash}
+        boardId={this.props.boardId}
         chatContentLoading={this.props.chatContentLoading}
         fetchEalierChat={this.props.fetchEalierChat}
         reachEarliestChat={this.props.reachEarliestChat}
@@ -96,7 +96,7 @@ const mapStateToProps = state => ({
   chatContentLoading: state.chatPageReducer.chatContentLoading,
   reachEarliestChat: state.chatPageReducer.reachEarliestChat,
   username: state.profileReducer.profile.username,
-  boardHash: state.forumReducer.boardHash,
+  boardId: state.forumReducer.boardId,
   fetchingVoteCost: state.forumReducer.fetchingVoteCost,
   voteInfo: state.forumReducer.voteInfo,
   voteInfoError: state.forumReducer.voteInfoError,

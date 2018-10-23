@@ -6,13 +6,13 @@ import { connect } from 'react-redux'
 
 class NewPostContainer extends Component {
   render () {
-    const boardHash = this.props.navigation.getParam('boardHash')
+    const boardId = this.props.navigation.getParam('boardId')
     return (
       <NewPost
         navigation={this.props.navigation}
         avatar={WalletUtils.getAvatar()}
         newPost={this.props.newPost}
-        boardHash={boardHash}
+        boardId={boardId}
       />
     )
   }

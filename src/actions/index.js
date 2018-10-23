@@ -197,11 +197,11 @@ export function setTokens (publicToken, userToken, timelineToken) {
   }
 }
 
-export function switchBoard (boardName, boardHash) {
+export function switchBoard (boardName, boardId) {
   return {
     type: 'SWITCH_BOARD',
     meta: {
-      boardHash: boardHash,
+      boardId: boardId,
       boardName: boardName
     }
   }

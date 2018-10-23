@@ -84,7 +84,7 @@ export default class PostDetail extends Component {
         return
       }
       const destination = 'OFF-CHAIN'
-      const boardId = this.props.boardHash
+      const boardId = this.props.boardId
       const parentHash = this.state.replyingTo.postHash
       const postType = 'COMMENT'
       this.props.newPost(content, boardId, parentHash, postType, destination)

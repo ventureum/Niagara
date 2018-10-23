@@ -35,7 +35,7 @@ export default class NewPost extends Component {
       } else {
         destination = 'OFF-CHAIN'
       }
-      const boardId = this.props.boardHash
+      const boardId = this.props.boardId
       const web3 = WalletUtils.getWeb3Instance()
       const noParent = web3.utils.padRight('0x0', 64)
       const postType = 'POST'

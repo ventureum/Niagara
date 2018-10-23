@@ -65,7 +65,7 @@ export default class ChatPage extends Component {
       } else {
         destination = 'OFF-CHAIN'
       }
-      const boardId = this.props.boardHash
+      const boardId = this.props.boardId
       const parentHash = post.postHash
       const postType = 'COMMENT'
       this.props.newPost(content, boardId, parentHash, postType, destination)

@@ -47,6 +47,7 @@
     "getstream": "^3.17.0",
     "identicon.js": "^2.3.2",
     "immutability-helper": "^2.7.1",
+    "initials": "^3.0.0",
     "js-sha3": "^0.8.0",
     "lodash": "^4.17.10",
     "moment": "^2.22.2",
@@ -110,7 +111,9 @@
       "jest",
       "expect"
     ],
-    "ignore": ["flow-typed/*"]
+    "ignore": [
+      "flow-typed/*"
+    ]
   },
   "rnpm": {
     "assets": [

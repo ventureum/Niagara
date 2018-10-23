@@ -2,7 +2,7 @@ import update from 'immutability-helper'
 import { BOARD_ALL_HASH } from '../../utils/constants.js'
 
 const initialState = {
-  boardHash: BOARD_ALL_HASH,
+  boardId: BOARD_ALL_HASH,
   boardName: 'All',
   newPosts: [],
   homePosts: [],
@@ -17,7 +17,8 @@ const initialState = {
   replies: [],
   milestoneData: {},
   milestoneDataLoading: false,
-  userFollowing: []
+  userFollowing: [],
+  groupsLoading: false
 }
 
 export default function (state = initialState, action) {

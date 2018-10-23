@@ -8,7 +8,8 @@ import {
   newPost,
   voteFeedPost,
   resetErrorMessage,
-  setCurrentParentPost
+  setCurrentParentPost,
+  getUserFollowing
 } from '../../actions'
 import { POPULAR_RANKING } from '../../utils/constants'
 
@@ -18,9 +19,10 @@ class DiscoverContainer extends Component {
   }
 
   refreshPosts = () => {
-    const { boardHash } = this.props
-    this.props.refreshPosts('board', boardHash, 'popularPosts', POPULAR_RANKING)
-    this.props.refreshPosts('board', boardHash, 'newPosts')
+    const { boardId } = this.props
+    this.props.refreshPosts('board', boardId, 'popularPosts', POPULAR_RANKING)
+    this.props.refreshPosts('board', boardId, 'newPosts')
+    this.props.getUserFollowing()
   }
 
   render () {
@@ -33,12 +35,15 @@ class DiscoverContainer extends Component {
         loading={this.props.loading}
         newPostsLoading={this.props.newPostsLoading}
         popularPostsLoading={this.props.popularPostsLoading}
-        boardHash={this.props.boardHash}
+        boardId={this.props.boardId}
         boardName={this.props.boardName}
         newPost={this.props.newPost}
         errorMessage={this.props.errorMessage}
         setCurrentParentPost={this.props.setCurrentParentPost}
         resetErrorMessage={this.props.resetErrorMessage}
+        getUserFollowing={this.props.getUserFollowing}
+        userFollowing={this.props.userFollowing}
+        groupsLoading={this.props.groupsLoading}
       />
     )
   }
@@ -51,19 +56,22 @@ const mapStateToProps = ({forumReducer}) => ({
   newPostsLoading: forumReducer.newPostsLoading,
   homePostsLoading: forumReducer.homePostsLoading,
   popularPostsLoading: forumReducer.popularPostsLoading,
-  boardHash: forumReducer.boardHash,
+  boardId: forumReducer.boardId,
   boardName: forumReducer.boardName,
-  errorMessage: forumReducer.errorMessage
+  errorMessage: forumReducer.errorMessage,
+  userFollowing: forumReducer.userFollowing,
+  groupsLoading: forumReducer.groupsLoading
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  refreshPosts: (feedSlug, boardHash, targetArray, ranking) => dispatch(refreshPosts(feedSlug, boardHash, targetArray, ranking)),
-  getMorePosts: (feedSlug, boardHash, targetArray, ranking) => dispatch(getMorePosts(feedSlug, boardHash, targetArray, ranking)),
-  switchBoard: (boardHash, boardName) => dispatch(switchBoard(boardHash, boardName)),
+  refreshPosts: (feedSlug, boardId, targetArray, ranking) => dispatch(refreshPosts(feedSlug, boardId, targetArray, ranking)),
+  getMorePosts: (feedSlug, boardId, targetArray, ranking) => dispatch(getMorePosts(feedSlug, boardId, targetArray, ranking)),
+  switchBoard: (boardId, boardName) => dispatch(switchBoard(boardId, boardName)),
   newPost: (content, boardId, parentHash, postType, destination) => dispatch(newPost(content, boardId, parentHash, postType, destination)),
   voteFeedPost: (postHash, value) => dispatch(voteFeedPost(postHash, value)),
   setCurrentParentPost: (postHash, targetArray) => dispatch(setCurrentParentPost(postHash, targetArray)),
-  resetErrorMessage: () => dispatch(resetErrorMessage())
+  resetErrorMessage: () => dispatch(resetErrorMessage()),
+  getUserFollowing: () => dispatch(getUserFollowing())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(DiscoverContainer)

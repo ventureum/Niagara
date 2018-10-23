@@ -40,7 +40,7 @@ class PostDetailContainer extends Component {
         voteFeedPost={this.props.voteFeedPost}
         voteFeedReply={this.props.voteFeedReply}
         newPost={this.props.newPost}
-        boardHash={this.props.boardHash}
+        boardId={this.props.boardId}
         refreshViewingPost={this.props.refreshViewingPost}
       />
     )
@@ -53,7 +53,7 @@ const mapStateToProps = ({ forumReducer }) => ({
   errorMessage: forumReducer.errorMessage,
   milestoneData: forumReducer.milestoneData,
   milestoneDataLoading: forumReducer.milestoneDataLoading,
-  boardHash: forumReducer.boardHash,
+  boardId: forumReducer.boardId,
   post: forumReducer[forumReducer.currentParentPost.targetArray].find((post) => {
     return post.postHash === forumReducer.currentParentPost.postHash
   })
