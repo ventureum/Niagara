@@ -15,6 +15,12 @@ typeMap.set('0x2fca5a5e', 'POST')
 typeMap.set('0x04bc4e7a', 'AIRDROP')
 typeMap.set('0xf7003d25', 'MILESTONE')
 
+const boardMap = new Map()
+boardMap.set(
+  '0xfafe9e798792a4c59a71bf36c7082fa92c3849ffe26f8d2cf81f5f4da4e115ad',
+  'MilestoneChatbot Test'
+)
+
 /*
   fetch the content of a single post from IPFS
   @param post A post object with its ipfsPath
@@ -143,6 +149,8 @@ async function getFeedDataFromGetStream (feed, id_lt = null, id_gt = null, size,
     } else if (id_lt === null && id_gt !== null) { // eslint-disable-line
     feedData = await targetFeed.get({ limit: size, id_gt: id_gt })
   }
+  const following = await targetFeed.following()
+  console.log(`${feedSlug} follwing:`, following)
   return feedData
 }
 
@@ -698,6 +706,70 @@ async function getTargetPost (requester, postHash) {
   }
 }
 
+async function followBoards (actor, boardIds) {
+  const request = {
+    actor: actor,
+    boardIds: boardIds
+  }
+
+  const result = await axios.post(
+    `${Config.FEED_END_POINT}/subscribe-boards`,
+    request
+  )
+
+  if (result.data.ok) {
+    return result
+  } else {
+    throw (result.data.message)
+  }
+}
+
+async function unfollowBoards (actor, boardIds) {
+  const request = {
+    actor: actor,
+    boardIds: boardIds
+  }
+
+  const result = await axios.post(
+    `${Config.FEED_END_POINT}/unsubscribe-boards`,
+    request
+  )
+
+  if (result.data.ok) {
+    return result
+  } else {
+    throw (result.data.message)
+  }
+}
+
+async function getUserFollowing (actor) {
+  const toFeedTokenApi = {
+    'feedSlug': 'user',
+    'userId': actor,
+    'getStreamApiKey': Config.STREAM_API_KEY,
+    'getStreamApiSecret': Config.STREAM_API_SECRET
+  }
+  const response = await axios.post(
+    Config.FEED_TOKEN_API,
+    toFeedTokenApi
+  )
+  if (!response.data.ok) {
+    throw (response)
+  }
+  // get feed data from Stream API
+  const targetFeed = client.feed('user', actor, response.data.feedToken)
+  const following = await targetFeed.following()
+  console.log(`${actor} follwing:`, following)
+
+  const result = following.results.map(item => {
+    const boardId = item.target_id.split(':')[1]
+    return {
+      boardId: boardId,
+      boardName: boardMap.get(boardId)
+    }
+  })
+  return result
+}
 export {
   batchReadFeedsByBoardId,
   checkBalanceForTx,
@@ -717,5 +789,8 @@ export {
   getRecentComments,
   getRecentVotes,
   getAllReplies,
-  getTargetPost
+  getTargetPost,
+  followBoards,
+  unfollowBoards,
+  getUserFollowing
 }

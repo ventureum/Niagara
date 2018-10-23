@@ -563,3 +563,45 @@ export function getRecentPosts () {
     dispatch(_getRecentPosts(actor))
   }
 }
+
+export function followBoards (boardIds) {
+  return (dispatch, getState) => {
+    const actor = getState().profileReducer.profile.actor
+    dispatch(_followBoards(actor, boardIds))
+  }
+}
+
+export function _followBoards (actor, boardIds) {
+  return {
+    type: 'FOLLOW_BOARDS',
+    payload: forum.followBoards(actor, boardIds)
+  }
+}
+
+export function unfollowBoards (boardIds) {
+  return (dispatch, getState) => {
+    const actor = getState().profileReducer.profile.actor
+    dispatch(_unfollowBoards(actor, boardIds))
+  }
+}
+
+export function _unfollowBoards (actor, boardIds) {
+  return {
+    type: 'UNFOLLOW_BOARDS',
+    payload: forum.unfollowBoards(actor, boardIds)
+  }
+}
+
+export function getUserFollowing () {
+  return (dispatch, getState) => {
+    const actor = getState().profileReducer.profile.actor
+    dispatch(_getUserFollowing(actor))
+  }
+}
+
+export function _getUserFollowing (actor) {
+  return {
+    type: 'GET_USER_FOLLOWING',
+    payload: forum.getUserFollowing(actor)
+  }
+}

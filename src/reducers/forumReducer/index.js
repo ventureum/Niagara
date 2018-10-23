@@ -16,7 +16,8 @@ const initialState = {
   currentParentPost: {},
   replies: [],
   milestoneData: {},
-  milestoneDataLoading: false
+  milestoneDataLoading: false,
+  userFollowing: []
 }
 
 export default function (state = initialState, action) {
@@ -282,6 +283,27 @@ export default function (state = initialState, action) {
     return {
       ...state,
       currentParentPost: action.payload
+    }
+  }
+
+  if (action.type === 'GET_USER_FOLLOWING_PENDING') {
+    return {
+      ...state,
+      groupsLoading: true
+    }
+  }
+  if (action.type === 'GET_USER_FOLLOWING_REJECTED') {
+    return {
+      ...state,
+      groupsLoading: false,
+      errorMessage: action.payload
+    }
+  }
+  if (action.type === 'GET_USER_FOLLOWING_FULFILLED') {
+    return {
+      ...state,
+      groupsLoading: false,
+      userFollowing: action.payload
     }
   }
   return state
