@@ -18,7 +18,8 @@ const initialState = {
   milestoneData: {},
   milestoneDataLoading: false,
   userFollowing: [],
-  groupsLoading: false
+  boardsLoading: false,
+  boardPosts: []
 }
 
 export default function (state = initialState, action) {
@@ -290,21 +291,28 @@ export default function (state = initialState, action) {
   if (action.type === 'GET_USER_FOLLOWING_PENDING') {
     return {
       ...state,
-      groupsLoading: true
+      boardsLoading: true
     }
   }
   if (action.type === 'GET_USER_FOLLOWING_REJECTED') {
     return {
       ...state,
-      groupsLoading: false,
+      boardsLoading: false,
       errorMessage: action.payload
     }
   }
   if (action.type === 'GET_USER_FOLLOWING_FULFILLED') {
     return {
       ...state,
-      groupsLoading: false,
+      boardsLoading: false,
       userFollowing: action.payload
+    }
+  }
+
+  if (action.type === 'CLEAR_BOARD_DETAIL') {
+    return {
+      ...state,
+      boardPosts: []
     }
   }
   return state

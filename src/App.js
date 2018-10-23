@@ -28,6 +28,7 @@ import TCRContainer from './container/TCRContainer'
 import AppLoadingScreen from './container/AppLoadingScreen'
 import UserLoadingScreen from './container/UserLoadingContainer'
 import HomeContainer from './container/HomeContainer'
+import BoardDetail from './container/BoardDetailContainer'
 
 const Login = createStackNavigator(
   {
@@ -70,7 +71,8 @@ const MainNavigator = createStackNavigator(
     ActivityPage: { screen: ActivityPage },
     Transaction: { screen: Transaction },
     Refuel: { screen: Refuel },
-    Assets: { screen: AssetsContainer }
+    Assets: { screen: AssetsContainer },
+    BoardDetail: { screen: BoardDetail }
   },
   {
     initialRouteName: 'HomeTab',

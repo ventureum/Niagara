@@ -1,37 +1,31 @@
 import React, { Component } from 'react'
-import { Alert, FlatList, View, RefreshControl } from 'react-native'
+import { Alert, FlatList, View, RefreshControl, TouchableOpacity } from 'react-native'
 import {
   Container,
-  Body,
   Header,
-  Left,
-  Right,
-  Button,
   Icon,
   Content,
-  Text
+  Text,
+  Title
 } from 'native-base'
 import styles from './styles'
 import VideoFeedCard from '../../components/VideoFeedCard'
 import FeedCardV3 from '../../components/FeedCardV3'
+import ventureum from '../../../theme/variables/ventureum'
 
 console.ignoredYellowBox = ['Setting a timer']
 
-export default class Discover extends Component {
+export default class BoardDetail extends Component {
   onRefresh = () => {
-    this.props.refreshPosts(this.props.actor, 'homePosts')
+    this.props.refreshPosts(this.props.actor, 'boardPosts')
   }
 
   getMorePosts = () => {
-    this.props.getMorePosts(this.props.actor, 'homePosts')
-  }
-
-  onVoteAction = (postHash, action) => {
-    this.props.voteFeedPost(postHash, action)
+    this.props.getMorePosts(this.props.actor, 'boardPosts')
   }
 
   toPostDetail = (post) => {
-    this.props.setCurrentParentPost(post.postHash, 'homePosts')
+    this.props.setCurrentParentPost(post.postHash, 'boardPosts')
     this.props.navigation.navigate('PostDetail', { post })
   }
 
@@ -75,31 +69,33 @@ export default class Discover extends Component {
         { cancelable: false }
       )
     }
-    const { homePosts, homePostsLoading } = this.props
+    const { boardPosts, boardPostsLoading, board } = this.props
     return (
       <Container>
-        <Header >
-          <Left>
-            <Button transparent>
-              <Icon
-                active
-                name='search'
-              />
-            </Button>
-          </Left>
-          <Body />
-          <Right>
-            <Button transparent
-              onPress={() => this.onRefresh()}>
-              <Icon
-                active
-                name='refresh'
-              />
-            </Button>
-          </Right>
+        <Header>
+          <TouchableOpacity
+            onPress={() => this.props.navigation.goBack()}
+            style={{ marginLeft: ventureum.basicPadding }}>
+            <Icon
+              name='arrow-back'
+              style={{fontSize: 26, color: ventureum.secondaryColor}}
+            />
+          </TouchableOpacity>
+          <Title>
+            {board.boardName}
+          </Title>
+          <TouchableOpacity
+            onPress={() => this.onRefresh()}
+            style={{ marginRight: ventureum.basicPadding }}>
+            <Icon
+              active
+              name='refresh'
+              style={{fontSize: 26, color: ventureum.secondaryColor}}
+            />
+          </TouchableOpacity>
         </Header>
         <View style={styles.fill}>
-          {(homePosts.length === 0 && !homePostsLoading)
+          {(boardPosts.length === 0 && !boardPostsLoading)
             ? <Content
               contentContainerStyle={{
                 flex: 1,
@@ -110,15 +106,15 @@ export default class Discover extends Component {
               <Text > No feed information were found. </Text>
             </Content>
             : <FlatList
-              data={homePosts}
+              data={boardPosts}
               renderItem={this.onRenderItem}
               ref={(ref) => { this.flatListRef = ref }}
               keyExtractor={item => item.id}
               onEndReachedThreshold={0.5}
-              onEndReached={() => {}}
+              onEndReached={() => { }}
               refreshControl={
                 <RefreshControl
-                  refreshing={homePostsLoading}
+                  refreshing={boardPostsLoading}
                   onRefresh={this.onRefresh}
                 />
               }

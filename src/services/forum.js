@@ -772,7 +772,6 @@ async function getUserFollowing (actor) {
       nameInitials: initials(boardName)
     }
   })
-  console.log(`${actor} follwing:`, result)
 
   return result
 }

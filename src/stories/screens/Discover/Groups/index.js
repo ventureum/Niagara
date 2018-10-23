@@ -16,7 +16,7 @@ export default class GroupsTab extends Component {
     const list = userFollowing.map((item, index) => {
       return (
         <TouchableOpacity key={index} onPress={() => {
-          this.props.toBoardDetail(item.boardId)
+          this.props.toBoardDetail(item)
         }}>
           <View style={styles.container}>
             <View style={styles.initialsContainer}>
@@ -34,7 +34,6 @@ export default class GroupsTab extends Component {
 
   render () {
     const { userFollowing } = this.props
-    console.log(this.props)
     return (
       <View>
         <ScrollView>

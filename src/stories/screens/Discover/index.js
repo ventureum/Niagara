@@ -25,8 +25,8 @@ export default class Discover extends Component {
     this.props.navigation.navigate('NewPost', { boardId: this.props.boardId })
   }
 
-  toBoardDetail = (boardId) => {
-    this.props.navigation.navigate('BoardDetail', { boardId: boardId })
+  toBoardDetail = (board) => {
+    this.props.navigation.navigate('BoardDetail', { board: board })
   }
 
   // getMorePosts = () => {
@@ -67,11 +67,11 @@ export default class Discover extends Component {
           </Left>
           <Body />
           <Right>
-            <Button transparent>
+            <Button transparent
+              onPress={() => this.onRefresh()}>
               <Icon
                 active
                 name='refresh'
-                onPress={() => this.onRefresh()}
               />
             </Button>
           </Right>
@@ -95,7 +95,7 @@ export default class Discover extends Component {
           </Tab>
           <Tab heading='GROUPS'>
             <GroupsTab
-              loading={this.props.groupsLoading}
+              loading={this.props.boardsLoading}
               userFollowing={this.props.userFollowing}
               toBoardDetail={this.toBoardDetail}
             />

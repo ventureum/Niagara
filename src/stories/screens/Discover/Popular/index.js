@@ -46,10 +46,10 @@ export default class PopularTab extends Component {
   }
 
   render () {
-    const { posts } = this.props
+    const { posts, loading } = this.props
     return (
       <View style={styles.fill}>
-        {posts.length === 0
+        {(posts.length === 0 && !loading)
           ? <Content
             contentContainerStyle={{
               flex: 1,
@@ -77,7 +77,7 @@ export default class PopularTab extends Component {
             left: (width / 2) - 16
           }}
           size='large'
-          animating={this.props.loading}
+          animating={loading}
         />
       </View>
     )

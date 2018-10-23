@@ -605,3 +605,9 @@ function _getUserFollowing (actor) {
     payload: forum.getUserFollowing(actor)
   }
 }
+
+export function clearBoardDetail () {
+  return {
+    type: 'CLEAR_BOARD_DETAIL'
+  }
+}
