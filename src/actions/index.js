@@ -106,7 +106,7 @@ export async function refreshToken (token, i) {
   return token
 }
 
-export function _refreshTokens (tokens) {
+function _refreshTokens (tokens) {
   return {
     type: 'REFRESH_TOKENS',
     payload: Promise.all(tokens.map((token, i) => {
@@ -148,7 +148,7 @@ export function refreshPosts (feedSlug, feedId, targetArray, ranking) {
   }
 }
 
-export function _refreshPosts (requester, feedSlug, feedId, targetArray, ranking) {
+function _refreshPosts (requester, feedSlug, feedId, targetArray, ranking) {
   return {
     type: 'REFRESH_POSTS',
     payload: forum.batchReadFeedsByBoardId(
@@ -165,7 +165,7 @@ export function _refreshPosts (requester, feedSlug, feedId, targetArray, ranking
   }
 }
 
-export function _getMorePosts (requester, feedSlug, feedId, lastUUID, targetArray, ranking) {
+function _getMorePosts (requester, feedSlug, feedId, lastUUID, targetArray, ranking) {
   return {
     type: 'GET_MORE_POSTS',
     payload: forum.batchReadFeedsByBoardId(
@@ -207,14 +207,14 @@ export function switchBoard (boardName, boardId) {
   }
 }
 
-export function _newOnChainPost (content, boardId, parentHash, postType, newContentToIPFS, newTransaction) {
+function _newOnChainPost (content, boardId, parentHash, postType, newContentToIPFS, newTransaction) {
   return {
     type: 'NEW_POST',
     payload: forum.newOnChainPost(content, boardId, parentHash, postType, newContentToIPFS, newTransaction)
   }
 }
 
-export function _newOffChainPost (content, boardId, parentHash, postType, actor) {
+function _newOffChainPost (content, boardId, parentHash, postType, actor) {
   return {
     type: 'NEW_POST',
     payload: forum.newOffChainPost(content, boardId, parentHash, postType, actor)
@@ -246,7 +246,7 @@ export function newPost (content, boardId, parentHash, postType, destination) {
   }
 }
 
-export function _voteFeedPost (actor, postHash, action) {
+function _voteFeedPost (actor, postHash, action) {
   return {
     type: 'VOTE_FEED_POST',
     payload: forum.voteFeedPost(actor, postHash, action)
@@ -260,7 +260,7 @@ export function voteFeedPost (postHash, action) {
   }
 }
 
-export function _voteFeedReply (actor, postHash, action) {
+function _voteFeedReply (actor, postHash, action) {
   return {
     type: 'VOTE_FEED_REPLY',
     payload: forum.voteFeedPost(actor, postHash, action)
@@ -274,7 +274,7 @@ export function voteFeedReply (postHash, action) {
   }
 }
 
-export function _getVoteCostEstimate (requester, postHash) {
+function _getVoteCostEstimate (requester, postHash) {
   return {
     type: 'GET_VOTE_COST_ESTIMATE',
     payload: forum.getVoteCostEstimate(requester, postHash)
@@ -294,7 +294,7 @@ export function resetErrorMessage () {
   }
 }
 
-export function _updateTargetPost (requester, postHash, targetArray) {
+function _updateTargetPost (requester, postHash, targetArray) {
   return {
     type: 'UPDATE_TARGET_POST',
     payload: forum.getTargetPost(requester, postHash),
@@ -310,7 +310,7 @@ export function updateTargetPost (postHash, targetArray) {
     dispatch(_updateTargetPost(requester, postHash, targetArray))
   }
 }
-export function _getReplies (requester, postHash) {
+function _getReplies (requester, postHash) {
   return {
     type: 'GET_REPLIES',
     payload: forum.getAllReplies(requester, postHash)
@@ -324,7 +324,7 @@ export function getReplies (postHash) {
   }
 }
 
-export function _fetchUserMilstoneData (postHash, actor) {
+function _fetchUserMilstoneData (postHash, actor) {
   return {
     type: 'FETCH_USER_MILESTONE_DATA',
     payload: forum.fetchUserMilstoneData(postHash, actor)
@@ -338,14 +338,14 @@ export function fetchUserMilstoneData (postHash) {
   }
 }
 
-export function _processPurchasePutOption (postHash, purchaser, numToken, numVtxFeeToken, newTransaction, refreshCallback) {
+function _processPurchasePutOption (postHash, purchaser, numToken, numVtxFeeToken, newTransaction, refreshCallback) {
   return {
     type: 'PROCESS_PUT_OPTION',
     payload: forum.purchasePutOption(postHash, purchaser, numToken, numVtxFeeToken, newTransaction, refreshCallback)
   }
 }
 
-export function _processExecutePutOption (postHash, numToken, milestoneTokenAddress, numVtxFeeToken, newTransaction, refreshCallback) {
+function _processExecutePutOption (postHash, numToken, milestoneTokenAddress, numVtxFeeToken, newTransaction, refreshCallback) {
   return {
     type: 'PROCESS_PUT_OPTION',
     payload: forum.executePutOption(postHash, numToken, milestoneTokenAddress, numVtxFeeToken, newTransaction, refreshCallback)
@@ -399,7 +399,7 @@ export function refreshViewingPost () {
   }
 }
 
-export function _sendTransaction (receiverAddress, tokenSymbol, tokenAddress, amount, gasLimit, newTransaction) {
+function _sendTransaction (receiverAddress, tokenSymbol, tokenAddress, amount, gasLimit, newTransaction) {
   return {
     type: 'SEND_TRANSACTION',
     payload: WalletUtils.sendTransaction(receiverAddress, tokenSymbol, tokenAddress, amount, gasLimit, newTransaction)
@@ -439,7 +439,7 @@ export async function fetchTransactionStatus (transactionHash) {
   return receipt
 }
 
-export function _updateTransactionStatus (transactions) {
+function _updateTransactionStatus (transactions) {
   return {
     type: 'UPDATE_TRANSACTION',
     payload: Promise.all(transactions.map((transaction, i) => {
@@ -463,7 +463,7 @@ export function updateTransactionStatus () {
   }
 }
 
-export function _fetchProfile (actor) {
+function _fetchProfile (actor) {
   return {
     type: 'FETCH_PROFILE',
     payload: forum.fetchProfile(actor)
@@ -476,7 +476,7 @@ export function fetchProfile () {
   }
 }
 
-export function _refuel (actor, reputations, refreshProfile) {
+function _refuel (actor, reputations, refreshProfile) {
   return {
     type: 'REFUEL',
     payload: forum.refuel(actor, reputations, refreshProfile)
@@ -490,7 +490,7 @@ export function refuel (reputations, refreshProfile) {
   }
 }
 
-export function _registerUser (actor, username, telegramId, getUserData) {
+function _registerUser (actor, username, telegramId, getUserData) {
   return {
     type: 'REGISTER_USER',
     payload: forum.registerUser(actor, username, telegramId, getUserData)
@@ -522,7 +522,7 @@ export function setActor (actor) {
   }
 }
 
-export function _getRecentVotes (actor) {
+function _getRecentVotes (actor) {
   return {
     type: 'GET_RECENT_VOTES',
     payload: forum.getRecentVotes(actor)
@@ -536,7 +536,7 @@ export function getRecentVotes () {
   }
 }
 
-export function _getRecentComments (actor) {
+function _getRecentComments (actor) {
   return {
     type: 'GET_RECENT_COMMENTS',
     payload: forum.getRecentComments(actor)
@@ -550,7 +550,7 @@ export function getRecentComments () {
   }
 }
 
-export function _getRecentPosts (actor) {
+function _getRecentPosts (actor) {
   return {
     type: 'GET_RECENT_POSTS',
     payload: forum.getRecentPosts(actor)
@@ -571,7 +571,7 @@ export function followBoards (boardIds) {
   }
 }
 
-export function _followBoards (actor, boardIds) {
+function _followBoards (actor, boardIds) {
   return {
     type: 'FOLLOW_BOARDS',
     payload: forum.followBoards(actor, boardIds)
@@ -585,7 +585,7 @@ export function unfollowBoards (boardIds) {
   }
 }
 
-export function _unfollowBoards (actor, boardIds) {
+function _unfollowBoards (actor, boardIds) {
   return {
     type: 'UNFOLLOW_BOARDS',
     payload: forum.unfollowBoards(actor, boardIds)
@@ -599,7 +599,7 @@ export function getUserFollowing () {
   }
 }
 
-export function _getUserFollowing (actor) {
+function _getUserFollowing (actor) {
   return {
     type: 'GET_USER_FOLLOWING',
     payload: forum.getUserFollowing(actor)
