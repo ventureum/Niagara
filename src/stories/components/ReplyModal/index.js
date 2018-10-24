@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Modal, View, TouchableWithoutFeedback, TextInput, TouchableOpacity } from 'react-native'
+import { Modal, View, TouchableWithoutFeedback, TextInput, TouchableOpacity, Text } from 'react-native'
 import { Icon } from 'native-base'
 import ventureum from '../../../theme/variables/ventureum'
 
@@ -45,12 +45,15 @@ export default class ReplyModal extends Component {
                 enablesReturnKeyAutomatically
                 autoCorrect
                 autoFocus
-                style={{ marginHorizontal: ventureum.basicPadding }}
+                style={{
+                  marginHorizontal: ventureum.basicPadding
+                }}
                 onChangeText={(value) => {
                   this.setState({ text: value })
                 }}
-                value={this.state.text}
-              />
+              >
+                <Text style={{ lineHeight: 22, fontSize: 16 }} >{this.state.text}</Text>
+              </TextInput>
             </View>
             <TouchableOpacity
               style={{
@@ -59,7 +62,7 @@ export default class ReplyModal extends Component {
               }}
               onPress={() => {
                 this.props.onSubmitComment(this.state.text)
-                this.setState({text: null})
+                this.setState({ text: null })
               }}
               disabled={this.state.text === ''}
             >
