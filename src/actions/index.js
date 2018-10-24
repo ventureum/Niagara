@@ -151,11 +151,10 @@ export function refreshPosts (feedSlug, feedId, targetArray, ranking) {
 function _refreshPosts (requester, feedSlug, feedId, targetArray, ranking) {
   return {
     type: 'REFRESH_POSTS',
-    payload: forum.batchReadFeedsByBoardId(
+    payload: forum.getPosts(
       requester,
-      feedSlug + ':' + feedId,
-      null,
-      null,
+      feedSlug,
+      feedId,
       FETCHING_SIZE,
       ranking
     ),
@@ -165,13 +164,13 @@ function _refreshPosts (requester, feedSlug, feedId, targetArray, ranking) {
   }
 }
 
-function _getMorePosts (requester, feedSlug, feedId, lastUUID, targetArray, ranking) {
+function _getMorePosts (requester, feedSlug, feedId, targetArray) {
   return {
     type: 'GET_MORE_POSTS',
-    payload: forum.batchReadFeedsByBoardId(
+    payload: forum.getPosts(
       requester,
-      feedSlug + ':' + feedId,
-      lastUUID
+      feedSlug,
+      feedId
     ),
     meta: {
       targetArray: targetArray

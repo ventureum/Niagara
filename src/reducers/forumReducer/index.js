@@ -1,44 +1,53 @@
-import update from 'immutability-helper'
 import { BOARD_ALL_HASH } from '../../utils/constants.js'
 
 const initialState = {
   boardId: BOARD_ALL_HASH,
   boardName: 'All',
-  newPosts: [],
-  homePosts: [],
-  popularPosts: [],
-  lastUUID: '',
-  newPostsLoading: false,
-  homePostsLoading: false,
-  popularPostsLoading: false,
+  newPosts: {
+    loading: false,
+    next: '',
+    posts: []
+  },
+  homePosts: {
+    loading: false,
+    next: '',
+    posts: []
+  },
+  popularPosts: {
+    loading: false,
+    next: '',
+    posts: []
+  },
   loading: false,
   errorMessage: '',
   currentParentPost: {},
-  replies: [],
+  replies: {
+    loading: false,
+    posts: [],
+    next: ''
+  },
   milestoneData: {},
   milestoneDataLoading: false,
-  userFollowing: [],
-  boardsLoading: false,
-  boardPosts: []
+  userFollowing: {
+    loading: false,
+    following: []
+  },
+  boardPosts: {
+    loading: false,
+    next: '',
+    posts: []
+  }
 }
 
 export default function (state = initialState, action) {
   if (action.type === 'REFRESH_POSTS_FULFILLED') {
-    const length = action.payload.length
     const { targetArray } = action.meta
-    if (length === 0) {
-      return {
-        ...state,
-        [`${targetArray}Loading`]: false,
-        [targetArray]: [],
-        errorMessage: ''
-      }
-    }
     return {
       ...state,
-      [targetArray]: action.payload,
-      lastUUID: action.payload[length - 1].id,
-      [`${targetArray}Loading`]: false,
+      [`${targetArray}`]: {
+        ...action.payload,
+        loading: false
+      },
       errorMessage: ''
     }
   }
@@ -47,7 +56,10 @@ export default function (state = initialState, action) {
     const { targetArray } = action.meta
     return {
       ...state,
-      [`${targetArray}Loading`]: true,
+      [`${targetArray}`]: {
+        ...state[targetArray],
+        loading: true
+      },
       errorMessage: ''
     }
   }
@@ -55,33 +67,27 @@ export default function (state = initialState, action) {
     const { targetArray } = action.meta
     return {
       ...state,
-      [`${targetArray}Loading`]: false,
+      [`${targetArray}`]: {
+        ...state[targetArray],
+        loading: false
+      },
       errorMessage: action.payload.data.message.errorCode
     }
   }
+
   if (action.type === 'GET_MORE_POSTS_FULFILLED') {
-    const length = action.payload.length
     const { targetArray } = action.meta
-    if (length === 0) {
-      return {
-        ...state,
+    const newArray = state[targetArray].posts
+    newArray.push(action.payload.posts)
+    return {
+      ...state,
+      [`${targetArray}`]: {
+        posts: newArray,
         loading: false,
-        errorMessage: ''
-      }
+        next: action.payload.next
+      },
+      errorMessage: action.payload.data.message.errorCode
     }
-    return update(
-      update(
-        update(
-          update(
-            state,
-            { [targetArray]: { $push: action.payload } }
-          ),
-          { lastUUID: { $set: action.payload[length - 1].id } }
-        ),
-        { loading: { $set: false } }
-      ),
-      { errorMessage: { $set: '' } }
-    )
   }
 
   if (action.type === 'NEW_POST_PENDING') {
@@ -113,29 +119,41 @@ export default function (state = initialState, action) {
     return {
       ...state,
       loading: false,
-      [targetArray]: state[targetArray].map(
-        (post, i) => {
-          return (post.postHash === voteInfo.postHash ? {
-            ...post,
-            postVoteCountInfo: voteInfo.postVoteCountInfo,
-            requestorVoteCountInfo: voteInfo.requestorVoteCountInfo
-          } : post
-          )
-        }
-      )
+      [targetArray]: {
+        ...state[targetArray],
+        loading: false,
+        posts: state[targetArray].posts.map(
+          (post, i) => {
+            return (post.postHash === voteInfo.postHash ? {
+              ...post,
+              postVoteCountInfo: voteInfo.postVoteCountInfo,
+              requestorVoteCountInfo: voteInfo.requestorVoteCountInfo
+            } : post
+            )
+          }
+        )
+      }
     }
   }
 
   if (action.type === 'VOTE_FEED_POST_PENDING') {
+    const { targetArray } = state.currentParentPost
     return {
       ...state,
-      loading: true
+      [`${targetArray}`]: {
+        ...state[targetArray],
+        loading: true
+      }
     }
   }
   if (action.type === 'VOTE_FEED_POST_REJECTED') {
+    const { targetArray } = state.currentParentPost
     return {
       ...state,
-      loading: false,
+      [`${targetArray}`]: {
+        ...state[targetArray],
+        loading: false
+      },
       errorMessage: action.payload.data.message.errorCode
     }
   }
@@ -158,21 +176,29 @@ export default function (state = initialState, action) {
     return {
       ...state,
       loading: false,
-      [targetArray]: state[targetArray].map(post => {
-        if (post.postHash === action.payload.postHash) {
-          return {
-            ...post,
-            ...action.payload
+      [targetArray]: {
+        ...state[targetArray],
+        loading: false,
+        posts: state[targetArray].posts.map(post => {
+          if (post.postHash === action.payload.postHash) {
+            return {
+              ...post,
+              ...action.payload
+            }
           }
-        }
-        return post
-      })
+          return post
+        })
+      }
     }
   }
   if (action.type === 'UPDATE_TARGET_POST_REJECTED') {
+    const { targetArray } = action.meta
     return {
       ...state,
-      loading: false,
+      [`${targetArray}`]: {
+        ...state[targetArray],
+        loading: false
+      },
       errorMessage: action.payload.errorCode
     }
   }
@@ -180,7 +206,10 @@ export default function (state = initialState, action) {
   if (action.type === 'GET_REPLIES_PENDING') {
     return {
       ...state,
-      loading: true,
+      replies: {
+        ...state.replies,
+        loading: true
+      },
       errorMessage: ''
     }
   }
@@ -188,14 +217,20 @@ export default function (state = initialState, action) {
     return {
       ...state,
       loading: false,
-      replies: action.payload,
+      replies: {
+        ...action.payload,
+        loading: false
+      },
       errorMessage: ''
     }
   }
   if (action.type === 'GET_REPLIES_REJECTED') {
     return {
       ...state,
-      loading: false,
+      replies: {
+        ...state.replies,
+        loading: false
+      },
       errorMessage: action.payload
     }
   }
@@ -225,7 +260,11 @@ export default function (state = initialState, action) {
   if (action.type === 'CLEAR_POST_DETAIL') {
     return {
       ...state,
-      replies: [],
+      replies: {
+        loading: false,
+        posts: [],
+        next: ''
+      },
       currentParentPost: state.currentParentPost
     }
   }
@@ -255,28 +294,36 @@ export default function (state = initialState, action) {
     return {
       ...state,
       loading: false,
-      replies: state.replies.map(
-        (reply) => {
-          return (reply.postHash === voteInfo.postHash ? {
-            ...reply,
-            postVoteCountInfo: voteInfo.postVoteCountInfo,
-            requestorVoteCountInfo: voteInfo.requestorVoteCountInfo
-          } : reply
-          )
-        }
-      )
+      replies: {
+        posts: state.replies.posts.map(
+          (reply) => {
+            return (reply.postHash === voteInfo.postHash ? {
+              ...reply,
+              postVoteCountInfo: voteInfo.postVoteCountInfo,
+              requestorVoteCountInfo: voteInfo.requestorVoteCountInfo
+            } : reply
+            )
+          }
+        )
+      }
     }
   }
   if (action.type === 'VOTE_FEED_REPLY_PENDING') {
     return {
       ...state,
-      loading: true
+      replies: {
+        ...state.replies,
+        loading: true
+      }
     }
   }
   if (action.type === 'VOTE_FEED_REPLY_REJECTED') {
     return {
       ...state,
-      loading: false,
+      replies: {
+        ...state.replies,
+        loading: false
+      },
       errorMessage: action.payload.data.message.errorCode
     }
   }
@@ -291,28 +338,40 @@ export default function (state = initialState, action) {
   if (action.type === 'GET_USER_FOLLOWING_PENDING') {
     return {
       ...state,
-      boardsLoading: true
+      userFollowing: {
+        ...state.userFollowing,
+        loading: true
+      }
     }
   }
   if (action.type === 'GET_USER_FOLLOWING_REJECTED') {
     return {
       ...state,
-      boardsLoading: false,
+      userFollowing: {
+        ...state.userFollowing,
+        loading: false
+      },
       errorMessage: action.payload
     }
   }
   if (action.type === 'GET_USER_FOLLOWING_FULFILLED') {
     return {
       ...state,
-      boardsLoading: false,
-      userFollowing: action.payload
+      userFollowing: {
+        following: action.payload,
+        loading: false
+      }
     }
   }
 
   if (action.type === 'CLEAR_BOARD_DETAIL') {
     return {
       ...state,
-      boardPosts: []
+      boardPosts: {
+        loading: false,
+        next: '',
+        posts: []
+      }
     }
   }
   return state

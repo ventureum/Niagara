@@ -79,8 +79,8 @@ function getBytes32FromMultiash (multihash) {
     API. size must satisfy: 0 < size <= 10
   @return return a array of post details
 */
-async function batchReadFeedsByBoardId (requester, feed, id_lt = null, id_gt = null, size, ranking) {
-  let feedData = await getFeedDataFromGetStream(feed, id_lt, id_gt, size, ranking)
+async function getPosts (requester, feedSlug, feedId, size = 10, ranking) {
+  let feedData = await getFeedDataFromGetStream(feedSlug, feedId, size, ranking)
 
   // build the arrays of post hash from feed data
   let postMap = new Map()
@@ -126,14 +126,16 @@ async function batchReadFeedsByBoardId (requester, feed, id_lt = null, id_gt = n
     }
   }
 
-  return (postDetails)
+  return {
+    posts: postDetails,
+    next: feedData.next
+  }
 }
 
-async function getFeedDataFromGetStream (feed, id_lt = null, id_gt = null, size, ranking) {
-  const feedSlug = feed.split(':')
+async function getFeedDataFromGetStream (feedSlug, feedId, size, ranking) {
   const toFeedTokenApi = {
-    'feedSlug': feedSlug[0],
-    'userId': feedSlug[1],
+    'feedSlug': feedSlug,
+    'userId': feedId,
     'getStreamApiKey': Config.STREAM_API_KEY,
     'getStreamApiSecret': Config.STREAM_API_SECRET
   }
@@ -145,15 +147,9 @@ async function getFeedDataFromGetStream (feed, id_lt = null, id_gt = null, size,
     throw (response)
   }
   // get feed data from Stream API
-  const targetFeed = client.feed(feedSlug[0], feedSlug[1], response.data.feedToken)
+  const targetFeed = client.feed(feedSlug, feedId, response.data.feedToken)
   let feedData
-  if (id_lt === null && id_gt === null) { // eslint-disable-line
-    feedData = await targetFeed.get({ limit: size, ranking: ranking })
-  } else if (id_lt !== null && id_gt === null) { // eslint-disable-line
-    feedData = await targetFeed.get({ limit: size, id_lt: id_lt })
-  } else if (id_lt === null && id_gt !== null) { // eslint-disable-line
-    feedData = await targetFeed.get({ limit: size, id_gt: id_gt })
-  }
+  feedData = await targetFeed.get({ limit: size, ranking: ranking })
   return feedData
 }
 
@@ -689,16 +685,18 @@ function getRecentVotes (actor) {
 }
 
 async function getAllReplies (requester, postHash) {
-  const feed = 'comment:' + postHash
-  let replies = await batchReadFeedsByBoardId(requester, feed, null, null, 50)
-  if (replies.length !== 0) {
-    replies = await Promise.all(replies.map(async (reply) => {
-      const subRelies = await getAllReplies(requester, reply.postHash)
-      return {
-        ...reply,
-        replies: subRelies
-      }
-    }))
+  let replies = await getPosts(requester, 'comment', postHash, 50)
+  if (replies.posts.length !== 0) {
+    replies = {
+      ...replies,
+      posts: await Promise.all(replies.posts.map(async (post) => {
+        const subRelies = await getAllReplies(requester, post.postHash)
+        return {
+          ...post,
+          replies: subRelies
+        }
+      }))
+    }
   }
   return replies
 }
@@ -792,7 +790,7 @@ async function getUserFollowing (actor) {
   return result
 }
 export {
-  batchReadFeedsByBoardId,
+  getPosts,
   checkBalanceForTx,
   getPostTypeHash,
   newOnChainPost,

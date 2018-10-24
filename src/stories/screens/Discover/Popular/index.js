@@ -46,7 +46,8 @@ export default class PopularTab extends Component {
   }
 
   render () {
-    const { posts, loading } = this.props
+    const { popularPosts } = this.props
+    const { posts, loading } = popularPosts
     return (
       <View style={styles.fill}>
         {(posts.length === 0 && !loading)

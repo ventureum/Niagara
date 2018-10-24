@@ -15,7 +15,7 @@ function getInitialChatHistory (postHash) {
 function _getInitialChatHistory (requester, postHash) {
   return {
     type: 'GET_INITIAL_CHAT_HISTORY',
-    payload: forum.batchReadFeedsByBoardId(
+    payload: forum.getPosts(
       requester,
       `comment:${postHash}`,
       null,
@@ -28,7 +28,7 @@ function _getInitialChatHistory (requester, postHash) {
 function _fetchLatestChat (requester, postHash, latestUUID) {
   return {
     type: 'FETCH_LATEST_CHAT',
-    payload: forum.batchReadFeedsByBoardId(
+    payload: forum.getPosts(
       requester,
       `comment:${postHash}`,
       null,
@@ -52,11 +52,9 @@ function fetchLatestChat (postHash) {
 function _fetchEalierChat (requester, postHash, earliestUUID) {
   return {
     type: 'FETCH_EARLIER_CHAT',
-    payload: forum.batchReadFeedsByBoardId(
+    payload: forum.getPosts(
       requester,
       `comment:${postHash}`,
-      earliestUUID,
-      null,
       INITIAL_FETCH_SIZE
     )
   }

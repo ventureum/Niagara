@@ -28,7 +28,6 @@ class BoardDetailContainer extends Component {
         boardPosts={this.props.boardPosts}
         refreshPosts={this.refreshPosts}
         getMorePosts={this.props.getMorePosts}
-        boardPostsLoading={this.props.boardPostsLoading}
         errorMessage={this.props.errorMessage}
         setCurrentParentPost={this.props.setCurrentParentPost}
         resetErrorMessage={this.props.resetErrorMessage}
@@ -39,7 +38,6 @@ class BoardDetailContainer extends Component {
 
 const mapStateToProps = ({ profileReducer, forumReducer }) => ({
   boardPosts: forumReducer.boardPosts,
-  boardPostsLoading: forumReducer.boardPostsLoading,
   errorMessage: forumReducer.errorMessage,
   actor: profileReducer.profile.actor
 })

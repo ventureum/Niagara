@@ -12,8 +12,8 @@ import styles from './styles'
 const { height, width } = Dimensions.get('screen')
 
 export default class GroupsTab extends Component {
-  renderList = (userFollowing) => {
-    const list = userFollowing.map((item, index) => {
+  renderList = (following) => {
+    const list = following.map((item, index) => {
       return (
         <TouchableOpacity key={index} onPress={() => {
           this.props.toBoardDetail(item)
@@ -34,10 +34,11 @@ export default class GroupsTab extends Component {
 
   render () {
     const { userFollowing } = this.props
+    const { following, loading } = userFollowing
     return (
       <View>
         <ScrollView>
-          {this.renderList(userFollowing)}
+          {this.renderList(following)}
         </ScrollView>
         <ActivityIndicator
           color={ventureum.secondaryColor}
@@ -47,7 +48,7 @@ export default class GroupsTab extends Component {
             left: (width / 2) - 16
           }}
           size='large'
-          animating={this.props.loading}
+          animating={loading}
         />
       </View>
 

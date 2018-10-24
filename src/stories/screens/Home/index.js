@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Alert, FlatList, View, RefreshControl } from 'react-native'
+import { FlatList, View, RefreshControl } from 'react-native'
 import {
   Container,
   Body,
@@ -65,17 +65,8 @@ export default class Discover extends Component {
   }
 
   render () {
-    if (this.props.errorMessage !== '') {
-      Alert.alert(
-        'Failed',
-        this.props.errorMessage,
-        [
-          { text: 'OK', onPress: () => this.props.resetErrorMessage() }
-        ],
-        { cancelable: false }
-      )
-    }
-    const { homePosts, homePostsLoading } = this.props
+    const { homePosts } = this.props
+    const { posts, loading } = homePosts
     return (
       <Container>
         <Header >
@@ -99,7 +90,7 @@ export default class Discover extends Component {
           </Right>
         </Header>
         <View style={styles.fill}>
-          {(homePosts.length === 0 && !homePostsLoading)
+          {(posts.length === 0 && !loading)
             ? <Content
               contentContainerStyle={{
                 flex: 1,
@@ -110,15 +101,15 @@ export default class Discover extends Component {
               <Text > No feed information were found. </Text>
             </Content>
             : <FlatList
-              data={homePosts}
+              data={posts}
               renderItem={this.onRenderItem}
               ref={(ref) => { this.flatListRef = ref }}
               keyExtractor={item => item.id}
               onEndReachedThreshold={0.5}
-              onEndReached={() => {}}
+              onEndReached={() => { }}
               refreshControl={
                 <RefreshControl
-                  refreshing={homePostsLoading}
+                  refreshing={loading}
                   onRefresh={this.onRefresh}
                 />
               }

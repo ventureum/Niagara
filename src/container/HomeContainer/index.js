@@ -4,7 +4,6 @@ import Home from '../../stories/screens/Home'
 import {
   refreshPosts,
   getMorePosts,
-  newPost,
   voteFeedPost,
   resetErrorMessage,
   setCurrentParentPost
@@ -23,9 +22,7 @@ class HomeContainer extends Component {
         homePosts={this.props.homePosts}
         refreshPosts={this.props.refreshPosts}
         getMorePosts={this.props.getMorePosts}
-        homePostsLoading={this.props.homePostsLoading}
         errorMessage={this.props.errorMessage}
-        voteFeedPost={this.props.voteFeedPost}
         setCurrentParentPost={this.props.setCurrentParentPost}
         resetErrorMessage={this.props.resetErrorMessage}
       />
@@ -35,7 +32,6 @@ class HomeContainer extends Component {
 
 const mapStateToProps = ({profileReducer, forumReducer}) => ({
   homePosts: forumReducer.homePosts,
-  homePostsLoading: forumReducer.homePostsLoading,
   errorMessage: forumReducer.errorMessage,
   actor: profileReducer.profile.actor
 })
@@ -43,8 +39,6 @@ const mapStateToProps = ({profileReducer, forumReducer}) => ({
 const mapDispatchToProps = (dispatch) => ({
   refreshPosts: (actor, targetArray) => dispatch(refreshPosts('user', actor, targetArray)),
   getMorePosts: (actor, targetArray) => dispatch(getMorePosts('user', actor, targetArray)),
-  newPost: (content, boardId, parentHash, postType, destination) =>
-    dispatch(newPost(content, boardId, parentHash, postType, destination)),
   voteFeedPost: (postHash, value) => dispatch(voteFeedPost(postHash, value)),
   setCurrentParentPost: (postHash, targetArray) => dispatch(setCurrentParentPost(postHash, targetArray)),
   resetErrorMessage: () => dispatch(resetErrorMessage())

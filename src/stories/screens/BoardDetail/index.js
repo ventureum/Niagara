@@ -69,7 +69,8 @@ export default class BoardDetail extends Component {
         { cancelable: false }
       )
     }
-    const { boardPosts, boardPostsLoading, board } = this.props
+    const { boardPosts, board } = this.props
+    const { posts, loading } = boardPosts
     return (
       <Container>
         <Header>
@@ -78,7 +79,7 @@ export default class BoardDetail extends Component {
             style={{ marginLeft: ventureum.basicPadding }}>
             <Icon
               name='arrow-back'
-              style={{fontSize: 26, color: ventureum.secondaryColor}}
+              style={{ fontSize: 26, color: ventureum.secondaryColor }}
             />
           </TouchableOpacity>
           <Title>
@@ -90,12 +91,12 @@ export default class BoardDetail extends Component {
             <Icon
               active
               name='refresh'
-              style={{fontSize: 26, color: ventureum.secondaryColor}}
+              style={{ fontSize: 26, color: ventureum.secondaryColor }}
             />
           </TouchableOpacity>
         </Header>
         <View style={styles.fill}>
-          {(boardPosts.length === 0 && !boardPostsLoading)
+          {(posts.length === 0 && !loading)
             ? <Content
               contentContainerStyle={{
                 flex: 1,
@@ -106,7 +107,7 @@ export default class BoardDetail extends Component {
               <Text > No feed information were found. </Text>
             </Content>
             : <FlatList
-              data={boardPosts}
+              data={posts}
               renderItem={this.onRenderItem}
               ref={(ref) => { this.flatListRef = ref }}
               keyExtractor={item => item.id}
@@ -114,7 +115,7 @@ export default class BoardDetail extends Component {
               onEndReached={() => { }}
               refreshControl={
                 <RefreshControl
-                  refreshing={boardPostsLoading}
+                  refreshing={loading}
                   onRefresh={this.onRefresh}
                 />
               }

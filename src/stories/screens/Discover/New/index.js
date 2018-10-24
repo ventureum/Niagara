@@ -46,7 +46,8 @@ export default class NewTab extends Component {
   }
 
   render () {
-    const { posts, loading } = this.props
+    const { newPosts } = this.props
+    const { posts, loading } = newPosts
     return (
       <View style={styles.fill}>
         {(posts.length === 0 && !loading)

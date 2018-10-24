@@ -56,7 +56,7 @@ export default class Discover extends Component {
         { cancelable: false }
       )
     }
-    const { newPosts, popularPosts } = this.props
+    const { newPosts, popularPosts, userFollowing } = this.props
     return (
       <Container>
         <Header >
@@ -82,24 +82,19 @@ export default class Discover extends Component {
         <Tabs>
           <Tab heading='POPULAR'>
             <PopularTab
-              posts={popularPosts}
-              onVoteAction={this.onVoteAction}
-              loading={this.props.popularPostsLoading}
+              popularPosts={popularPosts}
               toPostDetail={this.toPostDetail}
             />
           </Tab>
           <Tab heading='NEW'>
             <NewTab
-              posts={newPosts}
-              onVoteAction={this.onVoteAction}
-              loading={this.props.newPostsLoading}
+              newPosts={newPosts}
               toPostDetail={this.toPostDetail}
             />
           </Tab>
           <Tab heading='GROUPS'>
             <GroupsTab
-              loading={this.props.boardsLoading}
-              userFollowing={this.props.userFollowing}
+              userFollowing={userFollowing}
               toBoardDetail={this.toBoardDetail}
             />
           </Tab>

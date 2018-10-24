@@ -33,8 +33,6 @@ class DiscoverContainer extends Component {
         refreshPosts={this.refreshPosts}
         getMorePosts={this.props.getMorePosts}
         loading={this.props.loading}
-        newPostsLoading={this.props.newPostsLoading}
-        popularPostsLoading={this.props.popularPostsLoading}
         boardId={this.props.boardId}
         boardName={this.props.boardName}
         newPost={this.props.newPost}
@@ -43,7 +41,6 @@ class DiscoverContainer extends Component {
         resetErrorMessage={this.props.resetErrorMessage}
         getUserFollowing={this.props.getUserFollowing}
         userFollowing={this.props.userFollowing}
-        boardsLoading={this.props.boardsLoading}
       />
     )
   }
@@ -53,14 +50,10 @@ const mapStateToProps = ({forumReducer}) => ({
   newPosts: forumReducer.newPosts,
   popularPosts: forumReducer.popularPosts,
   loading: forumReducer.loading,
-  newPostsLoading: forumReducer.newPostsLoading,
-  homePostsLoading: forumReducer.homePostsLoading,
-  popularPostsLoading: forumReducer.popularPostsLoading,
   boardId: forumReducer.boardId,
   boardName: forumReducer.boardName,
   errorMessage: forumReducer.errorMessage,
-  userFollowing: forumReducer.userFollowing,
-  boardsLoading: forumReducer.boardsLoading
+  userFollowing: forumReducer.userFollowing
 })
 
 const mapDispatchToProps = (dispatch) => ({
