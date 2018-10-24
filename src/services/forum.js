@@ -147,11 +147,11 @@ async function getFeedDataFromGetStream (feed, id_lt = null, id_gt = null, size,
   // get feed data from Stream API
   const targetFeed = client.feed(feedSlug[0], feedSlug[1], response.data.feedToken)
   let feedData
-    if (id_lt === null && id_gt === null) { // eslint-disable-line
+  if (id_lt === null && id_gt === null) { // eslint-disable-line
     feedData = await targetFeed.get({ limit: size, ranking: ranking })
-    } else if (id_lt !== null && id_gt === null) { // eslint-disable-line
+  } else if (id_lt !== null && id_gt === null) { // eslint-disable-line
     feedData = await targetFeed.get({ limit: size, id_lt: id_lt })
-    } else if (id_lt === null && id_gt !== null) { // eslint-disable-line
+  } else if (id_lt === null && id_gt !== null) { // eslint-disable-line
     feedData = await targetFeed.get({ limit: size, id_gt: id_gt })
   }
   return feedData
@@ -275,7 +275,15 @@ function getPostTypeHash (type) {
   @param newTransaction A callback function to be used when
     a new transaction is sent but before receipt. It takes a transaction hash as parameter.
 */
-function newOnChainPost (content, boardId, parentHash, postType, newContentToIPFS, newTransaction) {
+function newOnChainPost (
+  content,
+  boardId,
+  parentHash,
+  postType,
+  newContentToIPFS,
+  newTransaction,
+  refreshCallback
+) {
   return new Promise(async (resolve, reject) => {
     const enoughBalance = await checkBalanceForTx()
     if (!enoughBalance) {
@@ -305,13 +313,18 @@ function newOnChainPost (content, boardId, parentHash, postType, newContentToIPF
     let crypto = require('crypto')
     let postHash = '0x' + crypto.randomBytes(32).toString('hex')
     const hashedPostType = getPostTypeHash(postType)
-    forum.methods.post(boardId, parentHash, postHash, ipfsPath, hashedPostType).send({ gasPrice: GAS_PRICE })
+    forum.methods
+      .post(boardId, parentHash, postHash, ipfsPath, hashedPostType)
+      .send({ gasPrice: GAS_PRICE })
       .on('transactionHash', (txHash) => {
         if (newTransaction !== undefined) {
           newTransaction(txHash)
         }
       })
       .on('receipt', (receipt) => {
+        if (refreshCallback !== undefined) {
+          refreshCallback()
+        }
         resolve(receipt)
       })
       .on('error', (error) => {
@@ -321,7 +334,7 @@ function newOnChainPost (content, boardId, parentHash, postType, newContentToIPF
   )
 }
 
-function newOffChainPost (content, boardId, parentHash, postType, poster) {
+function newOffChainPost (content, boardId, parentHash, postType, poster, refreshCallback) {
   return new Promise(async (resolve, reject) => {
     let crypto = require('crypto')
     let postHash = '0x' + crypto.randomBytes(32).toString('hex')
@@ -342,6 +355,9 @@ function newOffChainPost (content, boardId, parentHash, postType, poster) {
       toDataBase
     )
     if (result.data.ok) {
+      if (refreshCallback !== undefined) {
+        refreshCallback()
+      }
       resolve(result)
     } else {
       reject(result)

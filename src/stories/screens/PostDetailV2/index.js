@@ -87,7 +87,7 @@ export default class PostDetail extends Component {
       const boardId = this.props.boardId
       const parentHash = this.state.replyingTo.postHash
       const postType = 'COMMENT'
-      this.props.newPost(content, boardId, parentHash, postType, destination)
+      this.props.newPost(content, boardId, parentHash, postType, destination, this.onRefresh)
     }
   }
 

@@ -16,7 +16,7 @@ export default class NewPost extends Component {
     })
   }
 
-  onTweet = (title, text) => {
+  onTweet = (title, text, refreshCallback) => {
     if (this.state.title !== null && this.state.text !== null) {
       const content = processContent(title, text)
       if (content === false) {
@@ -56,7 +56,7 @@ export default class NewPost extends Component {
           {
             text: 'Confirm',
             onPress: () => {
-              this.props.newPost(content, boardId, noParent, postType, destination)
+              this.props.newPost(content, boardId, noParent, postType, destination, refreshCallback)
               this.props.navigation.goBack()
             }
           }
@@ -67,6 +67,7 @@ export default class NewPost extends Component {
   }
 
   render () {
+    const { refreshCallback } = this.props
     return (
       <Container>
         <Header >
@@ -91,7 +92,7 @@ export default class NewPost extends Component {
               : <TouchableOpacity
                 style={styles.tweetButton}
                 onPress={() => {
-                  this.onTweet(this.state.title, this.state.text)
+                  this.onTweet(this.state.title, this.state.text, refreshCallback)
                 }}
               >
                 <Text style={styles.headerButtonText}>Tweet</Text>

@@ -22,7 +22,10 @@ export default class Discover extends Component {
   }
 
   toNewPost = () => {
-    this.props.navigation.navigate('NewPost', { boardId: this.props.boardId })
+    this.props.navigation.navigate('NewPost', {
+      boardId: this.props.boardId,
+      refreshCallback: this.onRefresh
+    })
   }
 
   toBoardDetail = (board) => {

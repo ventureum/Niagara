@@ -68,7 +68,8 @@ const mapDispatchToProps = (dispatch) => ({
   voteFeedPost: (postHash, value) => dispatch(voteFeedPost(postHash, value)),
   voteFeedReply: (postHash, value) => dispatch(voteFeedReply(postHash, value)),
   getVoteCostEstimate: (postHash) => dispatch(getVoteCostEstimate(postHash)),
-  newPost: (content, boardId, parentHash, postType, destination) => dispatch(newPost(content, boardId, parentHash, postType, destination)),
+  newPost: (content, boardId, parentHash, postType, destination, refreshCallback) =>
+    dispatch(newPost(content, boardId, parentHash, postType, destination, refreshCallback)),
   refreshViewingPost: (postHash) => dispatch(refreshViewingPost(postHash))
 })
 

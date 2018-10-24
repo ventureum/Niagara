@@ -207,21 +207,37 @@ export function switchBoard (boardName, boardId) {
   }
 }
 
-function _newOnChainPost (content, boardId, parentHash, postType, newContentToIPFS, newTransaction) {
+function _newOnChainPost (
+  content,
+  boardId,
+  parentHash,
+  postType,
+  newContentToIPFS,
+  newTransaction,
+  refreshCallback
+) {
   return {
     type: 'NEW_POST',
-    payload: forum.newOnChainPost(content, boardId, parentHash, postType, newContentToIPFS, newTransaction)
+    payload: forum.newOnChainPost(
+      content,
+      boardId,
+      parentHash,
+      postType,
+      newContentToIPFS,
+      newTransaction,
+      refreshCallback
+    )
   }
 }
 
-function _newOffChainPost (content, boardId, parentHash, postType, actor) {
+function _newOffChainPost (content, boardId, parentHash, postType, actor, refreshCallback) {
   return {
     type: 'NEW_POST',
-    payload: forum.newOffChainPost(content, boardId, parentHash, postType, actor)
+    payload: forum.newOffChainPost(content, boardId, parentHash, postType, actor, refreshCallback)
   }
 }
 
-export function newPost (content, boardId, parentHash, postType, destination) {
+export function newPost (content, boardId, parentHash, postType, destination, refreshCallback) {
   if (destination === 'ON-CHAIN') {
     return (dispatch) => {
       dispatch(_newOnChainPost(
@@ -230,7 +246,8 @@ export function newPost (content, boardId, parentHash, postType, destination) {
         parentHash,
         postType,
         () => { },
-        (txHash) => { dispatch(newTransaction(txHash)) }
+        (txHash) => { dispatch(newTransaction(txHash)) },
+        refreshCallback
       ))
     }
   }
@@ -241,7 +258,8 @@ export function newPost (content, boardId, parentHash, postType, destination) {
       boardId,
       parentHash,
       postType,
-      poster
+      poster,
+      refreshCallback
     ))
   }
 }
