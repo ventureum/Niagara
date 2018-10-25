@@ -16,6 +16,13 @@ export default class NewTab extends Component {
     this.props.toPostDetail(post, 'newPosts')
   }
 
+  getMorePosts = (targetArray) => {
+    const { loading } = this.props.newPosts
+    if (!loading) {
+      this.props.getMorePosts(targetArray)
+    }
+  }
+
   onRenderItem = ({ item }) => {
     if (item.content.meta !== undefined) {
       const { meta } = item.content
@@ -67,6 +74,7 @@ export default class NewTab extends Component {
             keyExtractor={item => item.id}
             onEndReachedThreshold={0.5}
             onEndReached={() => {
+              this.getMorePosts('newPosts')
             }}
           />
         }

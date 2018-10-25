@@ -17,9 +17,13 @@ class BoardDetailContainer extends Component {
 
   refreshPosts = () => {
     const { boardId } = this.props.navigation.getParam('board', '')
-    this.props.refreshPosts(boardId, 'boardPosts')
+    this.props.refreshPosts('board', boardId, 'boardPosts')
   }
 
+  getMorePosts = () => {
+    const board = this.props.navigation.getParam('board', '')
+    this.props.getMorePosts('board', board.boardId, 'boardPosts')
+  }
   render () {
     const board = this.props.navigation.getParam('board', '')
     return (
@@ -27,7 +31,7 @@ class BoardDetailContainer extends Component {
         board={board}
         boardPosts={this.props.boardPosts}
         refreshPosts={this.refreshPosts}
-        getMorePosts={this.props.getMorePosts}
+        getMorePosts={this.getMorePosts}
         errorMessage={this.props.errorMessage}
         setCurrentParentPost={this.props.setCurrentParentPost}
         resetErrorMessage={this.props.resetErrorMessage}
@@ -43,8 +47,8 @@ const mapStateToProps = ({ profileReducer, forumReducer }) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  refreshPosts: (boardId, targetArray) => dispatch(refreshPosts('board', boardId, targetArray)),
-  getMorePosts: (boardId, targetArray) => dispatch(getMorePosts('board', boardId, targetArray)),
+  refreshPosts: (feedSlug, boardId, targetArray) => dispatch(refreshPosts(feedSlug, boardId, targetArray)),
+  getMorePosts: (feedSlug, boardId, targetArray) => dispatch(getMorePosts(feedSlug, boardId, targetArray)),
   setCurrentParentPost: (postHash, targetArray) => dispatch(setCurrentParentPost(postHash, targetArray)),
   resetErrorMessage: () => dispatch(resetErrorMessage()),
   clearBoardDetail: () => dispatch(clearBoardDetail())

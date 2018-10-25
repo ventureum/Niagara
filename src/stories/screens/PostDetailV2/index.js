@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Icon, Left, Right, Header, Body, Container, Button, Text, Toast } from 'native-base'
+import { Icon, Left, Right, Header, Body, Button, Text, Toast } from 'native-base'
 import {
   FlatList,
   RefreshControl,
@@ -29,6 +29,13 @@ export default class PostDetail extends Component {
       this.props.voteFeedPost(postHash, action)
     } else {
       this.props.voteFeedReply(postHash, action)
+    }
+  }
+
+  getMoreReplies = () => {
+    const { loading } = this.props.replies
+    if (!loading) {
+      this.props.getMoreReplies()
     }
   }
 
@@ -258,24 +265,24 @@ export default class PostDetail extends Component {
 
   render () {
     const { post, replies } = this.props
-    const repliesCopy = JSON.parse(JSON.stringify(replies))
-    repliesCopy.posts.reverse()
-    let flattenReplies = this.flattenList(repliesCopy.posts)
+    const { posts, loading } = replies
+    let flattenReplies = this.flattenList(posts)
     const commentDivider = { commentDivider: true, id: '-200' }
     const mergedList = [post, commentDivider, ...flattenReplies]
     return (
-      <Container>
+      <View style={styles.fill}>
         <FlatList
           ref={(ref) => { this.flatListRef = ref }}
           data={mergedList}
           renderItem={this.onRenderItem}
           keyExtractor={item => item.id}
           onEndReachedThreshold={0.5}
-          onEndReached={this.props.getMorePosts}
-          extraData={[this.props, this.state]}
+          onEndReached={() => {
+            this.getMoreReplies()
+          }}
           refreshControl={
             <RefreshControl
-              refreshing={this.props.loading}
+              refreshing={loading}
               onRefresh={this.onRefresh}
             />
           }
@@ -289,7 +296,7 @@ export default class PostDetail extends Component {
             ? 'Add comment'
             : 'Replying to ' + this.state.replyingTo.username}
         />
-      </Container>
+      </View>
     )
   }
 }

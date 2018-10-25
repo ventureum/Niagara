@@ -16,6 +16,13 @@ export default class PopularTab extends Component {
     this.props.toPostDetail(post, 'popularPosts')
   }
 
+  getMorePosts = (targetArray) => {
+    const { loading } = this.props.popularPosts
+    if (!loading) {
+      this.props.getMorePosts(targetArray)
+    }
+  }
+
   onRenderItem = ({ item }) => {
     if (item.content.meta !== undefined) {
       const { meta } = item.content
@@ -67,6 +74,7 @@ export default class PopularTab extends Component {
             keyExtractor={item => item.id}
             onEndReachedThreshold={0.5}
             onEndReached={() => {
+              this.getMorePosts('popularPosts')
             }}
           />
         }

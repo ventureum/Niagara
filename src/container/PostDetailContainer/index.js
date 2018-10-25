@@ -10,7 +10,8 @@ import {
   refreshViewingPost,
   getVoteCostEstimate,
   newPost,
-  voteFeedReply
+  voteFeedReply,
+  getMoreReplies
 } from '../../actions'
 
 class PostDetailContainer extends Component {
@@ -23,14 +24,19 @@ class PostDetailContainer extends Component {
     }
   }
 
+  getMoreReplies= () => {
+    const post = this.props.post
+    this.props.getMoreReplies(post.postHash)
+  }
+
   render () {
     const post = this.props.post
     return (
       <PostDetailV2
         navigation={this.props.navigation}
         post={post}
+        getMoreReplies={this.getMoreReplies}
         replies={this.props.replies}
-        loading={this.props.loading}
         errorMessage={this.props.errorMessage}
         milestoneData={this.props.milestoneData}
         processPutOption={this.props.processPutOption}
@@ -70,7 +76,8 @@ const mapDispatchToProps = (dispatch) => ({
   getVoteCostEstimate: (postHash) => dispatch(getVoteCostEstimate(postHash)),
   newPost: (content, boardId, parentHash, postType, destination, refreshCallback) =>
     dispatch(newPost(content, boardId, parentHash, postType, destination, refreshCallback)),
-  refreshViewingPost: (postHash) => dispatch(refreshViewingPost(postHash))
+  refreshViewingPost: (postHash) => dispatch(refreshViewingPost(postHash)),
+  getMoreReplies: (postHash) => dispatch(getMoreReplies(postHash))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(PostDetailContainer)

@@ -17,11 +17,14 @@ console.ignoredYellowBox = ['Setting a timer']
 
 export default class BoardDetail extends Component {
   onRefresh = () => {
-    this.props.refreshPosts(this.props.actor, 'boardPosts')
+    this.props.refreshPosts()
   }
 
   getMorePosts = () => {
-    this.props.getMorePosts(this.props.actor, 'boardPosts')
+    const { loading } = this.props.boardPosts
+    if (!loading) {
+      this.props.getMorePosts()
+    }
   }
 
   toPostDetail = (post) => {
@@ -112,7 +115,9 @@ export default class BoardDetail extends Component {
               ref={(ref) => { this.flatListRef = ref }}
               keyExtractor={item => item.id}
               onEndReachedThreshold={0.5}
-              onEndReached={() => { }}
+              onEndReached={() => {
+                this.getMorePosts()
+              }}
               refreshControl={
                 <RefreshControl
                   refreshing={loading}

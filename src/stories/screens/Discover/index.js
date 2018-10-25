@@ -32,9 +32,9 @@ export default class Discover extends Component {
     this.props.navigation.navigate('BoardDetail', { board: board })
   }
 
-  // getMorePosts = () => {
-  //   this.props.getMorePosts(this.props.boardId, 'popularPosts')
-  // }
+  getMorePosts = (targetArray) => {
+    this.props.getMorePosts(targetArray)
+  }
 
   onVoteAction = (postHash, action) => {
     this.props.voteFeedPost(postHash, action)
@@ -84,12 +84,14 @@ export default class Discover extends Component {
             <PopularTab
               popularPosts={popularPosts}
               toPostDetail={this.toPostDetail}
+              getMorePosts={this.getMorePosts}
             />
           </Tab>
           <Tab heading='NEW'>
             <NewTab
               newPosts={newPosts}
               toPostDetail={this.toPostDetail}
+              getMorePosts={this.getMorePosts}
             />
           </Tab>
           <Tab heading='GROUPS'>

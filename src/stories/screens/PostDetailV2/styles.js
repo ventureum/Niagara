@@ -59,6 +59,9 @@ const styles = {
     fontSize: 12,
     color: '#333333',
     fontWeight: ventureum.bold
+  },
+  fill: {
+    flex: 1
   }
 }
 

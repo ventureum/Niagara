@@ -70,18 +70,9 @@ function getBytes32FromMultiash (multihash) {
   }
 }
 
-/*
-  @param feed A string consist of the name of target feed group and userID.
-    e.g.: 'board:all', 'comment:postHash', 'user:userID"
-  @param id_lt A optional string paramater. It is used to fetch activities that has UUID
-    less than id_lt from stream API
-  @param size A optinal number paramater to determine the size of each fetch from Stream
-    API. size must satisfy: 0 < size <= 10
-  @return return a array of post details
-*/
-async function getPosts (requester, feedSlug, feedId, size = 10, ranking) {
-  let feedData = await getFeedDataFromGetStream(feedSlug, feedId, size, ranking)
-
+async function getPosts (request) {
+  let feedData = await getFeedDataFromGetStream(request)
+  const { requester } = request
   // build the arrays of post hash from feed data
   let postMap = new Map()
   let onChainPosts = []
@@ -125,14 +116,28 @@ async function getPosts (requester, feedSlug, feedId, size = 10, ranking) {
       })
     }
   }
-
   return {
     posts: postDetails,
-    next: feedData.next
+    next: parseNext(feedData.next)
   }
 }
 
-async function getFeedDataFromGetStream (feedSlug, feedId, size, ranking) {
+function parseNext (next) {
+  let result = {}
+  if (next !== '') {
+    const conditions = next.slice(next.indexOf('?') + 1).split('&')
+    conditions.forEach(condition => {
+      const keyValue = condition.split('=')
+      if (keyValue[0] !== 'api_key') {
+        result[keyValue[0]] = keyValue[1]
+      }
+    })
+  }
+  return result
+}
+
+async function getFeedDataFromGetStream (request) {
+  const { feedSlug, feedId, limit, ranking, offset, id_lt } = request
   const toFeedTokenApi = {
     'feedSlug': feedSlug,
     'userId': feedId,
@@ -149,7 +154,12 @@ async function getFeedDataFromGetStream (feedSlug, feedId, size, ranking) {
   // get feed data from Stream API
   const targetFeed = client.feed(feedSlug, feedId, response.data.feedToken)
   let feedData
-  feedData = await targetFeed.get({ limit: size, ranking: ranking })
+  feedData = await targetFeed.get({
+    ranking,
+    offset,
+    limit,
+    id_lt
+  })
   return feedData
 }
 
@@ -684,13 +694,13 @@ function getRecentVotes (actor) {
   })
 }
 
-async function getAllReplies (requester, postHash) {
-  let replies = await getPosts(requester, 'comment', postHash, 50)
+async function getAllReplies (request) {
+  let replies = await getPosts(request)
   if (replies.posts.length !== 0) {
     replies = {
       ...replies,
       posts: await Promise.all(replies.posts.map(async (post) => {
-        const subRelies = await getAllReplies(requester, post.postHash)
+        const subRelies = await getAllReplies({...request, feedId: post.postHash})
         return {
           ...post,
           replies: subRelies
