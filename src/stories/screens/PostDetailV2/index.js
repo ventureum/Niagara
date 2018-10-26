@@ -46,7 +46,7 @@ export default class PostDetail extends Component {
   flattenList = (List) => {
     let newList = []
     List.forEach(item => {
-      let subList = item.replies
+      let subList = item.replies.posts
       newList.push(item)
       if (subList.length !== 0) {
         newList = newList.concat(this.flattenList(subList))
@@ -84,10 +84,10 @@ export default class PostDetail extends Component {
         return
       }
       const destination = 'OFF-CHAIN'
-      const boardId = this.props.boardHash
+      const boardId = this.props.boardId
       const parentHash = this.state.replyingTo.postHash
       const postType = 'COMMENT'
-      this.props.newPost(content, boardId, parentHash, postType, destination)
+      this.props.newPost(content, boardId, parentHash, postType, destination, this.onRefresh)
     }
   }
 
@@ -259,8 +259,8 @@ export default class PostDetail extends Component {
   render () {
     const { post, replies } = this.props
     const repliesCopy = JSON.parse(JSON.stringify(replies))
-    const repliesReversed = repliesCopy.reverse()
-    let flattenReplies = this.flattenList(repliesReversed)
+    repliesCopy.posts.reverse()
+    let flattenReplies = this.flattenList(repliesCopy.posts)
     const commentDivider = { commentDivider: true, id: '-200' }
     const mergedList = [post, commentDivider, ...flattenReplies]
     return (

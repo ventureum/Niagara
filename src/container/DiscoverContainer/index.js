@@ -8,55 +8,63 @@ import {
   newPost,
   voteFeedPost,
   resetErrorMessage,
-  setCurrentParentPostHash
+  setCurrentParentPost,
+  getUserFollowing
 } from '../../actions'
+import { POPULAR_RANKING } from '../../utils/constants'
 
 class DiscoverContainer extends Component {
-  constructor (props) {
-    super(props)
-    this.props.refreshPosts(this.props.boardHash)
+  componentWillMount () {
+    this.refreshPosts()
+  }
+
+  refreshPosts = () => {
+    const { boardId } = this.props
+    this.props.refreshPosts('board', boardId, 'popularPosts', POPULAR_RANKING)
+    this.props.refreshPosts('board', boardId, 'newPosts')
+    this.props.getUserFollowing()
   }
 
   render () {
     return (
       <Discover navigation={this.props.navigation}
-        posts={this.props.posts}
-        refreshPosts={this.props.refreshPosts}
+        popularPosts={this.props.popularPosts}
+        newPosts={this.props.newPosts}
+        refreshPosts={this.refreshPosts}
         getMorePosts={this.props.getMorePosts}
         loading={this.props.loading}
-        switchBoard={this.props.switchBoard}
-        boardHash={this.props.boardHash}
+        boardId={this.props.boardId}
         boardName={this.props.boardName}
         newPost={this.props.newPost}
         errorMessage={this.props.errorMessage}
-        voteFeedPost={this.props.voteFeedPost}
-        getVoteCostEstimate={this.props.getVoteCostEstimate}
-        fetchingVoteCost={this.props.fetchingVoteCost}
-        voteInfo={this.props.voteInfo}
-        voteInfoError={this.props.voteInfoError}
-        setCurrentParentPostHash={this.props.setCurrentParentPostHash}
+        setCurrentParentPost={this.props.setCurrentParentPost}
         resetErrorMessage={this.props.resetErrorMessage}
+        getUserFollowing={this.props.getUserFollowing}
+        userFollowing={this.props.userFollowing}
       />
     )
   }
 }
 
-const mapStateToProps = state => ({
-  posts: state.forumReducer.posts,
-  loading: state.forumReducer.loading,
-  boardHash: state.forumReducer.boardHash,
-  boardName: state.forumReducer.boardName,
-  errorMessage: state.forumReducer.errorMessage
+const mapStateToProps = ({forumReducer}) => ({
+  newPosts: forumReducer.newPosts,
+  popularPosts: forumReducer.popularPosts,
+  loading: forumReducer.loading,
+  boardId: forumReducer.boardId,
+  boardName: forumReducer.boardName,
+  errorMessage: forumReducer.errorMessage,
+  userFollowing: forumReducer.userFollowing
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  refreshPosts: (boardHash) => dispatch(refreshPosts('board', boardHash)),
-  getMorePosts: (boardHash) => dispatch(getMorePosts('board', boardHash)),
-  switchBoard: (boardHash, boardName) => dispatch(switchBoard(boardHash, boardName)),
+  refreshPosts: (feedSlug, boardId, targetArray, ranking) => dispatch(refreshPosts(feedSlug, boardId, targetArray, ranking)),
+  getMorePosts: (feedSlug, boardId, targetArray, ranking) => dispatch(getMorePosts(feedSlug, boardId, targetArray, ranking)),
+  switchBoard: (boardId, boardName) => dispatch(switchBoard(boardId, boardName)),
   newPost: (content, boardId, parentHash, postType, destination) => dispatch(newPost(content, boardId, parentHash, postType, destination)),
   voteFeedPost: (postHash, value) => dispatch(voteFeedPost(postHash, value)),
-  setCurrentParentPostHash: (postHash) => dispatch(setCurrentParentPostHash(postHash)),
-  resetErrorMessage: () => dispatch(resetErrorMessage())
+  setCurrentParentPost: (postHash, targetArray) => dispatch(setCurrentParentPost(postHash, targetArray)),
+  resetErrorMessage: () => dispatch(resetErrorMessage()),
+  getUserFollowing: () => dispatch(getUserFollowing())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(DiscoverContainer)

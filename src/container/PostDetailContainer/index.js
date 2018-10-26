@@ -40,7 +40,7 @@ class PostDetailContainer extends Component {
         voteFeedPost={this.props.voteFeedPost}
         voteFeedReply={this.props.voteFeedReply}
         newPost={this.props.newPost}
-        boardHash={this.props.boardHash}
+        boardId={this.props.boardId}
         refreshViewingPost={this.props.refreshViewingPost}
       />
     )
@@ -53,9 +53,9 @@ const mapStateToProps = ({ forumReducer }) => ({
   errorMessage: forumReducer.errorMessage,
   milestoneData: forumReducer.milestoneData,
   milestoneDataLoading: forumReducer.milestoneDataLoading,
-  boardHash: forumReducer.boardHash,
-  post: forumReducer.posts.find((post) => {
-    return post.postHash === forumReducer.currentParentPostHash
+  boardId: forumReducer.boardId,
+  post: forumReducer[forumReducer.currentParentPost.targetArray].posts.find((post) => {
+    return post.postHash === forumReducer.currentParentPost.postHash
   })
 })
 
@@ -68,7 +68,8 @@ const mapDispatchToProps = (dispatch) => ({
   voteFeedPost: (postHash, value) => dispatch(voteFeedPost(postHash, value)),
   voteFeedReply: (postHash, value) => dispatch(voteFeedReply(postHash, value)),
   getVoteCostEstimate: (postHash) => dispatch(getVoteCostEstimate(postHash)),
-  newPost: (content, boardId, parentHash, postType, destination) => dispatch(newPost(content, boardId, parentHash, postType, destination)),
+  newPost: (content, boardId, parentHash, postType, destination, refreshCallback) =>
+    dispatch(newPost(content, boardId, parentHash, postType, destination, refreshCallback)),
   refreshViewingPost: (postHash) => dispatch(refreshViewingPost(postHash))
 })
 

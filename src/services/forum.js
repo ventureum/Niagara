@@ -2,6 +2,7 @@ import Config from 'react-native-config'
 import WalletUtils from '../utils/wallet'
 import axios from 'axios'
 import bs58 from 'bs58'
+import initials from 'initials'
 
 const stream = require('getstream')
 const client = stream.connect(Config.STREAM_API_KEY, null, Config.STREAM_APP_ID)
@@ -14,6 +15,16 @@ typeMap.set('0x6bf78b95', 'COMMENT')
 typeMap.set('0x2fca5a5e', 'POST')
 typeMap.set('0x04bc4e7a', 'AIRDROP')
 typeMap.set('0xf7003d25', 'MILESTONE')
+
+const boardMap = new Map()
+boardMap.set(
+  '0xfafe9e798792a4c59a71bf36c7082fa92c3849ffe26f8d2cf81f5f4da4e115ad',
+  'MilestoneChatbot Test'
+)
+boardMap.set(
+  '0xc6c260628ca29dfacadb60c8bb41d15dadc0dbc133680f7322b1a1008739b64f',
+  'All'
+)
 
 /*
   fetch the content of a single post from IPFS
@@ -68,147 +79,159 @@ function getBytes32FromMultiash (multihash) {
     API. size must satisfy: 0 < size <= 10
   @return return a array of post details
 */
-function batchReadFeedsByBoardId (requester, feed, id_lt = null, id_gt = null, size) {
-  return new Promise(async (resolve, reject) => {
-    // get feed token from lamda API
-    const feedSlug = feed.split(':')
-    const toFeedTokenApi = {
-      'feedSlug': feedSlug[0],
-      'userId': feedSlug[1],
-      'getStreamApiKey': Config.STREAM_API_KEY,
-      'getStreamApiSecret': Config.STREAM_API_SECRET
-    }
-    const response = await axios.post(
-      Config.FEED_TOKEN_API,
-      toFeedTokenApi
-    )
-    if (!response.data.ok) {
-      return reject(response.data.message)
-    }
-    // get feed data from Stream API
-    const targetFeed = client.feed(feedSlug[0], feedSlug[1], response.data.feedToken)
-    let feedData
-    if (id_lt === null && id_gt === null) { // eslint-disable-line
-      feedData = await targetFeed.get({ limit: size })
-    } else if (id_lt !== null && id_gt === null) { // eslint-disable-line
-      feedData = await targetFeed.get({ limit: size, id_lt: id_lt })
-    } else if (id_lt === null && id_gt !== null) { // eslint-disable-line
-      feedData = await targetFeed.get({ limit: size, id_gt: id_gt })
-    }
+async function getPosts (requester, feedSlug, feedId, size = 10, ranking) {
+  let feedData = await getFeedDataFromGetStream(feedSlug, feedId, size, ranking)
 
-    // build the arrays of post hash from feed data
-    let postMap = new Map()
-    let onChainPosts = []
-    let offChainPosts = []
-    for (let i = 0; i < feedData.results.length; i++) {
-      if (feedData.results[i].source === 'ON-CHAIN') {
-        // On-chain posts
-        postMap.set(i, onChainPosts.length)
-        onChainPosts.push(feedData.results[i].object.split(':')[1])
-      } else if (feedData.results[i].source === 'OFF-CHAIN') {
-        // Off-chain posts
-        postMap.set(i, offChainPosts.length)
-        offChainPosts.push(feedData.results[i].object.split(':')[1])
-      }
+  // build the arrays of post hash from feed data
+  let postMap = new Map()
+  let onChainPosts = []
+  let offChainPosts = []
+  for (let i = 0; i < feedData.results.length; i++) {
+    if (feedData.results[i].source === 'ON-CHAIN') {
+      // On-chain posts
+      postMap.set(i, onChainPosts.length)
+      onChainPosts.push(feedData.results[i].object.split(':')[1])
+    } else if (feedData.results[i].source === 'OFF-CHAIN') {
+      // Off-chain posts
+      postMap.set(i, offChainPosts.length)
+      offChainPosts.push(feedData.results[i].object.split(':')[1])
     }
+  }
 
-    const web3 = WalletUtils.getWeb3Instance()
-    let BN = web3.utils.BN
-    let onChainPostDetails = []
-    if (onChainPosts.length > 0) {
-      // get the flatten array of ipfs path, token address, author, rewards, # of replies from forum contract
-      const forum = await WalletUtils.getContractInstance('Forum')
-      let onChainPostData = []
-      let receiveBuffer
-      while (onChainPosts.length > 10) {
-        const portionToFetch = onChainPosts.slice(0, 10)
-        receiveBuffer = await forum.methods.getBatchPosts(portionToFetch).call()
-        onChainPostData = onChainPostData.concat(receiveBuffer)
-        onChainPosts = onChainPosts.slice(10)
-      }
-      receiveBuffer = await forum.methods.getBatchPosts(onChainPosts).call()
-      onChainPostData = onChainPostData.concat(receiveBuffer)
-      if (onChainPosts.length !== onChainPostData.length * 7) {
-        return reject(new Error('On-Chain data does not match.'))
-      }
-      let onChainPostMeta = []
+  let onChainPostDetails = []
+  onChainPostDetails = await getOnChainPostDetails(onChainPosts)
 
-      // Transform the flatten array from forum contract into an array of post objects
-      let precision = 2
-      for (let i = 0; i < onChainPostData.length; i += 7) {
-        let hex = web3.utils.toBN(onChainPostData[i])
-        let base = new BN(10).pow(new BN(18 - precision))
-        if (!hex.isZero()) {
-          onChainPostMeta.push({
-            postHash: onChainPostData[i],
-            ipfsPath: getMultihashFromBytes32(onChainPostData[i + 2]),
-            actor: '0x' + onChainPostData[i + 3].substr(26, 40),
-            rewards: (web3.utils.toBN(onChainPostData[i + 4]).div(base).toNumber()) / (10 ** 2),
-            repliesLength: web3.utils.toDecimal(onChainPostData[i + 5]),
-            postType: typeMap.get(onChainPostData[i + 6].slice(0, 10)),
-            actorAddrAbbre: WalletUtils.getAddrAbbre('0x' + onChainPostData[i + 3].substr(26, 40))
-          })
-        } else {
-          break
-        }
-      }
-      // get the content of each post
-      for (let i = 0; i < onChainPostMeta.length; i++) {
-        let singleContent = await _getSingleContent(onChainPostMeta[i])
-        onChainPostDetails.push(singleContent)
-      }
-    }
+  let offChainPostDetails = []
+  offChainPostDetails = await getOffChainPostDetails(requester, offChainPosts)
 
-    let offChainPostDetails = []
+  let postDetails = []
 
-    const pResult = await Promise.all(offChainPosts.map((postHash) => {
-      return axios.post(
-        `${Config.FEED_END_POINT}/get-feed-post`,
-        {
-          'postHash': postHash,
-          'requestor': requester,
-          'getStreamApiKey': Config.STREAM_API_KEY,
-          'getStreamApiSecret': Config.STREAM_API_SECRET
-        }
-      )
-    }))
-
-    if (pResult.length !== offChainPosts.length) {
-      return reject(new Error('Off-Chain data does not match.'))
-    }
-    for (let i = 0; i < pResult.length; i++) {
-      if (!pResult[i].data.ok) {
-        return reject(pResult[i])
-      }
-      const { post, postVoteCountInfo, requestorVoteCountInfo } = pResult[i].data
-      offChainPostDetails.push({
-        ...post,
-        postVoteCountInfo,
-        requestorVoteCountInfo
+  for (let i = 0; i < feedData.results.length; i++) {
+    if (feedData.results[i].source === 'ON-CHAIN') {
+      postDetails.push({
+        ...onChainPostDetails[postMap.get(i)],
+        id: feedData.results[i].id,
+        time: feedData.results[i].time,
+        source: feedData.results[i].source,
+        rewards: feedData.results.rewards
+      })
+    } else {
+      postDetails.push({
+        ...offChainPostDetails[postMap.get(i)],
+        id: feedData.results[i].id,
+        time: feedData.results[i].time,
+        source: feedData.results[i].source,
+        rewards: feedData.results.rewards
       })
     }
+  }
 
-    let postDetails = []
-    for (let i = 0; i < feedData.results.length; i++) {
-      if (feedData.results[i].source === 'ON-CHAIN') {
-        postDetails.push({
-          ...onChainPostDetails[postMap.get(i)],
-          id: feedData.results[i].id,
-          time: feedData.results[i].time,
-          source: feedData.results[i].source
+  return {
+    posts: postDetails,
+    next: feedData.next
+  }
+}
+
+async function getFeedDataFromGetStream (feedSlug, feedId, size, ranking) {
+  const toFeedTokenApi = {
+    'feedSlug': feedSlug,
+    'userId': feedId,
+    'getStreamApiKey': Config.STREAM_API_KEY,
+    'getStreamApiSecret': Config.STREAM_API_SECRET
+  }
+  const response = await axios.post(
+    Config.FEED_TOKEN_API,
+    toFeedTokenApi
+  )
+  if (!response.data.ok) {
+    throw (response)
+  }
+  // get feed data from Stream API
+  const targetFeed = client.feed(feedSlug, feedId, response.data.feedToken)
+  let feedData
+  feedData = await targetFeed.get({ limit: size, ranking: ranking })
+  return feedData
+}
+
+async function getOffChainPostDetails (requester, offChainPosts) {
+  let offChainPostDetails = []
+  const pResult = await Promise.all(offChainPosts.map((postHash) => {
+    return axios.post(
+      `${Config.FEED_END_POINT}/get-feed-post`,
+      {
+        'postHash': postHash,
+        'requestor': requester,
+        'getStreamApiKey': Config.STREAM_API_KEY,
+        'getStreamApiSecret': Config.STREAM_API_SECRET
+      }
+    )
+  }))
+
+  if (pResult.length !== offChainPosts.length) {
+    throw (new Error('Off-Chain data does not match.'))
+  }
+  for (let i = 0; i < pResult.length; i++) {
+    if (!pResult[i].data.ok) {
+      throw (pResult[i])
+    }
+    const { post, postVoteCountInfo, requestorVoteCountInfo } = pResult[i].data
+    offChainPostDetails.push({
+      ...post,
+      postVoteCountInfo,
+      requestorVoteCountInfo
+    })
+  }
+  return offChainPostDetails
+}
+
+async function getOnChainPostDetails (onChainPosts) {
+  const web3 = WalletUtils.getWeb3Instance()
+  let BN = web3.utils.BN
+  let onChainPostDetails = []
+  if (onChainPosts.length > 0) {
+    // get the flatten array of ipfs path, token address, author, rewards, # of replies from forum contract
+    const forum = await WalletUtils.getContractInstance('Forum')
+    let onChainPostData = []
+    let receiveBuffer
+    while (onChainPosts.length > 10) {
+      const portionToFetch = onChainPosts.slice(0, 10)
+      receiveBuffer = await forum.methods.getBatchPosts(portionToFetch).call()
+      onChainPostData = onChainPostData.concat(receiveBuffer)
+      onChainPosts = onChainPosts.slice(10)
+    }
+    receiveBuffer = await forum.methods.getBatchPosts(onChainPosts).call()
+    onChainPostData = onChainPostData.concat(receiveBuffer)
+    if (onChainPosts.length !== onChainPostData.length * 7) {
+      throw (new Error('On-Chain data does not match.'))
+    }
+    let onChainPostMeta = []
+
+    // Transform the flatten array from forum contract into an array of post objects
+    let precision = 2
+    for (let i = 0; i < onChainPostData.length; i += 7) {
+      let hex = web3.utils.toBN(onChainPostData[i])
+      let base = new BN(10).pow(new BN(18 - precision))
+      if (!hex.isZero()) {
+        onChainPostMeta.push({
+          postHash: onChainPostData[i],
+          ipfsPath: getMultihashFromBytes32(onChainPostData[i + 2]),
+          actor: '0x' + onChainPostData[i + 3].substr(26, 40),
+          rewards: (web3.utils.toBN(onChainPostData[i + 4]).div(base).toNumber()) / (10 ** 2),
+          repliesLength: web3.utils.toDecimal(onChainPostData[i + 5]),
+          postType: typeMap.get(onChainPostData[i + 6].slice(0, 10)),
+          actorAddrAbbre: WalletUtils.getAddrAbbre('0x' + onChainPostData[i + 3].substr(26, 40))
         })
       } else {
-        postDetails.push({
-          ...offChainPostDetails[postMap.get(i)],
-          id: feedData.results[i].id,
-          time: feedData.results[i].time,
-          source: feedData.results[i].source
-        })
+        break
       }
     }
-
-    resolve(postDetails)
-  })
+    // get the content of each post
+    for (let i = 0; i < onChainPostMeta.length; i++) {
+      let singleContent = await _getSingleContent(onChainPostMeta[i])
+      onChainPostDetails.push(singleContent)
+    }
+  }
+  return onChainPostDetails
 }
 
 /*
@@ -248,7 +271,15 @@ function getPostTypeHash (type) {
   @param newTransaction A callback function to be used when
     a new transaction is sent but before receipt. It takes a transaction hash as parameter.
 */
-function newOnChainPost (content, boardId, parentHash, postType, newContentToIPFS, newTransaction) {
+function newOnChainPost (
+  content,
+  boardId,
+  parentHash,
+  postType,
+  newContentToIPFS,
+  newTransaction,
+  refreshCallback
+) {
   return new Promise(async (resolve, reject) => {
     const enoughBalance = await checkBalanceForTx()
     if (!enoughBalance) {
@@ -278,13 +309,18 @@ function newOnChainPost (content, boardId, parentHash, postType, newContentToIPF
     let crypto = require('crypto')
     let postHash = '0x' + crypto.randomBytes(32).toString('hex')
     const hashedPostType = getPostTypeHash(postType)
-    forum.methods.post(boardId, parentHash, postHash, ipfsPath, hashedPostType).send({ gasPrice: GAS_PRICE })
+    forum.methods
+      .post(boardId, parentHash, postHash, ipfsPath, hashedPostType)
+      .send({ gasPrice: GAS_PRICE })
       .on('transactionHash', (txHash) => {
         if (newTransaction !== undefined) {
           newTransaction(txHash)
         }
       })
       .on('receipt', (receipt) => {
+        if (refreshCallback !== undefined) {
+          refreshCallback()
+        }
         resolve(receipt)
       })
       .on('error', (error) => {
@@ -294,7 +330,7 @@ function newOnChainPost (content, boardId, parentHash, postType, newContentToIPF
   )
 }
 
-function newOffChainPost (content, boardId, parentHash, postType, poster) {
+function newOffChainPost (content, boardId, parentHash, postType, poster, refreshCallback) {
   return new Promise(async (resolve, reject) => {
     let crypto = require('crypto')
     let postHash = '0x' + crypto.randomBytes(32).toString('hex')
@@ -315,6 +351,9 @@ function newOffChainPost (content, boardId, parentHash, postType, poster) {
       toDataBase
     )
     if (result.data.ok) {
+      if (refreshCallback !== undefined) {
+        refreshCallback()
+      }
       resolve(result)
     } else {
       reject(result)
@@ -646,16 +685,18 @@ function getRecentVotes (actor) {
 }
 
 async function getAllReplies (requester, postHash) {
-  const feed = 'comment:' + postHash
-  let replies = await batchReadFeedsByBoardId(requester, feed, null, null, 50)
-  if (replies.length !== 0) {
-    replies = await Promise.all(replies.map(async (reply) => {
-      const subRelies = await getAllReplies(requester, reply.postHash)
-      return {
-        ...reply,
-        replies: subRelies
-      }
-    }))
+  let replies = await getPosts(requester, 'comment', postHash, 50)
+  if (replies.posts.length !== 0) {
+    replies = {
+      ...replies,
+      posts: await Promise.all(replies.posts.map(async (post) => {
+        const subRelies = await getAllReplies(requester, post.postHash)
+        return {
+          ...post,
+          replies: subRelies
+        }
+      }))
+    }
   }
   return replies
 }
@@ -682,8 +723,74 @@ async function getTargetPost (requester, postHash) {
   }
 }
 
+async function followBoards (actor, boardIds) {
+  const request = {
+    actor: actor,
+    boardIds: boardIds
+  }
+
+  const result = await axios.post(
+    `${Config.FEED_END_POINT}/subscribe-boards`,
+    request
+  )
+
+  if (result.data.ok) {
+    return result
+  } else {
+    throw (result.data.message)
+  }
+}
+
+async function unfollowBoards (actor, boardIds) {
+  const request = {
+    actor: actor,
+    boardIds: boardIds
+  }
+
+  const result = await axios.post(
+    `${Config.FEED_END_POINT}/unsubscribe-boards`,
+    request
+  )
+
+  if (result.data.ok) {
+    return result
+  } else {
+    throw (result.data.message)
+  }
+}
+
+async function getUserFollowing (actor) {
+  const toFeedTokenApi = {
+    'feedSlug': 'user',
+    'userId': actor,
+    'getStreamApiKey': Config.STREAM_API_KEY,
+    'getStreamApiSecret': Config.STREAM_API_SECRET
+  }
+  const response = await axios.post(
+    Config.FEED_TOKEN_API,
+    toFeedTokenApi
+  )
+  if (!response.data.ok) {
+    throw (response)
+  }
+  // get feed data from Stream API
+  const targetFeed = client.feed('user', actor, response.data.feedToken)
+  const following = await targetFeed.following()
+
+  const result = following.results.map(item => {
+    const boardId = item.target_id.split(':')[1]
+    const boardName = boardMap.get(boardId)
+    return {
+      boardId: boardId,
+      boardName: boardName,
+      nameInitials: initials(boardName)
+    }
+  })
+
+  return result
+}
 export {
-  batchReadFeedsByBoardId,
+  getPosts,
   checkBalanceForTx,
   getPostTypeHash,
   newOnChainPost,
@@ -701,5 +808,8 @@ export {
   getRecentComments,
   getRecentVotes,
   getAllReplies,
-  getTargetPost
+  getTargetPost,
+  followBoards,
+  unfollowBoards,
+  getUserFollowing
 }

@@ -6,20 +6,23 @@ import { connect } from 'react-redux'
 
 class NewPostContainer extends Component {
   render () {
-    const boardHash = this.props.navigation.getParam('boardHash')
+    const boardId = this.props.navigation.getParam('boardId')
+    const refreshCallback = this.props.navigation.getParam('refreshCallback', () => {})
     return (
       <NewPost
         navigation={this.props.navigation}
         avatar={WalletUtils.getAvatar()}
         newPost={this.props.newPost}
-        boardHash={boardHash}
+        boardId={boardId}
+        refreshCallback={refreshCallback}
       />
     )
   }
 }
 
 const mapDispatchToProps = (dispatch) => ({
-  newPost: (content, boardId, parentHash, postType, destination) => dispatch(newPost(content, boardId, parentHash, postType, destination))
+  newPost: (content, boardId, parentHash, postType, destination, refreshCallback) =>
+    dispatch(newPost(content, boardId, parentHash, postType, destination, refreshCallback))
 })
 
 export default connect(null, mapDispatchToProps)(NewPostContainer)

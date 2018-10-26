@@ -1,75 +1,93 @@
-import update from 'immutability-helper'
 import { BOARD_ALL_HASH } from '../../utils/constants.js'
 
 const initialState = {
-  boardHash: BOARD_ALL_HASH,
+  boardId: BOARD_ALL_HASH,
   boardName: 'All',
-  posts: [],
-  lastUUID: '',
+  newPosts: {
+    loading: false,
+    next: '',
+    posts: []
+  },
+  homePosts: {
+    loading: false,
+    next: '',
+    posts: []
+  },
+  popularPosts: {
+    loading: false,
+    next: '',
+    posts: []
+  },
   loading: false,
   errorMessage: '',
-  currentParentPostHash: '',
-  replies: [],
+  currentParentPost: {},
+  replies: {
+    loading: false,
+    posts: [],
+    next: ''
+  },
   milestoneData: {},
-  milestoneDataLoading: false
+  milestoneDataLoading: false,
+  userFollowing: {
+    loading: false,
+    following: []
+  },
+  boardPosts: {
+    loading: false,
+    next: '',
+    posts: []
+  }
 }
 
 export default function (state = initialState, action) {
   if (action.type === 'REFRESH_POSTS_FULFILLED') {
-    const length = action.payload.length
-    if (length === 0) {
-      return {
-        ...state,
-        loading: false,
-        posts: [],
-        errorMessage: ''
-      }
-    }
+    const { targetArray } = action.meta
     return {
       ...state,
-      posts: action.payload,
-      lastUUID: action.payload[length - 1].id,
-      loading: false,
+      [`${targetArray}`]: {
+        ...action.payload,
+        loading: false
+      },
       errorMessage: ''
     }
   }
 
   if (action.type === 'REFRESH_POSTS_PENDING') {
+    const { targetArray } = action.meta
     return {
       ...state,
-      loading: true,
+      [`${targetArray}`]: {
+        ...state[targetArray],
+        loading: true
+      },
       errorMessage: ''
     }
   }
   if (action.type === 'REFRESH_POSTS_REJECTED') {
+    const { targetArray } = action.meta
     return {
       ...state,
-      loading: false,
+      [`${targetArray}`]: {
+        ...state[targetArray],
+        loading: false
+      },
       errorMessage: action.payload.data.message.errorCode
     }
   }
+
   if (action.type === 'GET_MORE_POSTS_FULFILLED') {
-    const length = action.payload.length
-    if (length === 0) {
-      return {
-        ...state,
+    const { targetArray } = action.meta
+    const newArray = state[targetArray].posts
+    newArray.push(action.payload.posts)
+    return {
+      ...state,
+      [`${targetArray}`]: {
+        posts: newArray,
         loading: false,
-        errorMessage: ''
-      }
+        next: action.payload.next
+      },
+      errorMessage: action.payload.data.message.errorCode
     }
-    return update(
-      update(
-        update(
-          update(
-            state,
-            { posts: { $push: action.payload } }
-          ),
-          { lastUUID: { $set: action.payload[length - 1].id } }
-        ),
-        { loading: { $set: false } }
-      ),
-      { errorMessage: { $set: '' } }
-    )
   }
 
   if (action.type === 'NEW_POST_PENDING') {
@@ -96,33 +114,46 @@ export default function (state = initialState, action) {
     }
   }
   if (action.type === 'VOTE_FEED_POST_FULFILLED') {
-    const {voteInfo} = action.payload.data
+    const { voteInfo } = action.payload.data
+    const { targetArray } = state.currentParentPost
     return {
       ...state,
       loading: false,
-      posts: state.posts.map(
-        (post, i) => {
-          return (post.postHash === voteInfo.postHash ? {
-            ...post,
-            postVoteCountInfo: voteInfo.postVoteCountInfo,
-            requestorVoteCountInfo: voteInfo.requestorVoteCountInfo
-          } : post
-          )
-        }
-      )
+      [targetArray]: {
+        ...state[targetArray],
+        loading: false,
+        posts: state[targetArray].posts.map(
+          (post, i) => {
+            return (post.postHash === voteInfo.postHash ? {
+              ...post,
+              postVoteCountInfo: voteInfo.postVoteCountInfo,
+              requestorVoteCountInfo: voteInfo.requestorVoteCountInfo
+            } : post
+            )
+          }
+        )
+      }
     }
   }
 
   if (action.type === 'VOTE_FEED_POST_PENDING') {
+    const { targetArray } = state.currentParentPost
     return {
       ...state,
-      loading: true
+      [`${targetArray}`]: {
+        ...state[targetArray],
+        loading: true
+      }
     }
   }
   if (action.type === 'VOTE_FEED_POST_REJECTED') {
+    const { targetArray } = state.currentParentPost
     return {
       ...state,
-      loading: false,
+      [`${targetArray}`]: {
+        ...state[targetArray],
+        loading: false
+      },
       errorMessage: action.payload.data.message.errorCode
     }
   }
@@ -141,24 +172,33 @@ export default function (state = initialState, action) {
     }
   }
   if (action.type === 'UPDATE_TARGET_POST_FULFILLED') {
+    const { targetArray } = action.meta
     return {
       ...state,
       loading: false,
-      posts: state.posts.map(post => {
-        if (post.postHash === action.payload.postHash) {
-          return {
-            ...post,
-            ...action.payload
+      [targetArray]: {
+        ...state[targetArray],
+        loading: false,
+        posts: state[targetArray].posts.map(post => {
+          if (post.postHash === action.payload.postHash) {
+            return {
+              ...post,
+              ...action.payload
+            }
           }
-        }
-        return post
-      })
+          return post
+        })
+      }
     }
   }
   if (action.type === 'UPDATE_TARGET_POST_REJECTED') {
+    const { targetArray } = action.meta
     return {
       ...state,
-      loading: false,
+      [`${targetArray}`]: {
+        ...state[targetArray],
+        loading: false
+      },
       errorMessage: action.payload.errorCode
     }
   }
@@ -166,7 +206,10 @@ export default function (state = initialState, action) {
   if (action.type === 'GET_REPLIES_PENDING') {
     return {
       ...state,
-      loading: true,
+      replies: {
+        ...state.replies,
+        loading: true
+      },
       errorMessage: ''
     }
   }
@@ -174,14 +217,20 @@ export default function (state = initialState, action) {
     return {
       ...state,
       loading: false,
-      replies: action.payload,
+      replies: {
+        ...action.payload,
+        loading: false
+      },
       errorMessage: ''
     }
   }
   if (action.type === 'GET_REPLIES_REJECTED') {
     return {
       ...state,
-      loading: false,
+      replies: {
+        ...state.replies,
+        loading: false
+      },
       errorMessage: action.payload
     }
   }
@@ -211,8 +260,12 @@ export default function (state = initialState, action) {
   if (action.type === 'CLEAR_POST_DETAIL') {
     return {
       ...state,
-      replies: [],
-      currentParentPostHash: state.currentParentPostHash
+      replies: {
+        loading: false,
+        posts: [],
+        next: ''
+      },
+      currentParentPost: state.currentParentPost
     }
   }
 
@@ -241,36 +294,84 @@ export default function (state = initialState, action) {
     return {
       ...state,
       loading: false,
-      replies: state.replies.map(
-        (reply) => {
-          return (reply.postHash === voteInfo.postHash ? {
-            ...reply,
-            postVoteCountInfo: voteInfo.postVoteCountInfo,
-            requestorVoteCountInfo: voteInfo.requestorVoteCountInfo
-          } : reply
-          )
-        }
-      )
+      replies: {
+        posts: state.replies.posts.map(
+          (reply) => {
+            return (reply.postHash === voteInfo.postHash ? {
+              ...reply,
+              postVoteCountInfo: voteInfo.postVoteCountInfo,
+              requestorVoteCountInfo: voteInfo.requestorVoteCountInfo
+            } : reply
+            )
+          }
+        )
+      }
     }
   }
   if (action.type === 'VOTE_FEED_REPLY_PENDING') {
     return {
       ...state,
-      loading: true
+      replies: {
+        ...state.replies,
+        loading: true
+      }
     }
   }
   if (action.type === 'VOTE_FEED_REPLY_REJECTED') {
     return {
       ...state,
-      loading: false,
-      errorMessage: action.payload
+      replies: {
+        ...state.replies,
+        loading: false
+      },
+      errorMessage: action.payload.data.message.errorCode
     }
   }
 
-  if (action.type === 'SET_CURRENT_PARENT_POST_HASH') {
+  if (action.type === 'SET_CURRENT_PARENT_POST') {
     return {
       ...state,
-      currentParentPostHash: action.payload
+      currentParentPost: action.payload
+    }
+  }
+
+  if (action.type === 'GET_USER_FOLLOWING_PENDING') {
+    return {
+      ...state,
+      userFollowing: {
+        ...state.userFollowing,
+        loading: true
+      }
+    }
+  }
+  if (action.type === 'GET_USER_FOLLOWING_REJECTED') {
+    return {
+      ...state,
+      userFollowing: {
+        ...state.userFollowing,
+        loading: false
+      },
+      errorMessage: action.payload
+    }
+  }
+  if (action.type === 'GET_USER_FOLLOWING_FULFILLED') {
+    return {
+      ...state,
+      userFollowing: {
+        following: action.payload,
+        loading: false
+      }
+    }
+  }
+
+  if (action.type === 'CLEAR_BOARD_DETAIL') {
+    return {
+      ...state,
+      boardPosts: {
+        loading: false,
+        next: '',
+        posts: []
+      }
     }
   }
   return state

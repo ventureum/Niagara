@@ -19,7 +19,7 @@ class ReplyContainer extends Component {
         loading={this.props.loading}
         newPost={this.props.newPost}
         errorMessage={this.props.errorMessage}
-        boardHash={this.props.boardHash}
+        boardId={this.props.boardId}
       />
     )
   }
@@ -28,7 +28,7 @@ class ReplyContainer extends Component {
 const mapStateToProps = state => ({
   loading: state.forumReducer.loading,
   errorMessage: state.forumReducer.errorMessage,
-  boardHash: state.forumReducer.boardHash
+  boardId: state.forumReducer.boardId
 })
 
 const mapDispatchToProps = (dispatch) => ({

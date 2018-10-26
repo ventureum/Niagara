@@ -32,7 +32,7 @@ export default class Reply extends Component {
       } else {
         destination = 'OFF-CHAIN'
       }
-      const boardId = this.props.boardHash
+      const boardId = this.props.boardId
       const parentHash = parentPost.postHash
       const postType = 'COMMENT'
       let message = `A new ${destination} reply costs ${NEW_REPLY_FUEL_COST} fuel`

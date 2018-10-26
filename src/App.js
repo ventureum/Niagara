@@ -27,6 +27,8 @@ import TabBarComponent from './stories/components/TabBarComponent'
 import TCRContainer from './container/TCRContainer'
 import AppLoadingScreen from './container/AppLoadingScreen'
 import UserLoadingScreen from './container/UserLoadingContainer'
+import HomeContainer from './container/HomeContainer'
+import BoardDetail from './container/BoardDetailContainer'
 
 const Login = createStackNavigator(
   {
@@ -41,20 +43,20 @@ const Login = createStackNavigator(
 
 const HomeTabNavigator = createBottomTabNavigator(
   {
-    Assets: { screen: AssetsContainer },
-    TCR: { screen: TCRContainer },
+    Home: { screen: HomeContainer },
     Discover: { screen: DiscoverContainer },
+    TCR: { screen: TCRContainer },
     Profile: { screen: ProfileContainer }
   },
   {
     tabBarComponent: TabBarComponent,
-    initialRouteName: 'Assets'
+    initialRouteName: 'Home'
   }
 )
 
 const MainNavigator = createStackNavigator(
   {
-    Home: { screen: HomeTabNavigator },
+    HomeTab: { screen: HomeTabNavigator },
     Reply: { screen: Reply },
     NewPost: { screen: NewPost },
     PostDetail: { screen: PostDetail },
@@ -68,10 +70,12 @@ const MainNavigator = createStackNavigator(
     TransferPage: { screen: TransferPage },
     ActivityPage: { screen: ActivityPage },
     Transaction: { screen: Transaction },
-    Refuel: { screen: Refuel }
+    Refuel: { screen: Refuel },
+    Assets: { screen: AssetsContainer },
+    BoardDetail: { screen: BoardDetail }
   },
   {
-    initialRouteName: 'Home',
+    initialRouteName: 'HomeTab',
     headerMode: 'none'
   }
 )

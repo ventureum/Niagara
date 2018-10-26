@@ -4,6 +4,7 @@ import { shake128 } from 'js-sha3'
 import axios from 'axios'
 
 const DEFAULT_GAS_LIMIT = 500000
+const FETCHING_SIZE = 30
 
 export function listIsLoading (bool) {
   return {
@@ -105,7 +106,7 @@ export async function refreshToken (token, i) {
   return token
 }
 
-export function _refreshTokens (tokens) {
+function _refreshTokens (tokens) {
   return {
     type: 'REFRESH_TOKENS',
     payload: Promise.all(tokens.map((token, i) => {
@@ -140,32 +141,48 @@ export function refreshLogs (tokenIdx, url) {
   }
 }
 
-export function refreshPosts (feedSlug, feedId) {
+export function refreshPosts (feedSlug, feedId, targetArray, ranking) {
   return (dispatch, getState) => {
     const requester = getState().profileReducer.profile.actor
-    dispatch(_refreshPosts(requester, feedSlug, feedId))
+    dispatch(_refreshPosts(requester, feedSlug, feedId, targetArray, ranking))
   }
 }
 
-export function _refreshPosts (requester, feedSlug, feedId) {
+function _refreshPosts (requester, feedSlug, feedId, targetArray, ranking) {
   return {
     type: 'REFRESH_POSTS',
-    payload: forum.batchReadFeedsByBoardId(requester, feedSlug + ':' + feedId)
+    payload: forum.getPosts(
+      requester,
+      feedSlug,
+      feedId,
+      FETCHING_SIZE,
+      ranking
+    ),
+    meta: {
+      targetArray: targetArray
+    }
   }
 }
 
-export function _getMorePosts (requester, feedSlug, feedId, lastUUID) {
+function _getMorePosts (requester, feedSlug, feedId, targetArray) {
   return {
     type: 'GET_MORE_POSTS',
-    payload: forum.batchReadFeedsByBoardId(requester, feedSlug + ':' + feedId, lastUUID)
+    payload: forum.getPosts(
+      requester,
+      feedSlug,
+      feedId
+    ),
+    meta: {
+      targetArray: targetArray
+    }
   }
 }
 
-export function getMorePosts (feedSlug, feedId) {
+export function getMorePosts (feedSlug, feedId, targetArray, ranking) {
   return (dispatch, getState) => {
     const lastUUID = getState().forumReducer.lastUUID
     const requester = getState().profileReducer.profile.actor
-    dispatch(_getMorePosts(requester, feedSlug, feedId, lastUUID))
+    dispatch(_getMorePosts(requester, feedSlug, feedId, lastUUID, targetArray, ranking))
   }
 }
 
@@ -179,31 +196,47 @@ export function setTokens (publicToken, userToken, timelineToken) {
   }
 }
 
-export function switchBoard (boardName, boardHash) {
+export function switchBoard (boardName, boardId) {
   return {
     type: 'SWITCH_BOARD',
     meta: {
-      boardHash: boardHash,
+      boardId: boardId,
       boardName: boardName
     }
   }
 }
 
-export function _newOnChainPost (content, boardId, parentHash, postType, newContentToIPFS, newTransaction) {
+function _newOnChainPost (
+  content,
+  boardId,
+  parentHash,
+  postType,
+  newContentToIPFS,
+  newTransaction,
+  refreshCallback
+) {
   return {
     type: 'NEW_POST',
-    payload: forum.newOnChainPost(content, boardId, parentHash, postType, newContentToIPFS, newTransaction)
+    payload: forum.newOnChainPost(
+      content,
+      boardId,
+      parentHash,
+      postType,
+      newContentToIPFS,
+      newTransaction,
+      refreshCallback
+    )
   }
 }
 
-export function _newOffChainPost (content, boardId, parentHash, postType, actor) {
+function _newOffChainPost (content, boardId, parentHash, postType, actor, refreshCallback) {
   return {
     type: 'NEW_POST',
-    payload: forum.newOffChainPost(content, boardId, parentHash, postType, actor)
+    payload: forum.newOffChainPost(content, boardId, parentHash, postType, actor, refreshCallback)
   }
 }
 
-export function newPost (content, boardId, parentHash, postType, destination) {
+export function newPost (content, boardId, parentHash, postType, destination, refreshCallback) {
   if (destination === 'ON-CHAIN') {
     return (dispatch) => {
       dispatch(_newOnChainPost(
@@ -212,7 +245,8 @@ export function newPost (content, boardId, parentHash, postType, destination) {
         parentHash,
         postType,
         () => { },
-        (txHash) => { dispatch(newTransaction(txHash)) }
+        (txHash) => { dispatch(newTransaction(txHash)) },
+        refreshCallback
       ))
     }
   }
@@ -223,12 +257,13 @@ export function newPost (content, boardId, parentHash, postType, destination) {
       boardId,
       parentHash,
       postType,
-      poster
+      poster,
+      refreshCallback
     ))
   }
 }
 
-export function _voteFeedPost (actor, postHash, action) {
+function _voteFeedPost (actor, postHash, action) {
   return {
     type: 'VOTE_FEED_POST',
     payload: forum.voteFeedPost(actor, postHash, action)
@@ -242,7 +277,7 @@ export function voteFeedPost (postHash, action) {
   }
 }
 
-export function _voteFeedReply (actor, postHash, action) {
+function _voteFeedReply (actor, postHash, action) {
   return {
     type: 'VOTE_FEED_REPLY',
     payload: forum.voteFeedPost(actor, postHash, action)
@@ -256,7 +291,7 @@ export function voteFeedReply (postHash, action) {
   }
 }
 
-export function _getVoteCostEstimate (requester, postHash) {
+function _getVoteCostEstimate (requester, postHash) {
   return {
     type: 'GET_VOTE_COST_ESTIMATE',
     payload: forum.getVoteCostEstimate(requester, postHash)
@@ -276,20 +311,23 @@ export function resetErrorMessage () {
   }
 }
 
-export function _updateTargetPost (requester, postHash) {
+function _updateTargetPost (requester, postHash, targetArray) {
   return {
     type: 'UPDATE_TARGET_POST',
-    payload: forum.getTargetPost(requester, postHash)
+    payload: forum.getTargetPost(requester, postHash),
+    meta: {
+      targetArray: targetArray
+    }
   }
 }
 
-export function updateTargetPost (postHash) {
+export function updateTargetPost (postHash, targetArray) {
   return (dispatch, getState) => {
     const requester = getState().profileReducer.profile.actor
-    dispatch(_updateTargetPost(requester, postHash))
+    dispatch(_updateTargetPost(requester, postHash, targetArray))
   }
 }
-export function _getReplies (requester, postHash) {
+function _getReplies (requester, postHash) {
   return {
     type: 'GET_REPLIES',
     payload: forum.getAllReplies(requester, postHash)
@@ -303,7 +341,7 @@ export function getReplies (postHash) {
   }
 }
 
-export function _fetchUserMilstoneData (postHash, actor) {
+function _fetchUserMilstoneData (postHash, actor) {
   return {
     type: 'FETCH_USER_MILESTONE_DATA',
     payload: forum.fetchUserMilstoneData(postHash, actor)
@@ -317,14 +355,14 @@ export function fetchUserMilstoneData (postHash) {
   }
 }
 
-export function _processPurchasePutOption (postHash, purchaser, numToken, numVtxFeeToken, newTransaction, refreshCallback) {
+function _processPurchasePutOption (postHash, purchaser, numToken, numVtxFeeToken, newTransaction, refreshCallback) {
   return {
     type: 'PROCESS_PUT_OPTION',
     payload: forum.purchasePutOption(postHash, purchaser, numToken, numVtxFeeToken, newTransaction, refreshCallback)
   }
 }
 
-export function _processExecutePutOption (postHash, numToken, milestoneTokenAddress, numVtxFeeToken, newTransaction, refreshCallback) {
+function _processExecutePutOption (postHash, numToken, milestoneTokenAddress, numVtxFeeToken, newTransaction, refreshCallback) {
   return {
     type: 'PROCESS_PUT_OPTION',
     payload: forum.executePutOption(postHash, numToken, milestoneTokenAddress, numVtxFeeToken, newTransaction, refreshCallback)
@@ -362,23 +400,23 @@ export function clearPostDetail () {
   }
 }
 
-export function setCurrentParentPostHash (postHash) {
+export function setCurrentParentPost (postHash, targetArray) {
   return {
-    type: 'SET_CURRENT_PARENT_POST_HASH',
-    payload: postHash
+    type: 'SET_CURRENT_PARENT_POST',
+    payload: { postHash, targetArray }
   }
 }
 
 export function refreshViewingPost () {
   return (dispatch, getState) => {
     const requester = getState().profileReducer.profile.actor
-    const postHash = getState().forumReducer.currentParentPostHash
-    dispatch(_getReplies(requester, postHash))
-    dispatch(updateTargetPost(postHash))
+    const post = getState().forumReducer.currentParentPost
+    dispatch(_getReplies(requester, post.postHash))
+    dispatch(updateTargetPost(post.postHash, post.targetArray))
   }
 }
 
-export function _sendTransaction (receiverAddress, tokenSymbol, tokenAddress, amount, gasLimit, newTransaction) {
+function _sendTransaction (receiverAddress, tokenSymbol, tokenAddress, amount, gasLimit, newTransaction) {
   return {
     type: 'SEND_TRANSACTION',
     payload: WalletUtils.sendTransaction(receiverAddress, tokenSymbol, tokenAddress, amount, gasLimit, newTransaction)
@@ -418,7 +456,7 @@ export async function fetchTransactionStatus (transactionHash) {
   return receipt
 }
 
-export function _updateTransactionStatus (transactions) {
+function _updateTransactionStatus (transactions) {
   return {
     type: 'UPDATE_TRANSACTION',
     payload: Promise.all(transactions.map((transaction, i) => {
@@ -442,7 +480,7 @@ export function updateTransactionStatus () {
   }
 }
 
-export function _fetchProfile (actor) {
+function _fetchProfile (actor) {
   return {
     type: 'FETCH_PROFILE',
     payload: forum.fetchProfile(actor)
@@ -455,7 +493,7 @@ export function fetchProfile () {
   }
 }
 
-export function _refuel (actor, reputations, refreshProfile) {
+function _refuel (actor, reputations, refreshProfile) {
   return {
     type: 'REFUEL',
     payload: forum.refuel(actor, reputations, refreshProfile)
@@ -469,7 +507,7 @@ export function refuel (reputations, refreshProfile) {
   }
 }
 
-export function _registerUser (actor, username, telegramId, getUserData) {
+function _registerUser (actor, username, telegramId, getUserData) {
   return {
     type: 'REGISTER_USER',
     payload: forum.registerUser(actor, username, telegramId, getUserData)
@@ -501,7 +539,7 @@ export function setActor (actor) {
   }
 }
 
-export function _getRecentVotes (actor) {
+function _getRecentVotes (actor) {
   return {
     type: 'GET_RECENT_VOTES',
     payload: forum.getRecentVotes(actor)
@@ -515,7 +553,7 @@ export function getRecentVotes () {
   }
 }
 
-export function _getRecentComments (actor) {
+function _getRecentComments (actor) {
   return {
     type: 'GET_RECENT_COMMENTS',
     payload: forum.getRecentComments(actor)
@@ -529,7 +567,7 @@ export function getRecentComments () {
   }
 }
 
-export function _getRecentPosts (actor) {
+function _getRecentPosts (actor) {
   return {
     type: 'GET_RECENT_POSTS',
     payload: forum.getRecentPosts(actor)
@@ -540,5 +578,53 @@ export function getRecentPosts () {
   return (dispatch, getState) => {
     const actor = getState().profileReducer.profile.actor
     dispatch(_getRecentPosts(actor))
+  }
+}
+
+export function followBoards (boardIds) {
+  return (dispatch, getState) => {
+    const actor = getState().profileReducer.profile.actor
+    dispatch(_followBoards(actor, boardIds))
+  }
+}
+
+function _followBoards (actor, boardIds) {
+  return {
+    type: 'FOLLOW_BOARDS',
+    payload: forum.followBoards(actor, boardIds)
+  }
+}
+
+export function unfollowBoards (boardIds) {
+  return (dispatch, getState) => {
+    const actor = getState().profileReducer.profile.actor
+    dispatch(_unfollowBoards(actor, boardIds))
+  }
+}
+
+function _unfollowBoards (actor, boardIds) {
+  return {
+    type: 'UNFOLLOW_BOARDS',
+    payload: forum.unfollowBoards(actor, boardIds)
+  }
+}
+
+export function getUserFollowing () {
+  return (dispatch, getState) => {
+    const actor = getState().profileReducer.profile.actor
+    dispatch(_getUserFollowing(actor))
+  }
+}
+
+function _getUserFollowing (actor) {
+  return {
+    type: 'GET_USER_FOLLOWING',
+    payload: forum.getUserFollowing(actor)
+  }
+}
+
+export function clearBoardDetail () {
+  return {
+    type: 'CLEAR_BOARD_DETAIL'
   }
 }

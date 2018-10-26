@@ -11,23 +11,23 @@ export default class TabBarComponent extends Component {
           <Button
             vertical
             active={index === 0}
-            onPress={() => this.props.navigation.navigate('Assets')}>
+            onPress={() => this.props.navigation.navigate('Home')}>
             <Icon name='coin' type='MaterialCommunityIcons' />
-            <Text>Assets</Text>
+            <Text>Home</Text>
           </Button>
           <Button
             vertical
             active={index === 1}
-            onPress={() => this.props.navigation.navigate('TCR')}>
+            onPress={() => this.props.navigation.navigate('Discover')}>
             <Icon name='format-list-bulleted' type='MaterialCommunityIcons' />
-            <Text>TCR</Text>
+            <Text>Discover</Text>
           </Button>
           <Button
             vertical
             active={index === 2}
-            onPress={() => this.props.navigation.navigate('Discover')}>
+            onPress={() => this.props.navigation.navigate('TCR')}>
             <Icon type='MaterialCommunityIcons' name='compass-outline' />
-            <Text>Discover</Text>
+            <Text>TCR</Text>
           </Button>
           <Button
             vertical
