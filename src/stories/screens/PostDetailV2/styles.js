@@ -61,7 +61,8 @@ const styles = {
     fontWeight: ventureum.bold
   },
   fill: {
-    flex: 1
+    flex: 1,
+    backgroundColor: 'white'
   }
 }
 
