@@ -166,6 +166,12 @@ async function getFeedDataFromGetStream (request) {
 async function getOffChainPostDetails (requester, offChainPosts) {
   let offChainPostDetails = []
   const pResult = await Promise.all(offChainPosts.map((postHash) => {
+    const request = {
+      'postHash': postHash,
+      'requestor': requester,
+      'getStreamApiKey': Config.STREAM_API_KEY,
+      'getStreamApiSecret': Config.STREAM_API_SECRET
+    }
     return axios.post(
       `${Config.FEED_END_POINT}/get-feed-post`,
       {
@@ -540,7 +546,7 @@ function registerUser (UUID, username, telegramId, getUserData) {
     const request = {
       actor: UUID,
       username: username,
-      UserType: 'USER',
+      userType: 'USER',
       telegramId: telegramId
     }
     const result = await axios.post(

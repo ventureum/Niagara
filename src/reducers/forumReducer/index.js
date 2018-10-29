@@ -1,4 +1,5 @@
 import { BOARD_ALL_HASH } from '../../utils/constants.js'
+import boardsData from '../../utils/boards.json'
 
 const initialState = {
   boardId: BOARD_ALL_HASH,
@@ -36,7 +37,8 @@ const initialState = {
     loading: false,
     next: {},
     posts: []
-  }
+  },
+  boards: boardsData.boards
 }
 
 export default function (state = initialState, action) {

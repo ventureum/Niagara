@@ -6,7 +6,9 @@ import {
   getMorePosts,
   resetErrorMessage,
   setCurrentParentPost,
-  clearBoardDetail
+  clearBoardDetail,
+  followBoards,
+  unfollowBoards
 } from '../../actions'
 
 class BoardDetailContainer extends Component {
@@ -35,6 +37,9 @@ class BoardDetailContainer extends Component {
         errorMessage={this.props.errorMessage}
         setCurrentParentPost={this.props.setCurrentParentPost}
         resetErrorMessage={this.props.resetErrorMessage}
+        userFollowing={this.props.userFollowing}
+        followBoards={this.props.followBoards}
+        unfollowBoards={this.props.unfollowBoards}
       />
     )
   }
@@ -43,7 +48,8 @@ class BoardDetailContainer extends Component {
 const mapStateToProps = ({ profileReducer, forumReducer }) => ({
   boardPosts: forumReducer.boardPosts,
   errorMessage: forumReducer.errorMessage,
-  actor: profileReducer.profile.actor
+  actor: profileReducer.profile.actor,
+  userFollowing: forumReducer.userFollowing
 })
 
 const mapDispatchToProps = (dispatch) => ({
@@ -51,7 +57,9 @@ const mapDispatchToProps = (dispatch) => ({
   getMorePosts: (feedSlug, boardId, targetArray) => dispatch(getMorePosts(feedSlug, boardId, targetArray)),
   setCurrentParentPost: (postHash, targetArray) => dispatch(setCurrentParentPost(postHash, targetArray)),
   resetErrorMessage: () => dispatch(resetErrorMessage()),
-  clearBoardDetail: () => dispatch(clearBoardDetail())
+  clearBoardDetail: () => dispatch(clearBoardDetail()),
+  followBoards: (boardIds) => dispatch(followBoards(boardIds)),
+  unfollowBoards: (boardIds) => dispatch(unfollowBoards(boardIds))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(BoardDetailContainer)
