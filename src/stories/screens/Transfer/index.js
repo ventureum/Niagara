@@ -1,30 +1,65 @@
 import React, { Component } from 'react'
-import { Container, Header, Left, Right, Button, Icon, Body, Title, Card } from 'native-base'
-import { View, Text, ScrollView, Switch, Platform, Modal, TextInput, TouchableOpacity } from 'react-native'
+import { Header, Left, Right, Button, Icon, Body, Title } from 'native-base'
+import { View, Text, Switch, Modal, TextInput, TouchableOpacity, FlatList } from 'react-native'
 import ventureum from '../../../theme/variables/ventureum'
 import styles from './styles'
 
 export default class Transfer extends Component {
   state = ({
-    autoTransfer: false,
+    showBlockDetails: false,
     showModifyDialog: false,
-    transferAmount: null
+    transferAmount: 0
   })
+
+  renderHeader = () => {
+    return (
+      <Header style={{ paddingBottom: null, borderBottomWidth: null, paddingLeft: 0 }}>
+        <Left>
+          <Button transparent onPress={() => this.props.navigation.goBack()}>
+            <Icon name='chevron-small-left' type='Entypo' />
+          </Button>
+        </Left>
+        <Body>
+          <Title>Redeem</Title>
+        </Body>
+        <Right />
+      </Header >
+    )
+  }
+
+  renderRedeemSetting = () => {
+    return (
+      <View style={styles.settingContainer}>
+        <Text style={styles.settingTitle} >
+          Redeem Settings
+        </Text>
+        <Text style={styles.settingText}>
+          Milestone points will be redeemed for VTX tokens every Sunday night.
+        </Text>
+        <View style={styles.redeemSettingContainer}>
+          <Text style={styles.redeemSettingText}>
+            Redeem all MSP by default
+          </Text>
+          <Switch value={false} />
+        </View>
+      </View>
+    )
+  }
 
   renderModifyModal = () => {
     return (
       <Modal
-        animationType={'slide'}
+        animationType={'fade'}
         transparent
         visible={this.state.showModifyDialog}
         onRequestClose={
-          () => { }
+          () => {
+            this.setState({ showModifyDialog: false })
+          }
         }
       >
         <View style={styles.modelView}>
-          <View style={styles.modalBackground} >
-            <Text>lala</Text>
-          </View>
+          <View style={styles.modalBackground} />
           <View style={styles.modelMessage}>
             <View style={styles.modelHeaderContainer}>
               <Text style={styles.assetText}>Modify Transfer Amount</Text>
@@ -48,7 +83,7 @@ export default class Transfer extends Component {
                 onChangeText={(amount) => {
                   this.setState({ transferAmount: amount })
                 }}
-                value={this.state.transferAmount}
+                value={String(this.state.transferAmount)}
                 underlineColorAndroid='transparent'
               />
             </View>
@@ -74,152 +109,129 @@ export default class Transfer extends Component {
             </View>
           </View>
         </View>
-
       </Modal >
     )
   }
 
-  renderTransferHistory = () => {
-    let listItems = []
-    for (let i = 0; i < 30; i++) {
-      listItems.push(
-        <Card key={i}>
-          <View style={[
-            styles.nextTransferContainer,
-            { paddingHorizontal: ventureum.basicPadding * 2 }
-          ]}>
-            <View style={styles.assetView}>
-              <Text style={styles.assetText}>10,000</Text>
-              <Text style={styles.assetSubText}>MSP</Text>
-            </View>
-            <View style={styles.assetView} >
-              <Icon name='arrow-right' type='Feather' style={{ color: ventureum.unClickable }} />
-              <Text style={styles.assetSubText}>Sep 4</Text>
-            </View>
-            <View style={styles.assetView}>
-              <Text style={styles.assetText}>17.49</Text>
-              <Text style={styles.assetSubText}>VTX</Text>
-            </View>
+  renderSpacer = (text) => {
+    return (
+      <View style={styles.spacer}>
+        <Text style={styles.spacerText}>{text}</Text>
+      </View>
+    )
+  }
+
+  renderTransfer = (time, MSP, VTX) => {
+    return (
+      <View style={styles.transferContainer}>
+        <View >
+          <Text style={styles.timeText}>2018-10-31</Text>
+          <Text style={styles.mspText}>{this.state.transferAmount} MSP</Text>
+        </View>
+        <Icon style={{ color: '#777777' }} name='arrow-right' type='Feather' />
+        <Text style={styles.vtxText}>12.24VTX</Text>
+      </View>
+    )
+  }
+
+  renderUpcomingRedeem = () => {
+    return (
+      <View style={styles.upcomingContainer}>
+        {this.renderTransfer()}
+        {this.state.showBlockDetails ? <View>
+          <View>
+            <Text style={styles.blockInfoTitle}>
+              Enrolled Milestone Points
+            </Text>
+            <Text style={styles.blockInfoText}>
+              482,852
+            </Text>
           </View>
-        </Card>
-      )
+          <View>
+            <Text style={styles.blockInfoTitle}>
+              Estimated Rate
+            </Text>
+            <Text style={styles.blockInfoText}>
+              100 MSP = 0.1749 VTX
+            </Text>
+          </View>
+          <View>
+            <Text style={styles.blockInfoTitle}>
+              VTX Pool
+            </Text>
+            <Text style={styles.blockInfoText}>
+              1,024
+            </Text>
+          </View>
+        </View>
+          : null
+        }
+        <View style={styles.upcomingFooter}>
+          <TouchableOpacity onPress={() => {
+            this.setState({ showBlockDetails: !this.state.showBlockDetails })
+          }}>
+            <Icon
+              name={this.state.showBlockDetails ? 'chevron-up' : 'chevron-down'}
+              type='MaterialCommunityIcons'
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              alignSelf: 'center'
+            }}
+            onPress={() => {
+              this.setState({ showModifyDialog: true })
+            }}
+          >
+            <Text style={{
+              fontWeight: ventureum.medium,
+              fontSize: 16,
+              color: ventureum.lightSecondaryColor
+            }}>MODIFY</Text>
+          </TouchableOpacity>
+
+        </View>
+      </View>
+    )
+  }
+
+  onRenderItem = ({ item, index }) => {
+    switch (item.name) {
+      case 'Redeem_Settings':
+        return this.renderRedeemSetting()
+      case 'UpcomingSpacer':
+        return this.renderSpacer('Upcoming Redeem (based on estimated rate)')
+      case 'UpcomingTransfer':
+        return this.renderUpcomingRedeem()
+      case 'HistorySpacer':
+        return this.renderSpacer('Redeem History')
+      default:
+        return null
     }
-    return listItems
   }
 
   render () {
-    const { autoTransfer } = this.state
+    let data = []
+    data.push({ name: 'Redeem_Settings', id: '0' })
+    data.push({ name: 'UpcomingSpacer', id: '1' })
+    data.push({ name: 'UpcomingTransfer', id: '2' })
+    data.push({ name: 'HistorySpacer', id: '3' })
     return (
-      <Container>
-        <Header style={{ paddingBottom: null, borderBottomWidth: null }}>
-          <Left>
-            <Button transparent onPress={() => this.props.navigation.goBack()}>
-              <Icon name='chevron-small-left' type='Entypo' />
-            </Button>
-          </Left>
-          <Body>
-            <Title>Transfer</Title>
-          </Body>
-          <Right />
-        </Header >
-        <ScrollView contentContainerStyle={styles.content}>
-          <Card >
-            <View style={styles.info}>
-              <View style={styles.nextTransferContainer}>
-                <View style={styles.assetView}>
-                  <Text style={styles.assetText}>10,000</Text>
-                  <Text style={styles.assetSubText}>MSP</Text>
-                </View>
-                <View style={styles.assetView} >
-                  <Icon name='arrow-right' type='Feather' style={{ color: ventureum.lightSecondaryColor }} />
-                  <Text style={styles.assetSubText}>Sep 4</Text>
-                </View>
-                <View style={styles.assetView}>
-                  <Text style={styles.assetText}>17.49</Text>
-                  <Text style={styles.assetSubText}>VTX</Text>
-                </View>
-              </View>
-
-              <View>
-                <TouchableOpacity
-                  style={styles.descriptionContainer}
-                  onPress={() => {
-                    this.setState({ detailOpened: !this.state.detailOpened })
-                  }}
-                >
-                  <Text style={{ ...styles.assetSubText, width: '70%' }}>
-                    The next transfer is scheduled on September 4, 2018, 23:59pm
-                  </Text>
-                  <Icon
-                    type='Entypo'
-                    name={
-                      this.state.detailOpened
-                        ? 'chevron-small-up'
-                        : 'chevron-small-down'
-                    }
-                    style={{ color: ventureum.subTextOnPrimary }}
-                  />
-                </TouchableOpacity>
-                {this.state.detailOpened
-                  ? <View style={styles.detailContainer} >
-                    <View style={styles.firstDetailContainer}>
-                      <View>
-                        <Text style={styles.detailItemTitle}>Enrolled Milstone Points</Text>
-                        <Text style={styles.detailItemValue}>482,852</Text>
-                      </View>
-                      <View>
-                        <Text style={styles.detailItemTitle}>VTX Pool</Text>
-                        <Text style={{
-                          ...styles.detailItemValue,
-                          alignSelf: 'flex-end'
-                        }}>1,024</Text>
-                      </View>
-                    </View>
-                    <View>
-                      <Text style={styles.detailItemTitle}>Estimated Rate</Text>
-                      <Text style={styles.detailItemValue}>100 MSP = 0.1749 VTX</Text>
-                    </View>
-                  </View>
-                  : null
-                }
-              </View>
-              <View style={styles.footer}>
-                <View style={styles.switchContainer}>
-                  <Text style={styles.switchText}>Auto-transfer</Text>
-                  <Switch
-                    onTintColor={ventureum.lightSecondaryColor}
-                    thumbTintColor={
-                      autoTransfer
-                        ? ventureum.secondaryColor
-                        : ventureum.subTextOnPrimary
-                    }
-                    value={autoTransfer}
-                    onValueChange={() => {
-                      this.setState({ autoTransfer: !autoTransfer })
-                    }}
-                    style={{
-                      transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
-                      marginLeft: ventureum.basicPadding,
-                      marginTop: Platform.OS === 'iOS' ? 0 : 3
-                    }}
-                  />
-                </View>
-                {
-                  autoTransfer
-                    ? <Button transparent onPress={() => {
-                      this.setState({ showModifyDialog: !this.state.showModifyDialog })
-                    }}>
-                      <Text style={{ color: ventureum.secondaryColor }}>Modify</Text>
-                    </Button>
-                    : null
-                }
-              </View>
-            </View>
-          </Card>
-          {this.renderTransferHistory()}
-        </ScrollView>
+      <View style={styles.fill}>
+        <FlatList
+          data={data}
+          renderItem={this.onRenderItem}
+          ref={(ref) => { this.flatListRef = ref }}
+          keyExtractor={item => item.id}
+          onEndReachedThreshold={0.5}
+          onEndReached={() => {
+          }}
+          ListHeaderComponent={this.renderHeader}
+          contentContainerStyle={styles.container}
+        />
         {this.renderModifyModal()}
-      </Container>
+      </View>
+
     )
   }
 }

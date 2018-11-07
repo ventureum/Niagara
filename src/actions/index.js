@@ -624,7 +624,7 @@ function _followBoards (actor, boardIds, callback) {
   return {
     type: 'FOLLOW_BOARDS',
     payload: forum.followBoards(actor, boardIds).then(
-      setTimeout(callback, 100)
+      setTimeout(callback, 500)
     )
   }
 }
@@ -641,7 +641,7 @@ function _unfollowBoards (actor, boardIds, callback) {
   return {
     type: 'UNFOLLOW_BOARDS',
     payload: forum.unfollowBoards(actor, boardIds).then(
-      setTimeout(callback, 100)
+      setTimeout(callback, 500)
     )
   }
 }
