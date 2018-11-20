@@ -190,12 +190,8 @@ async function getOffChainPostDetails (requester, offChainPosts) {
     if (!pResult[i].data.ok) {
       throw (pResult[i])
     }
-    const { post, postVoteCountInfo, requestorVoteCountInfo } = pResult[i].data
-    offChainPostDetails.push({
-      ...post,
-      postVoteCountInfo,
-      requestorVoteCountInfo
-    })
+    const { post } = pResult[i].data
+    offChainPostDetails.push(post)
   }
   return offChainPostDetails
 }

@@ -18,8 +18,7 @@ class Login extends React.Component {
             var nanoid = require('nanoid/non-secure')
             let urlKey = 'key'
             urlKey = nanoid(24)
-            const url = 'https://telegram.me/milestone_login_bot?start=' + urlKey
-            this.props.navigation.navigate('UserLoadingScreen', { urlKey: urlKey })
+            const url = 'https://telegram.me/Milestone_Auth_bot?start=' + urlKey
             Linking.canOpenURL(url).then(supported => {
               if (supported) {
                 Linking.openURL(url)
@@ -28,9 +27,13 @@ class Login extends React.Component {
               }
             })
           }}>
-          <Text style={{
-            fontWeight: ventureum.bold
-          }} primaryColor>LOG IN WITH TELEGRAM</Text>
+          <Text
+            style={{
+              fontWeight: ventureum.bold
+            }}
+            primaryColor>
+           LOG IN WITH TELEGRAM
+          </Text>
         </Button>
       </View>
     )

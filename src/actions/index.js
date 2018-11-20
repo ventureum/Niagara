@@ -545,13 +545,9 @@ function _registerUser (actor, username, telegramId, getUserData) {
   }
 }
 
-export function registerUser (idRoot, username, telegramId) {
-  const shakeHash = shake128(String(idRoot), 128)
-  const hashBytes = Buffer.from(shakeHash, 'hex')
-  const uuidParse = require('uuid-parse')
-  const actor = uuidParse.unparse(hashBytes)
+export function registerUser (actor, username, telegramId, accessToken) {
   return (dispatch, getState) => {
-    dispatch(setActor(actor))
+    dispatch(setAccessToken(accessToken))
     dispatch(_registerUser(
       actor,
       username,
@@ -563,10 +559,10 @@ export function registerUser (idRoot, username, telegramId) {
   }
 }
 
-export function setActor (actor) {
+export function setAccessToken (token) {
   return {
-    type: 'SET_ACTOR',
-    payload: actor
+    type: 'SET_ACCESS_TOKEN',
+    payload: token
   }
 }
 

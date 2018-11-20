@@ -22,7 +22,7 @@ const mapDispatchToProps = (dispatch) =>
   ({
     setWalletAddress: address => dispatch(setWalletAddress(address)),
     setPrivateKey: privKey => dispatch(setPrivateKey(privKey)),
-    registerUser: (idRoot, username, telegramId) => dispatch(registerUser(idRoot, username, telegramId))
+    registerUser: (idRoot, username, telegramId, accessToken) => dispatch(registerUser(idRoot, username, telegramId, accessToken))
   })
 
 const mapStateToProps = state => ({
