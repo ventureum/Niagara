@@ -1,21 +1,22 @@
 import { BOARD_ALL_HASH } from '../../utils/constants.js'
+import boardsData from '../../utils/boards.json'
 
 const initialState = {
   boardId: BOARD_ALL_HASH,
   boardName: 'All',
   newPosts: {
     loading: false,
-    next: '',
+    next: {},
     posts: []
   },
   homePosts: {
     loading: false,
-    next: '',
+    next: {},
     posts: []
   },
   popularPosts: {
     loading: false,
-    next: '',
+    next: {},
     posts: []
   },
   loading: false,
@@ -24,7 +25,7 @@ const initialState = {
   replies: {
     loading: false,
     posts: [],
-    next: ''
+    next: {}
   },
   milestoneData: {},
   milestoneDataLoading: false,
@@ -34,9 +35,10 @@ const initialState = {
   },
   boardPosts: {
     loading: false,
-    next: '',
+    next: {},
     posts: []
-  }
+  },
+  boards: boardsData.boards
 }
 
 export default function (state = initialState, action) {
@@ -77,8 +79,7 @@ export default function (state = initialState, action) {
 
   if (action.type === 'GET_MORE_POSTS_FULFILLED') {
     const { targetArray } = action.meta
-    const newArray = state[targetArray].posts
-    newArray.push(action.payload.posts)
+    const newArray = state[targetArray].posts.concat(action.payload.posts)
     return {
       ...state,
       [`${targetArray}`]: {
@@ -86,7 +87,7 @@ export default function (state = initialState, action) {
         loading: false,
         next: action.payload.next
       },
-      errorMessage: action.payload.data.message.errorCode
+      errorMessage: ''
     }
   }
 
@@ -225,6 +226,40 @@ export default function (state = initialState, action) {
     }
   }
   if (action.type === 'GET_REPLIES_REJECTED') {
+    return {
+      ...state,
+      replies: {
+        ...state.replies,
+        loading: false
+      },
+      errorMessage: action.payload
+    }
+  }
+
+  if (action.type === 'GET_MORE_REPLIES_PENDING') {
+    return {
+      ...state,
+      replies: {
+        ...state.replies,
+        loading: true
+      },
+      errorMessage: ''
+    }
+  }
+  if (action.type === 'GET_MORE_REPLIES_FULFILLED') {
+    const newArray = state.replies.posts.concat(action.payload.posts)
+    return {
+      ...state,
+      loading: false,
+      replies: {
+        posts: newArray,
+        loading: false,
+        next: action.payload.next
+      },
+      errorMessage: ''
+    }
+  }
+  if (action.type === 'GET_MORE_REPLIES_REJECTED') {
     return {
       ...state,
       replies: {

@@ -15,13 +15,18 @@ class HomeContainer extends Component {
     this.props.refreshPosts(this.props.actor, 'homePosts')
   }
 
+  getMorePosts = () => {
+    const { actor } = this.props
+    this.props.getMorePosts('user', actor, 'homePosts')
+  }
+
   render () {
     return (
       <Home navigation={this.props.navigation}
         actor={this.props.actor}
         homePosts={this.props.homePosts}
         refreshPosts={this.props.refreshPosts}
-        getMorePosts={this.props.getMorePosts}
+        getMorePosts={this.getMorePosts}
         errorMessage={this.props.errorMessage}
         setCurrentParentPost={this.props.setCurrentParentPost}
         resetErrorMessage={this.props.resetErrorMessage}
@@ -30,7 +35,7 @@ class HomeContainer extends Component {
   }
 }
 
-const mapStateToProps = ({profileReducer, forumReducer}) => ({
+const mapStateToProps = ({ profileReducer, forumReducer }) => ({
   homePosts: forumReducer.homePosts,
   errorMessage: forumReducer.errorMessage,
   actor: profileReducer.profile.actor
@@ -38,7 +43,7 @@ const mapStateToProps = ({profileReducer, forumReducer}) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   refreshPosts: (actor, targetArray) => dispatch(refreshPosts('user', actor, targetArray)),
-  getMorePosts: (actor, targetArray) => dispatch(getMorePosts('user', actor, targetArray)),
+  getMorePosts: (feedSlug, boardId, targetArray) => dispatch(getMorePosts(feedSlug, boardId, targetArray)),
   voteFeedPost: (postHash, value) => dispatch(voteFeedPost(postHash, value)),
   setCurrentParentPost: (postHash, targetArray) => dispatch(setCurrentParentPost(postHash, targetArray)),
   resetErrorMessage: () => dispatch(resetErrorMessage())

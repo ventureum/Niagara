@@ -1,70 +1,94 @@
 import ventureum from '../../../theme/variables/ventureum'
 
 const styles = {
-  content: {
-    paddingHorizontal: ventureum.basicPadding
+  fill: {
+    flex: 1
   },
-  info: {
-    flexDirection: 'column',
-    paddingVertical: ventureum.basicPadding,
+  container: {
+    flex: 1,
     alignItems: 'stretch',
-    paddingHorizontal: ventureum.basicPadding * 3,
-    flex: 1
+    backgroundColor: 'white'
   },
-  nextTransferContainer: {
+  settingContainer: {
+    paddingTop: ventureum.basicPadding * 4,
+    paddingBottom: ventureum.basicPadding * 3,
+    alignItems: 'stretch',
+    paddingHorizontal: ventureum.basicPadding * 2
+  },
+  settingTitle: {
+    color: '#333333',
+    fontSize: 18,
+    fontWeight: ventureum.medium
+  },
+  settingText: {
+    marginTop: ventureum.basicPadding,
+    width: '95%',
+    color: '#666666',
+    fontSize: 14,
+    fontWeight: ventureum.normal
+  },
+  redeemSettingContainer: {
+    marginTop: ventureum.basicPadding,
     flexDirection: 'row',
-    paddingVertical: ventureum.basicPadding * 3,
     justifyContent: 'space-between',
-    alignItems: 'center',
-    flex: 1
+    alignItems: 'center'
   },
-  assetView: {
+  redeemSettingText: {
+    color: '#333333',
+    fontSize: 14,
+    fontWeight: ventureum.normal
+  },
+  spacer: {
+    paddingHorizontal: ventureum.basicPadding * 2,
+    paddingTop: ventureum.basicPadding * 2,
+    paddingBottom: ventureum.basicPadding,
+    backgroundColor: '#f8f8f8'
+  },
+  spacerText: {
+    color: '#777777',
+    fontSize: 12
+  },
+  upcomingContainer: {
     flexDirection: 'column',
-    alignItems: 'center'
+    paddingHorizontal: ventureum.basicPadding * 2,
+    paddingTop: ventureum.basicPadding * 2,
+    paddingBottom: ventureum.basicPadding * 2
   },
-  assetText: {
-    fontSize: ventureum.pageTitleFontSize,
-    fontWeight: ventureum.bold,
-    color: ventureum.textOnPrimary
-  },
-  assetSubText: {
-    fontSize: ventureum.paragraphFontSize,
-    color: '#686868'
-  },
-  descriptionContainer: {
-    flexDirection: 'row',
-    paddingVertical: ventureum.basicPadding,
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  estimationTextContainer: {
-    flexDirection: 'row',
-    paddingVertical: ventureum.basicPadding,
-    width: '80%'
-  },
-  footer: {
+  transferContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center'
   },
-  listItemContainer: {
-    paddingHorizontal: ventureum.basicPadding,
-    paddingVertical: ventureum.basicPadding * 2,
-    borderBottomWidth: null,
-    borderTopWidth: 1,
-    borderColor: ventureum.borderColor
+  mspText: {
+    fontSize: 14,
+    color: '#333333',
+    fontWeight: ventureum.medium
   },
-  switchContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingVertical: ventureum.basicPadding
+  timeText: {
+    fontSize: 12,
+    color: '#777777'
   },
-  switchText: {
-    fontSize: ventureum.paragraphFontSize,
-    color: ventureum.textOnPrimary,
-    fontWeight: ventureum.lessBold
+  vtxText: {
+    fontSize: 14,
+    color: '#333333',
+    fontWeight: ventureum.medium
   },
+  upcomingFooter: {
+    paddingTop: ventureum.basicPadding * 2,
+    alignItems: 'flex-end'
+  },
+  blockInfoTitle: {
+    marginTop: ventureum.basicPadding * 2,
+    fontSize: 12,
+    color: '#777777'
+  },
+  blockInfoText: {
+    marginTop: ventureum.basicPadding,
+    fontSize: 14,
+    color: '#333333',
+    fontWeight: ventureum.medium
+  },
+
   modalBackground: {
     backgroundColor: 'black',
     opacity: 0.5,
@@ -81,7 +105,7 @@ const styles = {
   modelMessage: {
     backgroundColor: 'white',
     marginHorizontal: ventureum.basicPadding * 7,
-    borderRadius: ventureum.borderRadiusBase,
+    borderRadius: ventureum.borderRadiusBase * 3,
     padding: ventureum.basicPadding * 3,
     flexDirection: 'column',
     alignItems: 'stretch'
@@ -95,25 +119,14 @@ const styles = {
     alignItems: 'center',
     paddingVertical: ventureum.basicPadding
   },
-  detailContainer: {
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    paddingVertical: ventureum.basicPadding
+  assetText: {
+    fontSize: ventureum.pageTitleFontSize,
+    fontWeight: ventureum.bold,
+    color: ventureum.textOnPrimary
   },
-  firstDetailContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  },
-  detailItemTitle: {
-    fontSize: ventureum.paragraphFontSize - 1,
-    color: ventureum.subTextOnPrimary
-  },
-  detailItemValue: {
+  assetSubText: {
     fontSize: ventureum.paragraphFontSize,
-    color: ventureum.textOnPrimary,
-    marginVertical: ventureum.basicPadding,
-    fontWeight: ventureum.lessBold
+    color: '#686868'
   }
 }
 

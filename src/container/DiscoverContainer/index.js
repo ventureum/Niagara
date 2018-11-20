@@ -25,13 +25,18 @@ class DiscoverContainer extends Component {
     this.props.getUserFollowing()
   }
 
+  getMorePosts = (targetArray) => {
+    const { boardId } = this.props
+    this.props.getMorePosts('board', boardId, targetArray)
+  }
+
   render () {
     return (
       <Discover navigation={this.props.navigation}
         popularPosts={this.props.popularPosts}
         newPosts={this.props.newPosts}
         refreshPosts={this.refreshPosts}
-        getMorePosts={this.props.getMorePosts}
+        getMorePosts={this.getMorePosts}
         loading={this.props.loading}
         boardId={this.props.boardId}
         boardName={this.props.boardName}
@@ -41,6 +46,7 @@ class DiscoverContainer extends Component {
         resetErrorMessage={this.props.resetErrorMessage}
         getUserFollowing={this.props.getUserFollowing}
         userFollowing={this.props.userFollowing}
+        boards={this.props.boards}
       />
     )
   }
@@ -53,12 +59,13 @@ const mapStateToProps = ({forumReducer}) => ({
   boardId: forumReducer.boardId,
   boardName: forumReducer.boardName,
   errorMessage: forumReducer.errorMessage,
-  userFollowing: forumReducer.userFollowing
+  userFollowing: forumReducer.userFollowing,
+  boards: forumReducer.boards
 })
 
 const mapDispatchToProps = (dispatch) => ({
   refreshPosts: (feedSlug, boardId, targetArray, ranking) => dispatch(refreshPosts(feedSlug, boardId, targetArray, ranking)),
-  getMorePosts: (feedSlug, boardId, targetArray, ranking) => dispatch(getMorePosts(feedSlug, boardId, targetArray, ranking)),
+  getMorePosts: (feedSlug, boardId, targetArray) => dispatch(getMorePosts(feedSlug, boardId, targetArray)),
   switchBoard: (boardId, boardName) => dispatch(switchBoard(boardId, boardName)),
   newPost: (content, boardId, parentHash, postType, destination) => dispatch(newPost(content, boardId, parentHash, postType, destination)),
   voteFeedPost: (postHash, value) => dispatch(voteFeedPost(postHash, value)),

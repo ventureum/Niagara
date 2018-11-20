@@ -33,7 +33,10 @@ import BoardDetail from './container/BoardDetailContainer'
 const Login = createStackNavigator(
   {
     LoginPage: { screen: LoginPage },
-    UserLoadingScreen: { screen: UserLoadingScreen }
+    UserLoadingScreen: {
+      screen: UserLoadingScreen,
+      path: 'loading/:token'
+    }
   },
   {
     initialRouteName: 'LoginPage',
@@ -82,7 +85,7 @@ const MainNavigator = createStackNavigator(
 
 const App = createSwitchNavigator(
   {
-    Login: { screen: Login },
+    Login: { screen: Login, uriPrefix: 'login/' },
     Main: { screen: MainNavigator },
     AppLoadingScreen: { screen: AppLoadingScreen }
   },
@@ -91,10 +94,9 @@ const App = createSwitchNavigator(
     headerMode: 'none'
   }
 )
-
 const RootPage = () => (
   <Root>
-    <App />
+    <App uriPrefix={'http://open.milestone/'} />
   </Root>
 )
 

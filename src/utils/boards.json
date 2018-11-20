@@ -1,0 +1,14 @@
+{
+  "boards":[
+    {
+      "boardId":"0xc6c260628ca29dfacadb60c8bb41d15dadc0dbc133680f7322b1a1008739b64f",
+      "boardName": "All",
+      "nameInitials":"A"
+    },
+    {
+      "boardId":"0xfafe9e798792a4c59a71bf36c7082fa92c3849ffe26f8d2cf81f5f4da4e115ad",
+      "boardName": "MilestoneChatbot Test",
+      "nameInitials":"MCT"
+    }
+  ]
+}

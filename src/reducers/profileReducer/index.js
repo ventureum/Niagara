@@ -5,7 +5,8 @@ const initialState = {
   userLoaded: false,
   recentComments: [],
   recentPosts: [],
-  recentVotes: []
+  recentVotes: [],
+  accessToken: null
 }
 
 export default function (state = initialState, action) {
@@ -50,17 +51,18 @@ export default function (state = initialState, action) {
     }
   }
 
-  if (action.type === 'SET_ACTOR') {
+  if (action.type === 'SET_ACCESS_TOKEN') {
     return {
       ...state,
-      profile: { actor: action.payload }
+      accessToken: action.payload
     }
   }
 
   if (action.type === 'GET_RECENT_VOTES_FULFILLED') {
     return {
       ...state,
-      recentVotes: action.payload
+      recentVotes: action.payload,
+      loadingRecentVotes: false
     }
   }
   if (action.type === 'GET_RECENT_VOTES_PENDING') {
@@ -72,14 +74,16 @@ export default function (state = initialState, action) {
   if (action.type === 'GET_RECENT_VOTES_REJECTED') {
     return {
       ...state,
-      recentVotesErrors: action.payload
+      recentVotesErrors: action.payload,
+      loadingRecentVotes: false
     }
   }
 
   if (action.type === 'GET_RECENT_POSTS_FULFILLED') {
     return {
       ...state,
-      recentPosts: action.payload
+      recentPosts: action.payload,
+      loadingRecentPosts: false
     }
   }
   if (action.type === 'GET_RECENT_POSTS_PENDING') {
@@ -91,14 +95,16 @@ export default function (state = initialState, action) {
   if (action.type === 'GET_RECENT_POSTS_REJECTED') {
     return {
       ...state,
-      recentPostsErrors: action.payload
+      recentPostsErrors: action.payload,
+      loadingRecentPosts: false
     }
   }
 
   if (action.type === 'GET_RECENT_COMMENTS_FULFILLED') {
     return {
       ...state,
-      recentComments: action.payload
+      recentComments: action.payload,
+      loadingRecentComments: false
     }
   }
   if (action.type === 'GET_RECENT_COMMENTS_PENDING') {
@@ -110,7 +116,8 @@ export default function (state = initialState, action) {
   if (action.type === 'GET_RECENT_COMMENTS_REJECTED') {
     return {
       ...state,
-      recentCommentsErrors: action.payload
+      recentCommentsErrors: action.payload,
+      loadingRecentComments: false
     }
   }
   return state

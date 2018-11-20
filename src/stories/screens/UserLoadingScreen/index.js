@@ -6,7 +6,7 @@ import WalletUtils from '../../../utils/wallet'
 import logo from '../Login/images/logo.png'
 import styles from './styles'
 import ventureum from '../../../theme/variables/ventureum'
-import Axios from 'axios'
+const jwt = require('jsonwebtoken')
 
 export default class UserLoadingScreen extends Component {
   generateWallet () {
@@ -22,23 +22,20 @@ export default class UserLoadingScreen extends Component {
     this.props.setPrivateKey(wallet.privateKey)
   }
 
-  checkLogIn = () => {
-    var loopId = setInterval(async () => {
-      try {
-        const { urlKey } = this.props
-        const result = await Axios.get(`https://0gbc0znvfh.execute-api.us-west-1.amazonaws.com/alpha?key=${urlKey}`)
-        clearInterval(loopId)
-        clearTimeout(timeoutId)
-        this.props.registerUser(result.data.body.id, result.data.body.username, result.data.body.id)
-        this.generateWallet()
-      } catch (error) {
-      }
-    }, 1000)
-    var timeoutId = setTimeout(() => {
-      clearInterval(loopId)
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.userLoaded) {
+      this.props.navigation.navigate('Main')
+      return false
+    }
+    return true
+  }
+
+  receivedJWT = async () => {
+    const token = this.props.navigation.getParam('token', null)
+    if (token === null) {
       Alert.alert(
         'Ooops',
-        'Log in with Telegram timeout.',
+        'Log in with Telegram failed.',
         [
           {
             text: 'OK',
@@ -50,19 +47,20 @@ export default class UserLoadingScreen extends Component {
         { cancelable: false }
       )
       this.props.navigation.goBack()
-    }, 15000)
-  }
-
-  componentWillMount () {
-    this.checkLogIn()
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.userLoaded) {
-      this.props.navigation.navigate('Main')
-      return false
     }
-    return true
+    const JWTRS256_PUBLIC = `-----BEGIN PUBLIC KEY-----\n${Config.JWTRS256_PUBLIC}\n-----END PUBLIC KEY-----`
+    try {
+      const verifiedToken = await jwt.verify(token, JWTRS256_PUBLIC, { algorithms: ['RS256'] })
+      const { actor, username, telegramId } = verifiedToken.data
+      this.props.registerUser(actor, username, telegramId, token)
+      this.generateWallet()
+    } catch (e) {
+      throw new Error('Access token verification failed.')
+    }
+  }
+
+  componentDidMount () {
+    this.receivedJWT()
   }
 
   render () {
@@ -74,8 +72,17 @@ export default class UserLoadingScreen extends Component {
             <Text style={styles.appName}>Milestone</Text>
           </View>
           {Platform.OS === 'ios'
-            ? <ProgressViewIOS style={{ alignSelf: 'stretch' }} progressViewStyle='bar' progressTintColor={ventureum.lightSecondaryColor} />
-            : <ProgressBarAndroid style={{ alignSelf: 'stretch' }} styleAttr='Horizontal' color={ventureum.lightSecondaryColor} />
+            ? <ProgressViewIOS
+              style={{ alignSelf: 'stretch' }}
+              progressViewStyle='bar'
+              progressTintColor={ventureum.lightSecondaryColor}
+
+            />
+            : <ProgressBarAndroid
+              style={{ alignSelf: 'stretch' }} s
+              styleAttr='Horizontal'
+              color={ventureum.lightSecondaryColor}
+            />
           }
           <Text style={{
             color: ventureum.subTextOnPrimary,

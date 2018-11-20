@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
-import { Alert, FlatList, View, RefreshControl, TouchableOpacity } from 'react-native'
+import { Alert, FlatList, View, RefreshControl, TouchableOpacity, Text } from 'react-native'
 import {
   Container,
   Header,
   Icon,
   Content,
-  Text,
   Title
 } from 'native-base'
 import styles from './styles'
@@ -17,16 +16,27 @@ console.ignoredYellowBox = ['Setting a timer']
 
 export default class BoardDetail extends Component {
   onRefresh = () => {
-    this.props.refreshPosts(this.props.actor, 'boardPosts')
+    this.props.refreshPosts()
   }
 
   getMorePosts = () => {
-    this.props.getMorePosts(this.props.actor, 'boardPosts')
+    const { loading } = this.props.boardPosts
+    if (!loading) {
+      this.props.getMorePosts()
+    }
   }
 
   toPostDetail = (post) => {
     this.props.setCurrentParentPost(post.postHash, 'boardPosts')
     this.props.navigation.navigate('PostDetail', { post })
+  }
+
+  onJoin = (boardId) => {
+    this.props.followBoards([boardId])
+  }
+
+  onUnjoin = (boardId) => {
+    this.props.unfollowBoards([boardId])
   }
 
   onRenderItem = ({ item }) => {
@@ -69,8 +79,11 @@ export default class BoardDetail extends Component {
         { cancelable: false }
       )
     }
-    const { boardPosts, board } = this.props
+    const { boardPosts, board, userFollowing } = this.props
     const { posts, loading } = boardPosts
+    const joined = userFollowing.following.find(item => {
+      return item.boardId === board.boardId
+    })
     return (
       <Container>
         <Header>
@@ -85,15 +98,21 @@ export default class BoardDetail extends Component {
           <Title>
             {board.boardName}
           </Title>
-          <TouchableOpacity
-            onPress={() => this.onRefresh()}
+          {joined ? <TouchableOpacity
+            onPress={() => this.onUnjoin(board.boardId)}
             style={{ marginRight: ventureum.basicPadding }}>
-            <Icon
-              active
-              name='refresh'
-              style={{ fontSize: 26, color: ventureum.secondaryColor }}
-            />
+            <Text style={styles.joinText}>
+              Joined
+            </Text>
           </TouchableOpacity>
+            : <TouchableOpacity
+              onPress={() => this.onJoin(board.boardId)}
+              style={{ marginRight: ventureum.basicPadding }}>
+              <Text style={styles.joinText}>
+                Join
+              </Text>
+            </TouchableOpacity>
+          }
         </Header>
         <View style={styles.fill}>
           {(posts.length === 0 && !loading)
@@ -112,7 +131,9 @@ export default class BoardDetail extends Component {
               ref={(ref) => { this.flatListRef = ref }}
               keyExtractor={item => item.id}
               onEndReachedThreshold={0.5}
-              onEndReached={() => { }}
+              onEndReached={() => {
+                this.getMorePosts()
+              }}
               refreshControl={
                 <RefreshControl
                   refreshing={loading}

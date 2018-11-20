@@ -4,7 +4,7 @@ import { shake128 } from 'js-sha3'
 import axios from 'axios'
 
 const DEFAULT_GAS_LIMIT = 500000
-const FETCHING_SIZE = 30
+const FETCHING_SIZE = 5
 
 export function listIsLoading (bool) {
   return {
@@ -151,38 +151,41 @@ export function refreshPosts (feedSlug, feedId, targetArray, ranking) {
 function _refreshPosts (requester, feedSlug, feedId, targetArray, ranking) {
   return {
     type: 'REFRESH_POSTS',
-    payload: forum.getPosts(
+    payload: forum.getPosts({
       requester,
       feedSlug,
       feedId,
-      FETCHING_SIZE,
+      limit: FETCHING_SIZE,
       ranking
-    ),
+    }),
     meta: {
       targetArray: targetArray
     }
   }
 }
 
-function _getMorePosts (requester, feedSlug, feedId, targetArray) {
+function _getMorePosts (requester, feedSlug, feedId, targetArray, next) {
   return {
     type: 'GET_MORE_POSTS',
-    payload: forum.getPosts(
+    payload: forum.getPosts({
       requester,
       feedSlug,
-      feedId
-    ),
+      feedId,
+      ...next
+    }),
     meta: {
       targetArray: targetArray
     }
   }
 }
 
-export function getMorePosts (feedSlug, feedId, targetArray, ranking) {
+export function getMorePosts (feedSlug, feedId, targetArray) {
   return (dispatch, getState) => {
-    const lastUUID = getState().forumReducer.lastUUID
     const requester = getState().profileReducer.profile.actor
-    dispatch(_getMorePosts(requester, feedSlug, feedId, lastUUID, targetArray, ranking))
+    const next = getState().forumReducer[targetArray].next
+    if (next.offset || next.id_lt) {
+      dispatch(_getMorePosts(requester, feedSlug, feedId, targetArray, next))
+    }
   }
 }
 
@@ -327,17 +330,45 @@ export function updateTargetPost (postHash, targetArray) {
     dispatch(_updateTargetPost(requester, postHash, targetArray))
   }
 }
-function _getReplies (requester, postHash) {
+
+function _getReplies (requester, feedSlug, feedId) {
   return {
     type: 'GET_REPLIES',
-    payload: forum.getAllReplies(requester, postHash)
+    payload: forum.getAllReplies({
+      requester,
+      feedSlug,
+      feedId,
+      limit: FETCHING_SIZE
+    })
   }
 }
 
 export function getReplies (postHash) {
   return (dispatch, getState) => {
     const requester = getState().profileReducer.profile.actor
-    dispatch(_getReplies(requester, postHash))
+    dispatch(_getReplies(requester, 'comment', postHash))
+  }
+}
+
+function _getMoreReplies (requester, feedSlug, feedId, next) {
+  return {
+    type: 'GET_MORE_REPLIES',
+    payload: forum.getAllReplies({
+      requester,
+      feedSlug,
+      feedId,
+      ...next
+    })
+  }
+}
+
+export function getMoreReplies (postHash) {
+  return (dispatch, getState) => {
+    const requester = getState().profileReducer.profile.actor
+    const next = getState().forumReducer.replies.next
+    if (next.offset || next.id_lt) {
+      dispatch(_getMoreReplies(requester, 'comment', postHash, next))
+    }
   }
 }
 
@@ -411,7 +442,7 @@ export function refreshViewingPost () {
   return (dispatch, getState) => {
     const requester = getState().profileReducer.profile.actor
     const post = getState().forumReducer.currentParentPost
-    dispatch(_getReplies(requester, post.postHash))
+    dispatch(_getReplies(requester, 'comment', post.postHash))
     dispatch(updateTargetPost(post.postHash, post.targetArray))
   }
 }
@@ -514,13 +545,9 @@ function _registerUser (actor, username, telegramId, getUserData) {
   }
 }
 
-export function registerUser (idRoot, username, telegramId) {
-  const shakeHash = shake128(String(idRoot), 128)
-  const hashBytes = Buffer.from(shakeHash, 'hex')
-  const uuidParse = require('uuid-parse')
-  const actor = uuidParse.unparse(hashBytes)
+export function registerUser (actor, username, telegramId, accessToken) {
   return (dispatch, getState) => {
-    dispatch(setActor(actor))
+    dispatch(setAccessToken(accessToken))
     dispatch(_registerUser(
       actor,
       username,
@@ -532,10 +559,10 @@ export function registerUser (idRoot, username, telegramId) {
   }
 }
 
-export function setActor (actor) {
+export function setAccessToken (token) {
   return {
-    type: 'SET_ACTOR',
-    payload: actor
+    type: 'SET_ACCESS_TOKEN',
+    payload: token
   }
 }
 
@@ -584,28 +611,34 @@ export function getRecentPosts () {
 export function followBoards (boardIds) {
   return (dispatch, getState) => {
     const actor = getState().profileReducer.profile.actor
-    dispatch(_followBoards(actor, boardIds))
+    const callback = () => dispatch(getUserFollowing(actor))
+    dispatch(_followBoards(actor, boardIds, callback))
   }
 }
 
-function _followBoards (actor, boardIds) {
+function _followBoards (actor, boardIds, callback) {
   return {
     type: 'FOLLOW_BOARDS',
-    payload: forum.followBoards(actor, boardIds)
+    payload: forum.followBoards(actor, boardIds).then(
+      setTimeout(callback, 500)
+    )
   }
 }
 
 export function unfollowBoards (boardIds) {
   return (dispatch, getState) => {
     const actor = getState().profileReducer.profile.actor
-    dispatch(_unfollowBoards(actor, boardIds))
+    const callback = () => dispatch(getUserFollowing(actor))
+    dispatch(_unfollowBoards(actor, boardIds, callback))
   }
 }
 
-function _unfollowBoards (actor, boardIds) {
+function _unfollowBoards (actor, boardIds, callback) {
   return {
     type: 'UNFOLLOW_BOARDS',
-    payload: forum.unfollowBoards(actor, boardIds)
+    payload: forum.unfollowBoards(actor, boardIds).then(
+      setTimeout(callback, 500)
+    )
   }
 }
 

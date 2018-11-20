@@ -23,7 +23,10 @@ export default class Discover extends Component {
   }
 
   getMorePosts = () => {
-    this.props.getMorePosts(this.props.actor, 'homePosts')
+    const { loading } = this.props.homePosts
+    if (!loading) {
+      this.props.getMorePosts()
+    }
   }
 
   onVoteAction = (postHash, action) => {
@@ -106,7 +109,9 @@ export default class Discover extends Component {
               ref={(ref) => { this.flatListRef = ref }}
               keyExtractor={item => item.id}
               onEndReachedThreshold={0.5}
-              onEndReached={() => { }}
+              onEndReached={() => {
+                this.getMorePosts()
+              }}
               refreshControl={
                 <RefreshControl
                   refreshing={loading}
