@@ -85,7 +85,7 @@ export default class WalletUtils {
   }
 
   static getWeb3HTTPProvider () {
-    switch (store.getState().network) {
+    switch (store.getState().networkReducer.ethereumNetwork) {
       case 'ropsten':
         return new Web3.providers.HttpProvider(
           `https://ropsten.infura.io/${Config.INFURA_API_KEY}`

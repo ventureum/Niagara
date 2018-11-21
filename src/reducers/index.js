@@ -4,7 +4,7 @@ import tcrReducer from './tcrReducer'
 import walletReducer from './walletReducer'
 import assetsReducer from './assetReducer'
 import transactionReducer from './transactionReducer'
-import network from './networkReducer'
+import networkReducer from './networkReducer'
 import profileReducer from './profileReducer'
 import chatPageReducer from '../container/ChatPageContainer/reducer'
 import forumReducer from './forumReducer'
@@ -14,7 +14,7 @@ export default combineReducers({
   walletReducer,
   assetsReducer,
   transactionReducer,
-  network,
+  networkReducer,
   profileReducer,
   chatPageReducer,
   forumReducer

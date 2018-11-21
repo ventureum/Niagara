@@ -3,6 +3,7 @@ import WalletUtils from '../utils/wallet'
 import axios from 'axios'
 import bs58 from 'bs58'
 import initials from 'initials'
+import { store } from '../boot/configureStore.js'
 
 const stream = require('getstream')
 const client = stream.connect(Config.STREAM_API_KEY, null, Config.STREAM_APP_ID)
@@ -25,6 +26,24 @@ boardMap.set(
   '0xc6c260628ca29dfacadb60c8bb41d15dadc0dbc133680f7322b1a1008739b64f',
   'All'
 )
+
+class axiosUtils {
+  static feedSysAPI
+
+  static getFeedSysAPI () {
+    if (!this.feedSysAPI) {
+      const accessToken = store.getState().networkReducer.accessToken
+      this.feedSysAPI = axios.create({
+        baseURL: Config.FEED_END_POINT,
+        headers: {
+          'Authorization': accessToken,
+          'Content-Type': 'application/json'
+        }
+      })
+    }
+    return this.feedSysAPI
+  }
+}
 
 /*
   fetch the content of a single post from IPFS
@@ -144,6 +163,8 @@ async function getFeedDataFromGetStream (request) {
     'getStreamApiKey': Config.STREAM_API_KEY,
     'getStreamApiSecret': Config.STREAM_API_SECRET
   }
+  // const feedSysAPI = axiosUtils.getFeedSysAPI()
+
   const response = await axios.post(
     Config.FEED_TOKEN_API,
     toFeedTokenApi
@@ -172,14 +193,10 @@ async function getOffChainPostDetails (requester, offChainPosts) {
       'getStreamApiKey': Config.STREAM_API_KEY,
       'getStreamApiSecret': Config.STREAM_API_SECRET
     }
-    return axios.post(
-      `${Config.FEED_END_POINT}/get-feed-post`,
-      {
-        'postHash': postHash,
-        'requestor': requester,
-        'getStreamApiKey': Config.STREAM_API_KEY,
-        'getStreamApiSecret': Config.STREAM_API_SECRET
-      }
+    const feedSysAPI = axiosUtils.getFeedSysAPI()
+    return feedSysAPI.post(
+      `/get-feed-post`,
+      request
     )
   }))
 
@@ -358,8 +375,9 @@ function newOffChainPost (content, boardId, parentHash, postType, poster, refres
       'getStreamApiKey': Config.STREAM_API_KEY,
       'getStreamApiSecret': Config.STREAM_API_SECRET
     }
-    const result = await axios.post(
-      `${Config.FEED_END_POINT}/feed-post`,
+    const feedSysAPI = axiosUtils.getFeedSysAPI()
+    const result = await feedSysAPI.post(
+      `/feed-post`,
       toDataBase
     )
     if (result.data.ok) {
@@ -471,8 +489,10 @@ function voteFeedPost (actor, postHash, value) {
       postHash,
       value
     }
-    const result = await axios.post(
-      `${Config.FEED_END_POINT}/feed-upvote`,
+
+    const feedSysAPI = axiosUtils.getFeedSysAPI()
+    const result = await feedSysAPI.post(
+      `/feed-upvote`,
       toDataBase
     )
 
@@ -486,8 +506,9 @@ function voteFeedPost (actor, postHash, value) {
 
 function fetchProfile (actor) {
   return new Promise(async (resolve, reject) => {
-    const result = await axios.post(
-      `${Config.FEED_END_POINT}/get-profile`,
+    const feedSysAPI = axiosUtils.getFeedSysAPI()
+    const result = await feedSysAPI.post(
+      `/get-profile`,
       { actor: actor }
     )
     if (result.data.ok) {
@@ -500,8 +521,9 @@ function fetchProfile (actor) {
 
 function refuel (userAddress, reputations, refreshProfile) {
   return new Promise(async (resolve, reject) => {
-    const result = await axios.post(
-      `${Config.FEED_END_POINT}/refuel-reputations`,
+    const feedSysAPI = axiosUtils.getFeedSysAPI()
+    const result = await feedSysAPI.post(
+      `/refuel-reputations`,
       {
         UserAddress: userAddress,
         reputations: reputations
@@ -524,8 +546,9 @@ function getVoteCostEstimate (requestor, postHash) {
       postHash,
       value: QUERY
     }
-    const result = await axios.post(
-      `${Config.FEED_END_POINT}/feed-upvote`,
+    const feedSysAPI = axiosUtils.getFeedSysAPI()
+    const result = await feedSysAPI.post(
+      `/feed-upvote`,
       toDataBase
     )
 
@@ -545,8 +568,9 @@ function registerUser (UUID, username, telegramId, getUserData) {
       userType: 'USER',
       telegramId: telegramId
     }
-    const result = await axios.post(
-      `${Config.FEED_END_POINT}/profile`,
+    const feedSysAPI = axiosUtils.getFeedSysAPI()
+    const result = await feedSysAPI.post(
+      `/profile`,
       request
     )
     if (result.data.ok) {
@@ -563,8 +587,9 @@ function getBatchPosts (postHashes) {
     const request = {
       postHashes: postHashes
     }
-    const result = await axios.post(
-      `${Config.FEED_END_POINT}/get-batch-posts`,
+    const feedSysAPI = axiosUtils.getFeedSysAPI()
+    const result = await feedSysAPI.post(
+      `/get-batch-posts`,
       request
     )
     if (result.data.ok) {
@@ -582,8 +607,9 @@ function getRecentPosts (actor) {
       actor: actor,
       typeHash: getPostTypeHash('POST')
     }
-    const recentPostsRequest = await axios.post(
-      `${Config.FEED_END_POINT}/get-recent-posts`,
+    const feedSysAPI = axiosUtils.getFeedSysAPI()
+    const recentPostsRequest = await feedSysAPI.post(
+      `/get-recent-posts`,
       request
     )
     if (recentPostsRequest.data.ok) {
@@ -622,8 +648,9 @@ function getRecentComments (actor) {
       actor: actor,
       typeHash: getPostTypeHash('COMMENT')
     }
-    const recentCommentsRequest = await axios.post(
-      `${Config.FEED_END_POINT}/get-recent-posts`,
+    const feedSysAPI = axiosUtils.getFeedSysAPI()
+    const recentCommentsRequest = await feedSysAPI.post(
+      `/get-recent-posts`,
       request
     )
     if (recentCommentsRequest.data.ok) {
@@ -661,8 +688,9 @@ function getRecentVotes (actor) {
     let request = {
       actor: actor
     }
-    const recentVotesRequest = await axios.post(
-      `${Config.FEED_END_POINT}/get-recent-votes`,
+    const feedSysAPI = axiosUtils.getFeedSysAPI()
+    const recentVotesRequest = await feedSysAPI.post(
+      `/get-recent-votes`,
       request
     )
     if (recentVotesRequest.data.ok) {
@@ -702,7 +730,7 @@ async function getAllReplies (request) {
     replies = {
       ...replies,
       posts: await Promise.all(replies.posts.map(async (post) => {
-        const subRelies = await getAllReplies({...request, feedId: post.postHash})
+        const subRelies = await getAllReplies({ ...request, feedId: post.postHash })
         return {
           ...post,
           replies: subRelies
@@ -714,8 +742,9 @@ async function getAllReplies (request) {
 }
 
 async function getTargetPost (requester, postHash) {
-  const result = await axios.post(
-    `${Config.FEED_END_POINT}/get-feed-post`,
+  const feedSysAPI = axiosUtils.getFeedSysAPI()
+  const result = await feedSysAPI.post(
+    `/get-feed-post`,
     {
       'postHash': postHash,
       'requestor': requester,
@@ -724,12 +753,8 @@ async function getTargetPost (requester, postHash) {
     }
   )
   if (result.data.ok) {
-    const { post, postVoteCountInfo, requestorVoteCountInfo } = result.data
-    return ({
-      ...post,
-      postVoteCountInfo,
-      requestorVoteCountInfo
-    })
+    const { post } = result.data
+    return post
   } else {
     throw (result.data.message)
   }
@@ -741,8 +766,9 @@ async function followBoards (actor, boardIds) {
     boardIds: boardIds
   }
 
-  const result = await axios.post(
-    `${Config.FEED_END_POINT}/subscribe-boards`,
+  const feedSysAPI = axiosUtils.getFeedSysAPI()
+  const result = await feedSysAPI.post(
+    `/subscribe-boards`,
     request
   )
 
@@ -759,8 +785,9 @@ async function unfollowBoards (actor, boardIds) {
     boardIds: boardIds
   }
 
-  const result = await axios.post(
-    `${Config.FEED_END_POINT}/unsubscribe-boards`,
+  const feedSysAPI = axiosUtils.getFeedSysAPI()
+  const result = await feedSysAPI.post(
+    `/unsubscribe-boards`,
     request
   )
 
@@ -778,6 +805,7 @@ async function getUserFollowing (actor) {
     'getStreamApiKey': Config.STREAM_API_KEY,
     'getStreamApiSecret': Config.STREAM_API_SECRET
   }
+  // const feedSysAPI = axiosUtils.getFeedSysAPI()
   const response = await axios.post(
     Config.FEED_TOKEN_API,
     toFeedTokenApi
@@ -801,6 +829,7 @@ async function getUserFollowing (actor) {
 
   return result
 }
+
 export {
   getPosts,
   checkBalanceForTx,

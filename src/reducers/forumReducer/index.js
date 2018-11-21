@@ -328,8 +328,9 @@ export default function (state = initialState, action) {
     const { voteInfo } = action.payload.data
     return {
       ...state,
-      loading: false,
       replies: {
+        ...state.replies,
+        loading: false,
         posts: state.replies.posts.map(
           (reply) => {
             return (reply.postHash === voteInfo.postHash ? {

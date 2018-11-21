@@ -5,8 +5,7 @@ const initialState = {
   userLoaded: false,
   recentComments: [],
   recentPosts: [],
-  recentVotes: [],
-  accessToken: null
+  recentVotes: []
 }
 
 export default function (state = initialState, action) {
@@ -48,13 +47,6 @@ export default function (state = initialState, action) {
     return {
       ...state,
       loading: true
-    }
-  }
-
-  if (action.type === 'SET_ACCESS_TOKEN') {
-    return {
-      ...state,
-      accessToken: action.payload
     }
   }
 

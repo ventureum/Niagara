@@ -2,7 +2,8 @@ import * as React from 'react'
 import {
   Image,
   SafeAreaView,
-  Linking
+  Linking,
+  Platform
 } from 'react-native'
 import { Button, Text, View } from 'native-base'
 import logo from './images/logo.png'
@@ -18,7 +19,9 @@ class Login extends React.Component {
             var nanoid = require('nanoid/non-secure')
             let urlKey = 'key'
             urlKey = nanoid(24)
-            const url = 'https://telegram.me/Milestone_Auth_bot?start=' + urlKey
+            const source = Platform.OS === 'ios' ? 'IOS' : 'ANDROID'
+            const payload = `${urlKey}_${source}`
+            const url = 'https://telegram.me/Milestone_Auth_bot?start=' + payload
             Linking.canOpenURL(url).then(supported => {
               if (supported) {
                 Linking.openURL(url)
