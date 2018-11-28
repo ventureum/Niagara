@@ -2,32 +2,16 @@ import React, { Component } from 'react'
 import { Container, Text } from 'native-base'
 import { View, Image, Platform, ProgressViewIOS, ProgressBarAndroid, Alert } from 'react-native'
 import Config from 'react-native-config'
-import WalletUtils from '../../../utils/wallet'
 import logo from '../Login/images/logo.png'
 import styles from './styles'
 import ventureum from '../../../theme/variables/ventureum'
 const jwt = require('jsonwebtoken')
 
 export default class UserLoadingScreen extends Component {
-  generateWallet () {
-    let privateKey = Config.ACCOUNT_PRIVATE_KEY
-    if (privateKey === '0x') {
-      var crypto = require('crypto')
-      privateKey = '0x' + crypto.randomBytes(32).toString('hex')
-    }
-    const Web3 = require('web3')
-    const web3 = new Web3(WalletUtils.getWeb3HTTPProvider())
-    const wallet = web3.eth.accounts.privateKeyToAccount(privateKey)
-    this.props.setWalletAddress(wallet.address)
-    this.props.setPrivateKey(wallet.privateKey)
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.userLoaded) {
+  componentDidUpdate (prevProps, prevState, snapshot) {
+    if (this.props.userLoaded && this.props.accessToken !== {}) {
       this.props.navigation.navigate('Main')
-      return false
     }
-    return true
   }
 
   receivedJWT = async () => {
@@ -52,10 +36,11 @@ export default class UserLoadingScreen extends Component {
     try {
       const verifiedToken = await jwt.verify(token, JWTRS256_PUBLIC, { algorithms: ['RS256'] })
       const { actor, username, telegramId } = verifiedToken.data
-      this.props.registerUser(actor, username, telegramId, token)
-      this.generateWallet()
+      this.props.setAccessToken({ jwt: token, exp: verifiedToken.exp })
+      this.props.loginUser(actor, username, telegramId)
     } catch (e) {
-      throw new Error('Access token verification failed.')
+      console.log(e)
+      throw new Error('Access token verification failed/expired.')
     }
   }
 

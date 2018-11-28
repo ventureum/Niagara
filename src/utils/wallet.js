@@ -37,7 +37,7 @@ export default class WalletUtils {
     if (tokenSymbol === 'ETH' && tokenAddress === null) {
       const value = _web3.utils.toWei(amount, 'ether')
       promise = _web3.eth.sendTransaction({
-        from: walletReducer.walletAddress,
+        from: walletReducer.address,
         to: receiverAddress,
         value: value,
         gas: gasLimit
@@ -49,7 +49,7 @@ export default class WalletUtils {
       let base = (new BN(10)).pow(new BN(decimals))
       let value = base.mul(new BN(amount))
       promise = tokenInstance.methods.transfer(receiverAddress, value).send({
-        from: walletReducer.walletAddress,
+        from: walletReducer.address,
         gas: gasLimit
       })
     }
@@ -123,11 +123,12 @@ export default class WalletUtils {
     if (!this.web3) {
       const wallet = this.getWallet()
       this.web3 = new Web3(this.getWeb3HTTPProvider())
+      this.web3.eth.accounts.wallet.clear()
       this.web3.eth.accounts.wallet.add({
         privateKey: wallet.privateKey,
-        address: wallet.walletAddress
+        address: wallet.address
       })
-      this.web3.eth.defaultAccount = wallet.walletAddress
+      this.web3.eth.defaultAccount = wallet.address
     }
     return this.web3
   }
@@ -153,7 +154,7 @@ export default class WalletUtils {
 
     const _web3 = this.getWeb3Instance()
     return new Promise((resolve, reject) => {
-      _web3.eth.getBalance(walletReducer.walletAddress, (error, weiBalance) => {
+      _web3.eth.getBalance(walletReducer.address, (error, weiBalance) => {
         if (error) {
           reject(error)
         }
@@ -175,7 +176,7 @@ export default class WalletUtils {
 
     return new Promise((resolve, reject) => {
       const instance = this.getERC20Instance(contractAddress)
-      instance.methods.balanceOf(walletReducer.walletAddress).call((error, decimalsBalance) => {
+      instance.methods.balanceOf(walletReducer.address).call((error, decimalsBalance) => {
         if (error) {
           reject(error)
         }
@@ -192,7 +193,7 @@ export default class WalletUtils {
   */
   static getERC20Instance (address) {
     const _web3 = this.getWeb3Instance()
-    const account = this.getWallet().walletAddress
+    const account = this.getWallet().address
     return new _web3.eth.Contract(ERC20_ABI, address, { from: account, gas: 500000 })
   }
 
@@ -204,7 +205,7 @@ export default class WalletUtils {
   static async getContractInstance (name) {
     const _web3 = this.getWeb3Instance()
     const networkId = await _web3.eth.net.getId()
-    const account = this.getWallet().walletAddress
+    const account = this.getWallet().address
 
     var artifact
     switch (name) {
@@ -235,7 +236,7 @@ export default class WalletUtils {
       }
       identiconData = new Identicon(address, 64).toString()
     } else {
-      address = this.getWallet().walletAddress
+      address = this.getWallet().address
       identiconData = new Identicon(address, 64).toString()
     }
     return ('data:image/png;base64,' + identiconData)
@@ -292,5 +293,32 @@ export default class WalletUtils {
       return rv
     }
     return null
+  }
+
+  static generateWallet () {
+    let privateKey = Config.ACCOUNT_PRIVATE_KEY
+
+    if (privateKey === '0x') {
+      var crypto = require('crypto')
+      privateKey = '0x' + crypto.randomBytes(32).toString('hex')
+    }
+
+    if (!this.web3) {
+      this.web3 = new Web3(this.getWeb3HTTPProvider())
+    }
+
+    let wallet = this.getWallet()
+    if (wallet.privateKey === '') {
+      wallet = this.web3.eth.accounts.privateKeyToAccount(privateKey)
+    }
+
+    this.web3.eth.accounts.wallet.clear()
+    this.web3.eth.accounts.wallet.add({
+      privateKey: wallet.privateKey,
+      address: wallet.address
+    })
+
+    this.web3.eth.defaultAccount = wallet.address
+    return ({ address: wallet.address, privateKey: wallet.privateKey })
   }
 }

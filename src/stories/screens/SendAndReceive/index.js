@@ -41,7 +41,7 @@ export default class SendAndReceive extends Component {
         let amount = eventLog.value === '0' ? '0'
           : this.format(Number(eventLog.value) / (10 ** 18))
         const date = moment(eventLog.timeStamp * 1000).fromNow()
-        if (eventLog.from.toUpperCase() === this.props.walletAddress.toUpperCase()) {
+        if (eventLog.from.toUpperCase() === this.props.address.toUpperCase()) {
           amount = '- ' + amount
         } else {
           amount = '+ ' + amount

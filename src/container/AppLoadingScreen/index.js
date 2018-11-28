@@ -12,10 +12,17 @@ class AppLoadingScreen extends React.Component {
   };
 
   componentDidMount () {
-    if (!this.props.userLoaded) {
+    const { userLoaded, accessToken } = this.props
+    if (!userLoaded || !this.isTokenValid(accessToken)) {
       return this.props.navigation.navigate('Login')
     }
     return this.props.navigation.navigate('Main')
+  }
+
+  isTokenValid = (token) => {
+    const { exp } = token
+    // check if token will expire in 3 hours
+    return (Date.now() / 1000) + (3600 * 3) < exp
   }
 
   render () {
@@ -24,7 +31,8 @@ class AppLoadingScreen extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  userLoaded: state.profileReducer.userLoaded
+  userLoaded: state.profileReducer.userLoaded,
+  accessToken: state.networkReducer.accessToken
 })
 
 export default connect(mapStateToProps)(AppLoadingScreen)

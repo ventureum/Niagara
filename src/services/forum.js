@@ -32,7 +32,7 @@ class axiosUtils {
 
   static getFeedSysAPI () {
     if (!this.feedSysAPI) {
-      const accessToken = store.getState().networkReducer.accessToken
+      const accessToken = store.getState().networkReducer.accessToken.jwt
       this.feedSysAPI = axios.create({
         baseURL: Config.FEED_END_POINT,
         headers: {

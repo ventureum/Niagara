@@ -14,7 +14,7 @@ class ProfileContainer extends Component {
   }
 
   componentWillMount () {
-    this.props.fetchProfile()
+    // this.props.fetchProfile()
   }
 
   render () {

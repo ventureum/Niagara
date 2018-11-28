@@ -1,6 +1,6 @@
 const initialState = {
   ethereumNetwork: 'rinkeby',
-  accessToken: '',
+  accessToken: {},
   getStreamToken: ''
 }
 
@@ -9,6 +9,13 @@ export default function (state = initialState, action) {
     return {
       ...state,
       accessToken: action.payload
+    }
+  }
+
+  if (action.type === 'CLEAR_LOGIN_INFO') {
+    return {
+      ...state,
+      accessToken: {}
     }
   }
   return state

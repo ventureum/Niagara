@@ -402,7 +402,7 @@ function _processExecutePutOption (postHash, numToken, milestoneTokenAddress, nu
 
 export function processPutOption (postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action, refreshCallback) {
   return (dispatch, getState) => {
-    const purchaserAddress = getState().walletReducer.walletAddress
+    const purchaserAddress = getState().walletReducer.address
     if (action === 'Purchase') {
       dispatch(_processPurchasePutOption(
         postHash,
@@ -545,9 +545,8 @@ function _registerUser (actor, username, telegramId, getUserData) {
   }
 }
 
-export function registerUser (actor, username, telegramId, accessToken) {
-  return (dispatch, getState) => {
-    dispatch(setAccessToken(accessToken))
+export function registerUser (actor, username, telegramId) {
+  return (dispatch) => {
     dispatch(_registerUser(
       actor,
       username,
@@ -556,6 +555,39 @@ export function registerUser (actor, username, telegramId, accessToken) {
         dispatch(_fetchProfile(actor))
       }
     ))
+  }
+}
+
+export function loginUser (actor, username, telegramId) {
+  return async (dispatch) => {
+    const wallet = WalletUtils.generateWallet()
+    dispatch({
+      type: 'SET_WALLET_ADDRESS',
+      address: wallet.address
+    })
+    dispatch({
+      type: 'SET_PRIVATE_KEY',
+      privKey: wallet.privateKey
+    })
+    try {
+      const rv = await forum.fetchProfile(actor)
+      // user registered before
+      dispatch({
+        type: 'FETCH_PROFILE_FULFILLED',
+        payload: rv
+      }
+      )
+    } catch (e) {
+      // new user
+      dispatch(_registerUser(
+        actor,
+        username,
+        String(telegramId),
+        () => {
+          dispatch(_fetchProfile(actor))
+        }
+      ))
+    }
   }
 }
 
@@ -659,5 +691,11 @@ function _getUserFollowing (actor) {
 export function clearBoardDetail () {
   return {
     type: 'CLEAR_BOARD_DETAIL'
+  }
+}
+
+export function clearLoginInfo () {
+  return {
+    type: 'CLEAR_LOGIN_INFO'
   }
 }

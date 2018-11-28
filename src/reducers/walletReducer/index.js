@@ -1,6 +1,6 @@
 const initialState = {
   pinCode: '',
-  walletAddress: '',
+  address: '',
   privateKey: ''
 }
 
@@ -14,7 +14,7 @@ export default function (state = initialState, action) {
   if (action.type === 'SET_WALLET_ADDRESS') {
     return {
       ...state,
-      walletAddress: action.address
+      address: action.address
     }
   }
   if (action.type === 'SET_PRIVATE_KEY') {

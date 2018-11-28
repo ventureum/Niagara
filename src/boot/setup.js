@@ -1,8 +1,16 @@
 import '../../global'
 import * as React from 'react'
-import { StyleProvider, Text } from 'native-base'
+import { StyleProvider, Text, Root } from 'native-base'
 import { Provider } from 'react-redux'
-import { View, SafeAreaView, Image, Platform, ProgressViewIOS, ProgressBarAndroid } from 'react-native'
+import {
+  View,
+  SafeAreaView,
+  Image,
+  Platform,
+  ProgressViewIOS,
+  ProgressBarAndroid,
+  AppState
+} from 'react-native'
 import { persistor, configureStore, store } from './configureStore'
 import App from '../App'
 import getTheme from '../theme/components'
@@ -21,7 +29,9 @@ export interface State {
 export default class Setup extends React.Component<Props, State> {
   constructor () {
     super()
-    configureStore(() => this.setState({ isLoading: false }))
+    configureStore(() => {
+      this.setState({ isLoading: false })
+    })
 
     WalletUtils.loadTokens()
   }
@@ -49,7 +59,7 @@ export default class Setup extends React.Component<Props, State> {
               alignSelf: 'center',
               marginTop: ventureum.basicPadding * 2
             }}>
-            Loading...
+              Loading...
             </Text>
           </View>
         </SafeAreaView>
@@ -62,7 +72,9 @@ export default class Setup extends React.Component<Props, State> {
       <StyleProvider style={getTheme(variables)}>
         <Provider store={store}>
           <PersistGate loading={this.renderLoading()} persistor={persistor}>
-            <App />
+            <Root>
+              <App />
+            </Root>
           </PersistGate>
         </Provider>
       </StyleProvider >

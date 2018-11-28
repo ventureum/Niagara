@@ -79,5 +79,10 @@ export default function reducer (state = initialState, action) {
       loading: false
     }
   }
+
+  if (action.type === 'CLEAR_LOGIN_INFO') {
+    return initialState
+  }
+
   return state
 }
