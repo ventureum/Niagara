@@ -1,6 +1,5 @@
 import * as forum from '../services/forum'
 import WalletUtils from '../utils/wallet'
-import { shake128 } from 'js-sha3'
 import axios from 'axios'
 
 const DEFAULT_GAS_LIMIT = 500000

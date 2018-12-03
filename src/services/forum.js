@@ -830,6 +830,59 @@ async function getUserFollowing (actor) {
   return result
 }
 
+export async function setNextRedeem (actor, milestonePoints) {
+  const request = {
+    actor,
+    milestonePoints
+  }
+
+  const feedSysAPI = axiosUtils.getFeedSysAPI()
+  const response = await feedSysAPI.post(
+    '/set-next-redeem',
+    request
+  )
+  if (!response.data.ok) {
+    throw new Error('set next redeem failed')
+  }
+}
+
+export async function getNextRedeem (actor) {
+  const request = {
+    actor
+  }
+
+  const feedSysAPI = axiosUtils.getFeedSysAPI()
+  const response = await feedSysAPI.post(
+    '/get-next-redeem',
+    request
+  )
+  if (response.data.ok) {
+    return response.data.nextRedeem
+  } else {
+    throw (response.data.message)
+  }
+}
+
+export async function getRedeemHistory (actor, limit = 50, cursor = '') {
+  const request = {
+    actor,
+    limit,
+    cursor
+  }
+
+  const feedSysAPI = axiosUtils.getFeedSysAPI()
+  const response = await feedSysAPI.post(
+    '/get-redeem-history',
+    request
+  )
+
+  if (response.data.ok) {
+    return response.data.responseData
+  } else {
+    throw (response.data.message)
+  }
+}
+
 export {
   getPosts,
   checkBalanceForTx,

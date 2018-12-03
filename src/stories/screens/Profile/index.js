@@ -65,8 +65,8 @@ export default class Profile extends Component {
             >
               <Left>
                 <View style={styles.activityItem}>
-                  <Text style={{ alignSelf: 'flex-start' }}>Transfer</Text>
-                  <Text note>Next transfer scheduled on Sep 4</Text>
+                  <Text style={{ alignSelf: 'flex-start' }}>Redeem</Text>
+                  <Text note>Next redeem scheduled on Sep 4</Text>
                 </View>
               </Left>
               <Right>
