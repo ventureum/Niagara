@@ -1,21 +1,33 @@
 import React, { Component } from 'react'
 import { Text, Header, ListItem, Left, Icon, Right, Thumbnail, List } from 'native-base'
-import { View, ScrollView } from 'react-native'
+import { View, ScrollView, RefreshControl, Dimensions } from 'react-native'
 import styles from './styles'
 import ventureum from '../../../theme/variables/ventureum'
+const moment = require('moment')
+const WIDTH = Dimensions.get('window').height
 
 export default class Profile extends Component {
   onRefresh = () => {
-    this.props.fetchProfile()
+    this.props.getData()
   }
 
   render () {
     const { username, photoUrl, level } = this.props.profile
+    const { transfer, actionsPending } = this.props
     return (
-      <ScrollView style={{
-        backgroundColor: ventureum.primaryColor,
-        flex: 1
-      }}>
+      <ScrollView
+        style={{
+          backgroundColor: ventureum.primaryColor,
+          flex: 1
+        }}
+        refreshControl={
+          <RefreshControl
+            refreshing={actionsPending.fetchProfile || actionsPending.getNextRedeem}
+            onRefresh={this.onRefresh}
+            progressViewOffset={WIDTH / 4}
+          />
+        }
+      >
         <Header span style={{
           height: 240,
           borderBottomWidth: null,
@@ -66,7 +78,7 @@ export default class Profile extends Component {
               <Left>
                 <View style={styles.activityItem}>
                   <Text style={{ alignSelf: 'flex-start' }}>Redeem</Text>
-                  <Text note>Next redeem scheduled on Sep 4</Text>
+                  {transfer && transfer.nextRedeem && transfer.nextRedeem.redeemBlockInfo && <Text note>Next redeem scheduled on {moment(transfer.nextRedeem.redeemBlockInfo.executedAt).format('ll')}</Text>}
                 </View>
               </Left>
               <Right>

@@ -5,14 +5,22 @@ const initialState = {
   userLoaded: false,
   recentComments: [],
   recentPosts: [],
-  recentVotes: []
+  recentVotes: [],
+  transfer: {
+    autoRedeem: false,
+    nextRedeem: {},
+    history: {
+      'redeems': [],
+      'nextCursor': ''
+    }
+  }
 }
 
 export default function (state = initialState, action) {
   if (action.type === 'FETCH_PROFILE_FULFILLED') {
     return {
       ...state,
-      profile: action.payload.profile,
+      profile: action.payload,
       loadingUser: false,
       userLoaded: true
     }
@@ -112,8 +120,40 @@ export default function (state = initialState, action) {
       loadingRecentComments: false
     }
   }
+
   if (action.type === 'CLEAR_LOGIN_INFO') {
     return initialState
+  }
+
+  if (action.type === 'GET_REDEEM_HISTORY_FULFILLED') {
+    return {
+      ...state,
+      transfer: {
+        ...state.transfer,
+        'redeems': action.payload.redeems === null ? [] : action.payload.redeems,
+        'nextCursor': action.payload.nextCursor === undefined ? '' : action.payload.nextCursor
+      }
+    }
+  }
+
+  if (action.type === 'SET_NEXT_REDEEM_FULFILLED') {
+    return {
+      ...state,
+      transfer: {
+        ...state.transfer
+      }
+    }
+  }
+
+  if (action.type === 'GET_NEXT_REDEEM_FULFILLED') {
+    return {
+      ...state,
+      transfer: {
+        ...state.transfer,
+        nextRedeem: action.payload,
+        autoRedeem: action.payload.targetedMilestonePoints === Number.MAX_SAFE_INTEGER
+      }
+    }
   }
   return state
 }

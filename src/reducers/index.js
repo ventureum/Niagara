@@ -8,6 +8,8 @@ import networkReducer from './networkReducer'
 import profileReducer from './profileReducer'
 import chatPageReducer from '../container/ChatPageContainer/reducer'
 import forumReducer from './forumReducer'
+import loadingReducer from './loadingReducer'
+import errorReducer from './errorReducer'
 
 export default combineReducers({
   tcrReducer,
@@ -17,5 +19,7 @@ export default combineReducers({
   networkReducer,
   profileReducer,
   chatPageReducer,
-  forumReducer
+  forumReducer,
+  loadingReducer,
+  errorReducer
 })

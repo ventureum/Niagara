@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { Header, Left, Right, Button, Icon, Body, Title } from 'native-base'
-import { View, Text, Switch, Modal, TextInput, TouchableOpacity, FlatList } from 'react-native'
+import { View, Text, Switch, Modal, TextInput, TouchableOpacity, FlatList, RefreshControl } from 'react-native'
 import ventureum from '../../../theme/variables/ventureum'
 import styles from './styles'
+const moment = require('moment')
 
 export default class Transfer extends Component {
   state = ({
@@ -10,6 +11,10 @@ export default class Transfer extends Component {
     showModifyDialog: false,
     transferAmount: 0
   })
+
+  onRefresh = () => {
+    this.props.getData()
+  }
 
   renderHeader = () => {
     return (
@@ -28,6 +33,7 @@ export default class Transfer extends Component {
   }
 
   renderRedeemSetting = () => {
+    const { transfer } = this.props
     return (
       <View style={styles.settingContainer}>
         <Text style={styles.settingTitle} >
@@ -40,7 +46,12 @@ export default class Transfer extends Component {
           <Text style={styles.redeemSettingText}>
             Redeem all MSP by default
           </Text>
-          <Switch value={false} />
+          <Switch
+            value={transfer.autoRedeem}
+            onValueChange={(newValue) => {
+              newValue ? this.props.setNextRedeem(Number.MAX_SAFE_INTEGER, this.onRefresh) : this.props.setNextRedeem(0, this.onRefresh)
+            }}
+          />
         </View>
       </View>
     )
@@ -100,6 +111,7 @@ export default class Transfer extends Component {
               <Button
                 transparent
                 onPress={() => {
+                  this.props.setNextRedeem(parseInt(this.state.transferAmount), this.onRefresh)
                   this.setState({ showModifyDialog: false })
                 }}
                 style={{ marginLeft: ventureum.basicPadding }}
@@ -125,26 +137,27 @@ export default class Transfer extends Component {
     return (
       <View style={styles.transferContainer}>
         <View >
-          <Text style={styles.timeText}>2018-10-31</Text>
-          <Text style={styles.mspText}>{this.state.transferAmount} MSP</Text>
+          <Text style={styles.timeText}>{moment(time).format('LL')}</Text>
+          <Text style={styles.mspText}>{MSP} MSP</Text>
         </View>
         <Icon style={{ color: '#777777' }} name='arrow-right' type='Feather' />
-        <Text style={styles.vtxText}>12.24VTX</Text>
+        <Text style={styles.vtxText}>{VTX} VTX</Text>
       </View>
     )
   }
 
   renderUpcomingRedeem = () => {
+    const { nextRedeem } = this.props.transfer
     return (
-      <View style={styles.upcomingContainer}>
-        {this.renderTransfer()}
+      nextRedeem && <View style={styles.upcomingContainer}>
+        {this.renderTransfer(nextRedeem.redeemBlockInfo.executedAt, Math.min(nextRedeem.targetedMilestonePoints, nextRedeem.actualMilestonePoints), nextRedeem.estimatedTokens)}
         {this.state.showBlockDetails ? <View>
           <View>
             <Text style={styles.blockInfoTitle}>
               Enrolled Milestone Points
             </Text>
             <Text style={styles.blockInfoText}>
-              482,852
+              {nextRedeem.redeemBlockInfo.totalEnrolledMilestonePoints} MSP
             </Text>
           </View>
           <View>
@@ -152,7 +165,7 @@ export default class Transfer extends Component {
               Estimated Rate
             </Text>
             <Text style={styles.blockInfoText}>
-              100 MSP = 0.1749 VTX
+              100 MSP = {100 * (nextRedeem.redeemBlockInfo.tokenPool / nextRedeem.redeemBlockInfo.totalEnrolledMilestonePoints)} VTX
             </Text>
           </View>
           <View>
@@ -160,7 +173,7 @@ export default class Transfer extends Component {
               VTX Pool
             </Text>
             <Text style={styles.blockInfoText}>
-              1,024
+              {nextRedeem.redeemBlockInfo.tokenPool} VTX
             </Text>
           </View>
         </View>
@@ -211,6 +224,7 @@ export default class Transfer extends Component {
   }
 
   render () {
+    const { actionsPending } = this.props
     let data = []
     data.push({ name: 'Redeem_Settings', id: '0' })
     data.push({ name: 'UpcomingSpacer', id: '1' })
@@ -228,6 +242,12 @@ export default class Transfer extends Component {
           }}
           ListHeaderComponent={this.renderHeader}
           contentContainerStyle={styles.container}
+          refreshControl={
+            <RefreshControl
+              refreshing={actionsPending.redeemLoading}
+              onRefresh={this.onRefresh}
+            />
+          }
         />
         {this.renderModifyModal()}
       </View>

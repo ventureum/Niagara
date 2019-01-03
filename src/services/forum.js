@@ -4,6 +4,11 @@ import axios from 'axios'
 import bs58 from 'bs58'
 import initials from 'initials'
 import { store } from '../boot/configureStore.js'
+import delay from 'delay'
+import contract from '../utils/contract'
+import { CryptoUtils, LocalAddress } from 'loom-js'
+
+const shake128 = require('js-sha3').shake128
 
 const stream = require('getstream')
 const client = stream.connect(Config.STREAM_API_KEY, null, Config.STREAM_APP_ID)
@@ -16,6 +21,12 @@ typeMap.set('0x6bf78b95', 'COMMENT')
 typeMap.set('0x2fca5a5e', 'POST')
 typeMap.set('0x04bc4e7a', 'AIRDROP')
 typeMap.set('0xf7003d25', 'MILESTONE')
+
+const userTypeMap = {
+  'USER': '0x2db9fd3d',
+  'KOL': '0xf4af7c06',
+  'PF': '0x5707a2a6'
+}
 
 const boardMap = new Map()
 boardMap.set(
@@ -43,6 +54,13 @@ class axiosUtils {
     }
     return this.feedSysAPI
   }
+}
+
+function generatePrivateKey () {
+  let privateKey = CryptoUtils.generatePrivateKey()
+  let publicKey = CryptoUtils.publicKeyFromPrivateKey(privateKey)
+  let address = LocalAddress.fromPublicKey(publicKey).toString()
+  return { privateKey, publicKey, address }
 }
 
 /*
@@ -504,19 +522,21 @@ function voteFeedPost (actor, postHash, value) {
   })
 }
 
-function fetchProfile (actor) {
-  return new Promise(async (resolve, reject) => {
-    const feedSysAPI = axiosUtils.getFeedSysAPI()
-    const result = await feedSysAPI.post(
-      `/get-profile`,
-      { actor: actor }
-    )
-    if (result.data.ok) {
-      resolve(result.data)
-    } else {
-      reject(result.data.message)
-    }
-  })
+async function fetchProfile (actor, username, telegramId) {
+  const feedSysAPI = axiosUtils.getFeedSysAPI()
+  const result = await feedSysAPI.post(
+    `/get-profile`,
+    { actor: actor }
+  )
+  if (result.data.ok) {
+    return (result.data.profile)
+  } else if (result.data.message && result.data.message.errorCode === 'NoPrincipalIdExisting') {
+    // new user, register
+    const profile = await registerUser(actor, username, telegramId)
+    return profile
+  } else {
+    throw result.data.message
+  }
 }
 
 function refuel (userAddress, reputations, refreshProfile) {
@@ -560,26 +580,64 @@ function getVoteCostEstimate (requestor, postHash) {
   })
 }
 
-function registerUser (UUID, username, telegramId, getUserData) {
-  return new Promise(async (resolve, reject) => {
-    const request = {
-      actor: UUID,
+async function registerUser (UUID, username, telegramId) {
+  try {
+    // generate a new private key
+    let { privateKey, address } = generatePrivateKey()
+    const web3 = WalletUtils.getWeb3Instance()
+    privateKey = web3.utils.bytesToHex(privateKey)
+    let userType = userTypeMap['USER']
+    let reputation = 0
+    let meta = {
       username: username,
-      userType: 'USER',
-      telegramId: telegramId
+      telegramId: telegramId.toString()
     }
+    const rawUuid = '0x' + shake128(String(telegramId), 128)
+    console.log('private key:', privateKey)
+    await contract.start(privateKey)
+    await contract.registerUser(rawUuid, address, userType, reputation, JSON.stringify(meta))
+    await contract.disconnect()
+
+    // successfully registered onchain
+    // wait for database update, sleep for 2 seconds
+    await delay(2000)
+
+    // now, fetch user profile
+    // let profile = await fetchProfile(UUID, username, telegramId)
     const feedSysAPI = axiosUtils.getFeedSysAPI()
     const result = await feedSysAPI.post(
-      `/profile`,
-      request
+      `/get-profile`,
+      { actor: UUID }
     )
-    if (result.data.ok) {
-      getUserData()
-      resolve(result.data.ok)
-    } else {
-      reject(result)
+    if (!result.data.ok) {
+      throw result.data.message
     }
-  })
+    let { profile } = result.data
+
+    // successfully retrieved profile, now register privateKey
+    await setActorPrivateKey(UUID, privateKey)
+
+    // set profile's privateKey manually
+    profile.privateKey = privateKey
+    return profile
+  } catch (err) {
+    throw err
+  }
+}
+
+async function setActorPrivateKey (actor, privateKey) {
+  const request = {
+    actor: actor,
+    privateKey: privateKey
+  }
+  const feedSysAPI = axiosUtils.getFeedSysAPI()
+  const result = await feedSysAPI.post(
+    '/set-actor-private-key',
+    request
+  )
+  if (!result.data.ok) {
+    throw result.data.message
+  }
 }
 
 function getBatchPosts (postHashes) {
@@ -830,12 +888,12 @@ async function getUserFollowing (actor) {
   return result
 }
 
-export async function setNextRedeem (actor, milestonePoints) {
+async function setNextRedeem (actor, milestonePoints, callback) {
   const request = {
     actor,
     milestonePoints
   }
-
+  console.log(request)
   const feedSysAPI = axiosUtils.getFeedSysAPI()
   const response = await feedSysAPI.post(
     '/set-next-redeem',
@@ -844,9 +902,11 @@ export async function setNextRedeem (actor, milestonePoints) {
   if (!response.data.ok) {
     throw new Error('set next redeem failed')
   }
+  console.log(callback)
+  callback()
 }
 
-export async function getNextRedeem (actor) {
+async function getNextRedeem (actor) {
   const request = {
     actor
   }
@@ -863,7 +923,7 @@ export async function getNextRedeem (actor) {
   }
 }
 
-export async function getRedeemHistory (actor, limit = 50, cursor = '') {
+async function getRedeemHistory (actor, limit = 50, cursor = '') {
   const request = {
     actor,
     limit,
@@ -905,5 +965,8 @@ export {
   getTargetPost,
   followBoards,
   unfollowBoards,
-  getUserFollowing
+  getUserFollowing,
+  setNextRedeem,
+  getNextRedeem,
+  getRedeemHistory
 }
