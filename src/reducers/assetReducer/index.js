@@ -110,5 +110,9 @@ export default function (state = initialState, action) {
     }
   }
 
+  if (action.type === 'CLEAR_LOGIN_INFO') {
+    return initialState
+  }
+
   return state
 }

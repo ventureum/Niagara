@@ -1,6 +1,5 @@
 import * as forum from '../services/forum'
 import WalletUtils from '../utils/wallet'
-import { shake128 } from 'js-sha3'
 import axios from 'axios'
 
 const DEFAULT_GAS_LIMIT = 500000
@@ -402,7 +401,7 @@ function _processExecutePutOption (postHash, numToken, milestoneTokenAddress, nu
 
 export function processPutOption (postHash, numToken, milestoneTokenAddress, numVtxFeeToken, action, refreshCallback) {
   return (dispatch, getState) => {
-    const purchaserAddress = getState().walletReducer.walletAddress
+    const purchaserAddress = getState().walletReducer.address
     if (action === 'Purchase') {
       dispatch(_processPurchasePutOption(
         postHash,
@@ -511,10 +510,10 @@ export function updateTransactionStatus () {
   }
 }
 
-function _fetchProfile (actor) {
+function _fetchProfile (actor, username, telegramId) {
   return {
     type: 'FETCH_PROFILE',
-    payload: forum.fetchProfile(actor)
+    payload: forum.fetchProfile(actor, username, telegramId)
   }
 }
 export function fetchProfile () {
@@ -538,24 +537,19 @@ export function refuel (reputations, refreshProfile) {
   }
 }
 
-function _registerUser (actor, username, telegramId, getUserData) {
-  return {
-    type: 'REGISTER_USER',
-    payload: forum.registerUser(actor, username, telegramId, getUserData)
-  }
-}
-
-export function registerUser (actor, username, telegramId, accessToken) {
-  return (dispatch, getState) => {
-    dispatch(setAccessToken(accessToken))
-    dispatch(_registerUser(
-      actor,
-      username,
-      String(telegramId),
-      () => {
-        dispatch(_fetchProfile(actor))
-      }
-    ))
+export function loginUser (actor, username, telegramId) {
+  return async (dispatch) => {
+    const wallet = WalletUtils.generateWallet()
+    // set Ethereum wallet info
+    dispatch({
+      type: 'SET_WALLET_ADDRESS',
+      address: wallet.address
+    })
+    dispatch({
+      type: 'SET_PRIVATE_KEY',
+      privKey: wallet.privateKey
+    })
+    dispatch(_fetchProfile(actor, username, telegramId))
   }
 }
 
@@ -659,5 +653,53 @@ function _getUserFollowing (actor) {
 export function clearBoardDetail () {
   return {
     type: 'CLEAR_BOARD_DETAIL'
+  }
+}
+
+export function clearLoginInfo () {
+  return {
+    type: 'CLEAR_LOGIN_INFO'
+  }
+}
+
+function _getNextRedeem (actor) {
+  return {
+    type: 'GET_NEXT_REDEEM',
+    payload: forum.getNextRedeem(actor)
+  }
+}
+
+export function getNextRedeem () {
+  return (dispatch, getState) => {
+    const actor = getState().profileReducer.profile.actor
+    dispatch(_getNextRedeem(actor))
+  }
+}
+
+function _getRedeemHistory (actor) {
+  return {
+    type: 'GET_REDEEM_HISTORY',
+    payload: forum.getRedeemHistory(actor)
+  }
+}
+
+export function getRedeemHistory () {
+  return (dispatch, getState) => {
+    const actor = getState().profileReducer.profile.actor
+    dispatch(_getRedeemHistory(actor))
+  }
+}
+
+function _setNextRedeem (actor, milstonePoints, callback) {
+  return {
+    type: 'SET_NEXT_REDEEM',
+    payload: forum.setNextRedeem(actor, milstonePoints, callback)
+  }
+}
+
+export function setNextRedeem (milstonePoints, callback) {
+  return (dispatch, getState) => {
+    const actor = getState().profileReducer.profile.actor
+    dispatch(_setNextRedeem(actor, milstonePoints, callback))
   }
 }

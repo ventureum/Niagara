@@ -52,7 +52,7 @@ class Assets extends React.Component {
   }
 
   render () {
-    let { tokens, totalVal, walletAddress } = this.props
+    let { tokens, totalVal, address } = this.props
     const listItems = tokens.map((token, i) => {
       return (
         <ListItem key={i} onPress={() => this.tokenListOnPress(i)}>
@@ -72,8 +72,8 @@ class Assets extends React.Component {
       </List>
     )
 
-    let walletAddressAbbre = walletAddress.slice(0, 8) + '...' + walletAddress.slice(-6)
-    let identiconData = new Identicon(walletAddress, 64).toString()
+    let walletAddressAbbre = address.slice(0, 8) + '...' + address.slice(-6)
+    let identiconData = new Identicon(address, 64).toString()
     let identiconBase64 = 'data:image/png;base64,' + identiconData
     return (
       <Container>

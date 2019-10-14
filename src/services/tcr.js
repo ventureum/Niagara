@@ -11,7 +11,7 @@ class TCRService {
   }
 
   async init () {
-    this.account = WalletUtils.getWallet().walletAddress
+    this.account = WalletUtils.getWallet().address
     this.tcr = await WalletUtils.getContractInstance('Registry')
     this.token = await WalletUtils.getContractInstance('Token')
     this.address = this.tcr._address

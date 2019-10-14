@@ -5,7 +5,7 @@ import Login from '../../stories/screens/Login'
 export interface Props {
   navigation: any;
   pinCode: string;
-  walletAddress: string;
+  address: string;
 }
 export interface State {}
 class LoginContainer extends React.Component<Props, State> {
@@ -15,6 +15,6 @@ class LoginContainer extends React.Component<Props, State> {
 }
 
 const mapStateToProps = state => ({
-  walletAddress: state.walletReducer.walletAddress
+  address: state.walletReducer.address
 })
 export default connect(mapStateToProps)(LoginContainer)

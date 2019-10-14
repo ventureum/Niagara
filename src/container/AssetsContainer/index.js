@@ -14,7 +14,7 @@ class AssetsContainer extends React.Component {
       loading={this.props.loading}
       tokens={this.props.tokens}
       totalVal={0}
-      walletAddress={this.props.walletAddress}
+      address={this.props.address}
       refreshTokens={this.props.refreshTokens}
     />
   }
@@ -23,7 +23,7 @@ class AssetsContainer extends React.Component {
 const mapStateToProps = state => ({
   tokens: state.assetsReducer.tokens,
   loading: state.assetsReducer.loading,
-  walletAddress: state.walletReducer.walletAddress
+  address: state.walletReducer.address
 })
 
 const mapDispatchToProps = (dispatch) => ({

@@ -4,7 +4,6 @@ import {
   createBottomTabNavigator,
   createSwitchNavigator
 } from 'react-navigation'
-import { Root } from 'native-base'
 import LoginPage from './container/LoginContainer'
 import SendPage from './container/SendPageContainer'
 import ReceivePage from './container/ReceivePageContainer'
@@ -94,10 +93,5 @@ const App = createSwitchNavigator(
     headerMode: 'none'
   }
 )
-const RootPage = () => (
-  <Root>
-    <App uriPrefix={'http://open.milestone/'} />
-  </Root>
-)
 
-export default RootPage
+export default () => (<App uriPrefix={'http://open.milestone/'} />)

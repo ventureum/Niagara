@@ -42,7 +42,7 @@ class SendAndReceiveContainer extends React.Component {
       loading={this.props.loading}
       token={this.props.tokens[tokenIdx]}
       tokenIdx={tokenIdx}
-      walletAddress={this.state.web3.eth.defaultAccount}
+      address={this.state.web3.eth.defaultAccount}
       getLogs={this.getLogs}
     />
   }
